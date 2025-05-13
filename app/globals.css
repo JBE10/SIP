@@ -86,9 +86,3 @@
   scrollbar-width: none; /* Firefox */
 }
 
-@layer components {
-  .scrollbar-hide {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-}
