@@ -40,7 +40,7 @@ export default function ProfileEditModal({ profile, onClose }: ProfileEditModalP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically save the data to your backend
-    console.log("Updated profile:", formData)
+    console.log("Perfil actualizado:", formData)
     onClose()
   }
 
@@ -48,7 +48,7 @@ export default function ProfileEditModal({ profile, onClose }: ProfileEditModalP
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Editar perfil</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -56,7 +56,7 @@ export default function ProfileEditModal({ profile, onClose }: ProfileEditModalP
           <div className="flex justify-center mb-2">
             <div className="relative">
               <Avatar className="h-24 w-24 border-2 border-emerald-100">
-                <AvatarImage src={profile.images[0]} alt={profile.name} />
+                <AvatarImage src={profile.images[0] || "/placeholder.svg"} alt={profile.name} />
                 <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <Button
@@ -71,87 +71,87 @@ export default function ProfileEditModal({ profile, onClose }: ProfileEditModalP
           {/* Basic info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nombre</Label>
               <Input id="name" name="name" value={formData.name} onChange={handleChange} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
+              <Label htmlFor="age">Edad</Label>
               <Input id="age" name="age" type="number" value={formData.age} onChange={handleChange} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="gender">Gender</Label>
+            <Label htmlFor="gender">Género</Label>
             <Select value={formData.gender} onValueChange={(value) => handleSelectChange("gender", value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select gender" />
+                <SelectValue placeholder="Seleccionar género" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Non-binary">Non-binary</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="Hombre">Hombre</SelectItem>
+                <SelectItem value="Mujer">Mujer</SelectItem>
+                <SelectItem value="No binario">No binario</SelectItem>
+                <SelectItem value="Otro">Otro</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">Ubicación</Label>
             <Input id="location" name="location" value={formData.location} onChange={handleChange} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="sport">Primary Sport</Label>
+              <Label htmlFor="sport">Deporte principal</Label>
               <Select value={formData.sport} onValueChange={(value) => handleSelectChange("sport", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select sport" />
+                  <SelectValue placeholder="Seleccionar deporte" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Tennis">Tennis</SelectItem>
-                  <SelectItem value="Basketball">Basketball</SelectItem>
+                  <SelectItem value="Tenis">Tenis</SelectItem>
+                  <SelectItem value="Baloncesto">Baloncesto</SelectItem>
                   <SelectItem value="Running">Running</SelectItem>
-                  <SelectItem value="Soccer">Soccer</SelectItem>
+                  <SelectItem value="Fútbol">Fútbol</SelectItem>
                   <SelectItem value="Yoga">Yoga</SelectItem>
-                  <SelectItem value="Cycling">Cycling</SelectItem>
-                  <SelectItem value="Swimming">Swimming</SelectItem>
-                  <SelectItem value="Hiking">Hiking</SelectItem>
+                  <SelectItem value="Ciclismo">Ciclismo</SelectItem>
+                  <SelectItem value="Natación">Natación</SelectItem>
+                  <SelectItem value="Senderismo">Senderismo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="level">Skill Level</Label>
+              <Label htmlFor="level">Nivel</Label>
               <Select value={formData.level} onValueChange={(value) => handleSelectChange("level", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select level" />
+                  <SelectValue placeholder="Seleccionar nivel" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
+                  <SelectItem value="Principiante">Principiante</SelectItem>
+                  <SelectItem value="Intermedio">Intermedio</SelectItem>
+                  <SelectItem value="Avanzado">Avanzado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">Biografía</Label>
             <Textarea
               id="bio"
               name="bio"
               value={formData.bio}
               onChange={handleChange}
-              placeholder="Tell potential partners about yourself..."
+              placeholder="Cuéntale a tus posibles compañeros sobre ti..."
               className="h-24"
             />
           </div>
 
           <div className="flex justify-end space-x-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white">
-              Save Changes
+              Guardar cambios
             </Button>
           </div>
         </form>

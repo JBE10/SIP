@@ -10,18 +10,18 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
 const sports = [
-  "Basketball",
-  "Soccer",
-  "Tennis",
+  "Baloncesto",
+  "Fútbol",
+  "Tenis",
   "Running",
-  "Cycling",
-  "Swimming",
-  "Volleyball",
+  "Ciclismo",
+  "Natación",
+  "Voleibol",
   "Yoga",
   "Golf",
-  "Hiking",
-  "Climbing",
-  "Surfing",
+  "Senderismo",
+  "Escalada",
+  "Surf",
 ]
 
 export default function FiltersPage() {
@@ -48,7 +48,7 @@ export default function FiltersPage() {
             <ChevronLeft className="h-6 w-6 text-slate-600" />
           </Button>
         </Link>
-        <h1 className="text-xl font-bold text-slate-800">Filters</h1>
+        <h1 className="text-xl font-bold text-slate-800">Filtros</h1>
         <Button
           variant="ghost"
           className="text-emerald-600"
@@ -60,7 +60,7 @@ export default function FiltersPage() {
             setSkillLevel("all")
           }}
         >
-          Reset
+          Reiniciar
         </Button>
       </header>
 
@@ -69,7 +69,7 @@ export default function FiltersPage() {
         {/* Age Range */}
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-slate-800">Age Range</h2>
+            <h2 className="text-lg font-medium text-slate-800">Rango de edad</h2>
             <span className="text-sm text-slate-500">
               {ageRange[0]} - {ageRange[1]}
             </span>
@@ -87,8 +87,8 @@ export default function FiltersPage() {
         {/* Distance */}
         <div className="bg-white p-4 rounded-xl shadow-sm">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-slate-800">Distance</h2>
-            <span className="text-sm text-slate-500">{distance} miles</span>
+            <h2 className="text-lg font-medium text-slate-800">Distancia</h2>
+            <span className="text-sm text-slate-500">{distance} km</span>
           </div>
           <Slider
             defaultValue={[distance]}
@@ -102,30 +102,30 @@ export default function FiltersPage() {
 
         {/* Gender */}
         <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Gender</h2>
+          <h2 className="text-lg font-medium text-slate-800 mb-4">Género</h2>
           <RadioGroup defaultValue={gender} onValueChange={setGender} className="flex flex-col space-y-2">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="gender-all" />
-              <Label htmlFor="gender-all">All</Label>
+              <Label htmlFor="gender-all">Todos</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="male" id="gender-male" />
-              <Label htmlFor="gender-male">Male</Label>
+              <Label htmlFor="gender-male">Hombre</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="female" id="gender-female" />
-              <Label htmlFor="gender-female">Female</Label>
+              <Label htmlFor="gender-female">Mujer</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="other" id="gender-other" />
-              <Label htmlFor="gender-other">Other</Label>
+              <Label htmlFor="gender-other">Otro</Label>
             </div>
           </RadioGroup>
         </div>
 
         {/* Sports */}
         <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Sports</h2>
+          <h2 className="text-lg font-medium text-slate-800 mb-4">Deportes</h2>
           <div className="flex flex-wrap gap-2">
             {sports.map((sport) => (
               <Badge
@@ -146,23 +146,23 @@ export default function FiltersPage() {
 
         {/* Skill Level */}
         <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Skill Level</h2>
+          <h2 className="text-lg font-medium text-slate-800 mb-4">Nivel de habilidad</h2>
           <RadioGroup defaultValue={skillLevel} onValueChange={setSkillLevel} className="flex flex-col space-y-2">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="skill-all" />
-              <Label htmlFor="skill-all">All Levels</Label>
+              <Label htmlFor="skill-all">Todos los niveles</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="beginner" id="skill-beginner" />
-              <Label htmlFor="skill-beginner">Beginner</Label>
+              <Label htmlFor="skill-beginner">Principiante</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="intermediate" id="skill-intermediate" />
-              <Label htmlFor="skill-intermediate">Intermediate</Label>
+              <Label htmlFor="skill-intermediate">Intermedio</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="advanced" id="skill-advanced" />
-              <Label htmlFor="skill-advanced">Advanced</Label>
+              <Label htmlFor="skill-advanced">Avanzado</Label>
             </div>
           </RadioGroup>
         </div>
@@ -170,7 +170,7 @@ export default function FiltersPage() {
         {/* Apply button */}
         <Link href="/swipe" className="block">
           <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 rounded-xl shadow-md">
-            Apply Filters
+            Aplicar filtros
           </Button>
         </Link>
       </div>

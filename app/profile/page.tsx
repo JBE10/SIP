@@ -9,28 +9,29 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import ProfileEditModal from "@/components/profile-edit-modal"
+import BottomNavigation from "@/components/bottom-navigation"
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
 
   const userProfile = {
-    name: "Jamie Smith",
+    name: "Jaime Martínez",
     age: 27,
-    gender: "Non-binary",
-    location: "Brooklyn, NY",
-    sport: "Tennis",
-    level: "Intermediate",
-    bio: "Tennis enthusiast looking for regular practice partners. I've been playing for 3 years and enjoy both singles and doubles. Available most weekends and some weekday evenings.",
+    gender: "No binario",
+    location: "Madrid, España",
+    sport: "Tenis",
+    level: "Intermedio",
+    bio: "Entusiasta del tenis buscando compañeros regulares para practicar. Llevo jugando 3 años y disfruto tanto del individual como del dobles. Disponible la mayoría de los fines de semana y algunas tardes entre semana.",
     images: ["/placeholder.svg?height=400&width=400"],
     stats: {
       matches: 24,
       meetups: 18,
-      sports: ["Tennis", "Running", "Yoga"],
+      sports: ["Tenis", "Running", "Yoga"],
     },
     achievements: [
-      { name: "Early Adopter", description: "Joined during the beta phase" },
-      { name: "Social Butterfly", description: "Connected with 10+ partners" },
-      { name: "Regular Player", description: "Scheduled 5+ meetups in a month" },
+      { name: "Adoptante temprano", description: "Se unió durante la fase beta" },
+      { name: "Mariposa social", description: "Conectó con más de 10 compañeros" },
+      { name: "Jugador regular", description: "Programó más de 5 encuentros en un mes" },
     ],
   }
 
@@ -43,7 +44,7 @@ export default function ProfilePage() {
             <ChevronLeft className="h-6 w-6 text-slate-600" />
           </Button>
         </Link>
-        <h1 className="text-xl font-bold text-slate-800">Profile</h1>
+        <h1 className="text-xl font-bold text-slate-800">Perfil</h1>
         <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
           <Edit2 className="h-5 w-5 text-slate-600" />
         </Button>
@@ -57,7 +58,7 @@ export default function ProfilePage() {
           <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
             <div className="relative">
               <Avatar className="h-32 w-32 border-4 border-white">
-                <AvatarImage src={userProfile.images[0]} alt={userProfile.name} />
+                <AvatarImage src={userProfile.images[0] || "/placeholder.svg"} alt={userProfile.name} />
                 <AvatarFallback>{userProfile.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <Button
@@ -96,27 +97,27 @@ export default function ProfilePage() {
         {/* Tabs */}
         <Tabs defaultValue="stats" className="w-full">
           <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="stats">Stats</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="stats">Estadísticas</TabsTrigger>
+            <TabsTrigger value="achievements">Logros</TabsTrigger>
           </TabsList>
           <TabsContent value="stats">
             <Card className="p-4">
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-emerald-600">{userProfile.stats.matches}</p>
-                  <p className="text-sm text-slate-500">Matches</p>
+                  <p className="text-sm text-slate-500">Partidos</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-emerald-600">{userProfile.stats.meetups}</p>
-                  <p className="text-sm text-slate-500">Meetups</p>
+                  <p className="text-sm text-slate-500">Encuentros</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-emerald-600">{userProfile.stats.sports.length}</p>
-                  <p className="text-sm text-slate-500">Sports</p>
+                  <p className="text-sm text-slate-500">Deportes</p>
                 </div>
               </div>
 
-              <h3 className="font-medium text-slate-800 mb-2">My Sports</h3>
+              <h3 className="font-medium text-slate-800 mb-2">Mis deportes</h3>
               <div className="flex flex-wrap gap-2 mb-4">
                 {userProfile.stats.sports.map((sport, index) => (
                   <Badge
@@ -131,7 +132,7 @@ export default function ProfilePage() {
                   size="sm"
                   className="rounded-full h-6 border-dashed border-slate-300 text-slate-500"
                 >
-                  + Add
+                  + Añadir
                 </Button>
               </div>
             </Card>
@@ -180,71 +181,12 @@ export default function ProfilePage() {
         {/* Logout button */}
         <Button variant="outline" className="w-full mt-6 border-slate-200 text-slate-600 hover:bg-slate-100">
           <LogOut className="h-4 w-4 mr-2" />
-          Log out
+          Cerrar sesión
         </Button>
       </div>
 
       {/* Bottom navigation */}
-      <nav className="flex justify-around p-4 border-t bg-white">
-        <Button variant="ghost" className="flex flex-col items-center text-emerald-600">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle
-              cx="12"
-              cy="8"
-              r="4"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M6 21V19C6 16.7909 7.79086 15 10 15H14C16.2091 15 18 16.7909 18 19V21"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-xs mt-1">Profile</span>
-        </Button>
-        <Link href="/swipe">
-          <Button variant="ghost" className="flex flex-col items-center text-slate-600">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M21 11.5C21 16.75 12 22 12 22C12 22 3 16.75 3 11.5C3 7.02 7.02 3 12 3C16.98 3 21 7.02 21 11.5Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="12"
-                cy="11.5"
-                r="2.5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="text-xs mt-1">Discover</span>
-          </Button>
-        </Link>
-        <Link href="/chats">
-          <Button variant="ghost" className="flex flex-col items-center text-slate-600">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M21 12C21 16.9706 16.9706 21 12 21C10.8031 21 9.6678 20.7855 8.6157 20.3994L3 21L3.6006 15.3843C3.2145 14.3322 3 13.1969 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="text-xs mt-1">Chats</span>
-          </Button>
-        </Link>
-      </nav>
+      <BottomNavigation currentPath="/profile" />
 
       {/* Edit profile modal */}
       {isEditing && <ProfileEditModal profile={userProfile} onClose={() => setIsEditing(false)} />}

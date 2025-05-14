@@ -59,7 +59,7 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
               <div className="flex items-center mt-1">
                 <MapPin className="h-4 w-4 mr-1" />
                 <span className="text-sm">
-                  {profile.location} • {profile.distance} miles away
+                  {profile.location} • {profile.distance} km de distancia
                 </span>
               </div>
             </div>

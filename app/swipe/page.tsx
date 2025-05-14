@@ -4,18 +4,15 @@ import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, Filter, MessageCircle, User } from "lucide-react"
+import { ChevronLeft, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ProfileCard from "@/components/profile-card"
 import MatchModal from "@/components/match-modal"
 import { useMobile } from "@/hooks/use-mobile"
 import { profiles } from "@/data/mock-profiles"
 import Link from "next/link"
-// Add the import for the SportSelector component
 import SportSelector from "@/components/sport-selector"
-
-// Update the SwipePage component to include the SportSelector
-// Add it right after the header section and before the main content
+import BottomNavigation from "@/components/bottom-navigation"
 
 export default function SwipePage() {
   const router = useRouter()
@@ -30,12 +27,22 @@ export default function SwipePage() {
   const [isDragging, setIsDragging] = useState(false)
   const [selectedSport, setSelectedSport] = useState<string | null>(null)
 
+  // Filter profiles based on selected sport
+  const filteredProfiles = selectedSport
+    ? profiles.filter((profile) => profile.sport.toLowerCase() === selectedSport.toLowerCase())
+    : profiles
+
+  // Reset current index when sport selection changes
+  useEffect(() => {
+    setCurrentIndex(0)
+  }, [selectedSport])
+
   const handleSwipe = (dir: string) => {
     setDirection(dir)
 
     // Simulate a match with 30% probability when swiping right
     if (dir === "right" && Math.random() < 0.3) {
-      setMatchedProfile(profiles[currentIndex])
+      setMatchedProfile(filteredProfiles[currentIndex])
       setTimeout(() => {
         setShowMatch(true)
       }, 500)
@@ -43,7 +50,7 @@ export default function SwipePage() {
 
     setTimeout(() => {
       setDirection(null)
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length)
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % filteredProfiles.length)
     }, 300)
   }
 
@@ -127,7 +134,7 @@ export default function SwipePage() {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 relative">
-        {profiles.length > 0 ? (
+        {filteredProfiles.length > 0 ? (
           <div
             ref={cardRef}
             className={`transition-transform duration-300 ${
@@ -145,85 +152,53 @@ export default function SwipePage() {
             onMouseUp={isMobile ? undefined : handleTouchEnd}
             onMouseLeave={isMobile ? undefined : handleTouchEnd}
           >
-            <ProfileCard profile={profiles[currentIndex]} />
+            <ProfileCard profile={filteredProfiles[currentIndex]} />
           </div>
         ) : (
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <p className="text-lg text-slate-600">No more profiles to show.</p>
-            <p className="text-sm text-slate-400 mt-2">Try adjusting your filters.</p>
+            <p className="text-lg text-slate-600">No hay perfiles para mostrar con este deporte.</p>
+            <p className="text-sm text-slate-400 mt-2">Prueba seleccionando otro deporte o ajustando tus filtros.</p>
           </div>
         )}
 
-        {/* Swipe buttons */}
-        <div className="flex justify-center space-x-6 mt-8">
-          <Button
-            onClick={() => handleSwipe("left")}
-            className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="#FF4757"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Button>
+        {/* Swipe buttons - Only show if there are profiles */}
+        {filteredProfiles.length > 0 && (
+          <div className="flex justify-center space-x-6 mt-8">
+            <Button
+              onClick={() => handleSwipe("left")}
+              className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M18 6L6 18M6 6L18 18"
+                  stroke="#FF4757"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
 
-          <Button
-            onClick={() => handleSwipe("right")}
-            className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M4.5 12.75L10.5 18.75L19.5 5.25"
-                stroke="#2ED573"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </Button>
-        </div>
+            <Button
+              onClick={() => handleSwipe("right")}
+              className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4.5 12.75L10.5 18.75L19.5 5.25"
+                  stroke="#2ED573"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
+          </div>
+        )}
       </main>
 
       {/* Bottom navigation */}
-      <nav className="flex justify-around p-4 border-t bg-white">
-        <Link href="/profile">
-          <Button variant="ghost" className="flex flex-col items-center">
-            <User className="h-6 w-6 text-slate-600" />
-            <span className="text-xs mt-1 text-slate-600">Profile</span>
-          </Button>
-        </Link>
-        <Button variant="ghost" className="flex flex-col items-center text-emerald-600">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M21 11.5C21 16.75 12 22 12 22C12 22 3 16.75 3 11.5C3 7.02 7.02 3 12 3C16.98 3 21 7.02 21 11.5Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle
-              cx="12"
-              cy="11.5"
-              r="2.5"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-xs mt-1">Discover</span>
-        </Button>
-        <Link href="/chats">
-          <Button variant="ghost" className="flex flex-col items-center">
-            <MessageCircle className="h-6 w-6 text-slate-600" />
-            <span className="text-xs mt-1 text-slate-600">Chats</span>
-          </Button>
-        </Link>
-      </nav>
+      <BottomNavigation currentPath="/swipe" />
 
       {/* Match modal */}
       {showMatch && matchedProfile && (

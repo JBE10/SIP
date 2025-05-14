@@ -15,7 +15,6 @@ interface Profile {
   images: string[]
 }
 
-
 interface MatchModalProps {
   profile: Profile
   onClose: () => void
@@ -48,18 +47,18 @@ export default function MatchModal({ profile, onClose, onMessage }: MatchModalPr
           {/* Content */}
           <div className="relative z-10 flex flex-col items-center text-center p-6 pt-10">
             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-white mb-2">It's a Match!</h2>
-              <p className="text-white/80">You and {profile.name} both want to play together</p>
+              <h2 className="text-3xl font-bold text-white mb-2">¡Es un Match!</h2>
+              <p className="text-white/80">Tú y {profile.name} quieren jugar juntos</p>
             </div>
 
             <div className="flex items-center justify-center mb-8">
               <div className="relative">
                 <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
-                  <AvatarImage src="/placeholder.svg?height=200&width=200" alt="Your profile" />
-                  <AvatarFallback>You</AvatarFallback>
+                  <AvatarImage src="/placeholder.svg?height=200&width=200" alt="Tu perfil" />
+                  <AvatarFallback>Tú</AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md">
-                  <Badge className="bg-emerald-100 text-emerald-800">You</Badge>
+                  <Badge className="bg-emerald-100 text-emerald-800">Tú</Badge>
                 </div>
               </div>
 
@@ -77,7 +76,7 @@ export default function MatchModal({ profile, onClose, onMessage }: MatchModalPr
 
               <div className="relative">
                 <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
-                  <AvatarImage src={profile.images[0]} alt={profile.name} />
+                  <AvatarImage src={profile.images[0] || "/placeholder.svg"} alt={profile.name} />
                   <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md">
@@ -89,7 +88,7 @@ export default function MatchModal({ profile, onClose, onMessage }: MatchModalPr
             <div className="space-y-3 w-full">
               <Button onClick={onMessage} className="w-full bg-white text-emerald-600 hover:bg-white/90">
                 <MessageCircle className="mr-2 h-5 w-5" />
-                Send a Message
+                Enviar un mensaje
               </Button>
 
               <Button
@@ -97,7 +96,7 @@ export default function MatchModal({ profile, onClose, onMessage }: MatchModalPr
                 onClick={onClose}
                 className="w-full border-white/30 text-white hover:bg-white/10 hover:text-white"
               >
-                Keep Swiping
+                Seguir deslizando
               </Button>
             </div>
           </div>

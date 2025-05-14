@@ -20,7 +20,7 @@ export default function ChatPreview({ chat }: ChatPreviewProps) {
     <div className="flex items-center p-4 hover:bg-slate-100 transition-colors">
       <div className="relative">
         <Avatar className="h-14 w-14">
-          <AvatarImage src={chat.avatar} alt={chat.name} />
+          <AvatarImage src={chat.avatar || "/placeholder.svg"} alt={chat.name} />
           <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
         </Avatar>
         {chat.unread > 0 && (

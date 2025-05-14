@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import BottomNavigation from "@/components/bottom-navigation"
 
 interface Message {
   id: number
@@ -21,25 +22,25 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hey there! I saw you're into tennis. I've been playing for about 2 years now.",
+      text: "¡Hola! Vi que te gusta el tenis. Llevo jugando unos 2 años.",
       sender: "partner",
       timestamp: "10:30 AM",
     },
     {
       id: 2,
-      text: "Hi! Yes, I love tennis! I'm at an intermediate level. How about you?",
+      text: "¡Hola! Sí, ¡me encanta el tenis! Estoy en un nivel intermedio. ¿Y tú?",
       sender: "user",
       timestamp: "10:32 AM",
     },
     {
       id: 3,
-      text: "I'd say I'm intermediate too. Would you be interested in playing sometime this week?",
+      text: "Yo también diría que soy intermedio. ¿Te interesaría jugar algún día de esta semana?",
       sender: "partner",
       timestamp: "10:35 AM",
     },
     {
       id: 4,
-      text: "Are we still on for tennis tomorrow?",
+      text: "¿Seguimos con el partido de tenis mañana?",
       sender: "partner",
       timestamp: "10:40 AM",
     },
@@ -47,11 +48,11 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
   const partner = {
     id: params.id,
-    name: "Alex Johnson",
+    name: "Alex Jiménez",
     avatar: "/placeholder.svg?height=100&width=100",
-    sport: "Tennis",
-    level: "Intermediate",
-    lastActive: "Active now",
+    sport: "Tenis",
+    level: "Intermedio",
+    lastActive: "Activo ahora",
   }
 
   const handleSendMessage = () => {
@@ -71,7 +72,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     setTimeout(() => {
       const responseMsg: Message = {
         id: messages.length + 2,
-        text: "Sounds good! Looking forward to our match.",
+        text: "¡Perfecto! Espero con ansias nuestro partido.",
         sender: "partner",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       }
@@ -89,7 +90,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
 
         <div className="flex items-center flex-1 ml-2">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={partner.avatar} alt={partner.name} />
+            <AvatarImage src={partner.avatar || "/placeholder.svg"} alt={partner.name} />
             <AvatarFallback>{partner.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
@@ -118,7 +119,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
             {message.sender === "partner" && (
               <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
-                <AvatarImage src={partner.avatar} alt={partner.name} />
+                <AvatarImage src={partner.avatar || "/placeholder.svg"} alt={partner.name} />
                 <AvatarFallback>{partner.name.charAt(0)}</AvatarFallback>
               </Avatar>
             )}
@@ -145,7 +146,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder="Escribe un mensaje..."
             className="flex-1 bg-slate-100 border-none"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -161,6 +162,9 @@ export default function ChatPage({ params }: { params: { id: string } }) {
           </Button>
         </div>
       </div>
+
+      {/* Bottom navigation */}
+      <BottomNavigation currentPath="/chats" />
     </div>
   )
 }

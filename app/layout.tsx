@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SportMatch - Find Your Sports Partner",
-  description: "Connect with people who share your passion for sports",
+  title: "SportMatch - Encuentra Tu Compañero Deportivo",
+  description: "Conéctate con personas que comparten tu pasión por los deportes",
     generator: 'v0.dev'
 }
 
@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="es">
+      <body className={`${inter.className} overflow-x-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
