@@ -1,105 +1,173 @@
-import Link from "next/link"
-import { ChevronLeft, Search } from "lucide-react"
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { ChevronLeft, Send, Phone, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import ChatPreview from "@/components/chat-preview"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import BottomNavigation from "@/components/bottom-navigation"
 
-const mockChats = [
-  {
-    id: 1,
+interface Message {
+  id: number
+  text: string
+  sender: "user" | "partner"
+  timestamp: string
+}
+
+export default function ChatPage({ params }: { params: { id: string } }) {
+  // Acceder directamente a params.id ya que todavía es compatible
+  const chatId = params.id
+
+  const router = useRouter()
+  const [newMessage, setNewMessage] = useState("")
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      text: "¡Hola! Vi que te gusta el tenis. Llevo jugando unos 2 años.",
+      sender: "partner",
+      timestamp: "10:30 AM",
+    },
+    {
+      id: 2,
+      text: "¡Hola! Sí, ¡me encanta el tenis! Estoy en un nivel intermedio. ¿Y tú?",
+      sender: "user",
+      timestamp: "10:32 AM",
+    },
+    {
+      id: 3,
+      text: "Yo también diría que soy intermedio. ¿Te interesaría jugar algún día de esta semana?",
+      sender: "partner",
+      timestamp: "10:35 AM",
+    },
+    {
+      id: 4,
+      text: "¿Seguimos con el partido de tenis mañana?",
+      sender: "partner",
+      timestamp: "10:40 AM",
+    },
+  ])
+
+  const partner = {
+    id: chatId,
     name: "Alex Jiménez",
     avatar: "/placeholder.svg?height=100&width=100",
-    lastMessage: "¿Seguimos con el partido de tenis mañana?",
-    time: "10:30 AM",
-    unread: 2,
     sport: "Tenis",
-  },
-  {
-    id: 2,
-    name: "Sara Martínez",
-    avatar: "/placeholder.svg?height=100&width=100",
-    lastMessage: "¡Encontré una ruta de senderismo genial que podríamos probar!",
-    time: "Ayer",
-    unread: 0,
-    sport: "Senderismo",
-  },
-  {
-    id: 3,
-    name: "Miguel Chen",
-    avatar: "/placeholder.svg?height=100&width=100",
-    lastMessage: "Gracias por el partido de baloncesto. ¡Juguemos de nuevo pronto!",
-    time: "Hace 2 días",
-    unread: 0,
-    sport: "Baloncesto",
-  },
-]
+    level: "Intermedio",
+    lastActive: "Activo ahora",
+  }
 
-export default function ChatsPage() {
+  const handleSendMessage = () => {
+    if (newMessage.trim() === "") return
+
+    const newMsg: Message = {
+      id: messages.length + 1,
+      text: newMessage,
+      sender: "user",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    }
+
+    setMessages([...messages, newMsg])
+    setNewMessage("")
+
+    // Simulate partner response after a short delay
+    setTimeout(() => {
+      const responseMsg: Message = {
+        id: messages.length + 2,
+        text: "¡Perfecto! Espero con ansias nuestro partido.",
+        sender: "partner",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      }
+      setMessages((prev) => [...prev, responseMsg])
+    }, 2000)
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
-        <Link href="/swipe">
-          <Button variant="ghost" size="icon">
+      <div className="flex flex-col h-screen bg-slate-50">
+        {/* Header */}
+        <header className="flex items-center p-3 border-b bg-white sticky top-0 z-10">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ChevronLeft className="h-6 w-6 text-slate-600" />
           </Button>
-        </Link>
-        <h1 className="text-xl font-bold text-slate-800">Mensajes</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
-      </header>
 
-      {/* Search */}
-      <div className="p-4 bg-white border-b">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-          <Input placeholder="Buscar mensajes" className="pl-10 bg-slate-100 border-none" />
-        </div>
-      </div>
+          <div className="flex items-center flex-1 ml-2">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={partner.avatar || "/placeholder.svg"} alt={partner.name} />
+              <AvatarFallback>{partner.name.charAt(0)}</AvatarFallback>
+            </Avatar>
 
-      {/* Chat list */}
-      <div className="flex-1">
-        {mockChats.length > 0 ? (
-          <div className="divide-y divide-slate-200">
-            {mockChats.map((chat) => (
-              <Link href={`/chats/${chat.id}`} key={chat.id}>
-                <ChatPreview chat={chat} />
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-            <div className="bg-slate-100 p-4 rounded-full mb-4">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M21 11.5C21 16.75 12 22 12 22C12 22 3 16.75 3 11.5C3 7.02 7.02 3 12 3C16.98 3 21 7.02 21 11.5Z"
-                  stroke="#94A3B8"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle
-                  cx="12"
-                  cy="11.5"
-                  r="2.5"
-                  stroke="#94A3B8"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+            <div className="ml-3">
+              <div className="flex items-center">
+                <h2 className="font-medium text-slate-800">{partner.name}</h2>
+                <Badge className="ml-2 bg-emerald-100 text-emerald-800 text-xs">{partner.sport}</Badge>
+              </div>
+              <p className="text-xs text-emerald-600">{partner.lastActive}</p>
             </div>
-            <h3 className="text-lg font-medium text-slate-800">Aún no hay mensajes</h3>
-            <p className="text-sm text-slate-500 mt-1">¡Comienza a deslizar para encontrar tu compañero deportivo!</p>
-            <Link href="/swipe" className="mt-4">
-              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">Buscar compañeros</Button>
-            </Link>
           </div>
-        )}
-      </div>
 
-      {/* Bottom navigation */}
-      <BottomNavigation currentPath="/chats" />
-    </div>
+          <div className="flex">
+            <Button variant="ghost" size="icon" className="text-slate-600">
+              <Phone className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-slate-600">
+              <Video className="h-5 w-5" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+              <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+                {message.sender === "partner" && (
+                    <Avatar className="h-8 w-8 mr-2 mt-1 flex-shrink-0">
+                      <AvatarImage src={partner.avatar || "/placeholder.svg"} alt={partner.name} />
+                      <AvatarFallback>{partner.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                )}
+
+                <div
+                    className={`max-w-[75%] p-3 rounded-2xl ${
+                        message.sender === "user"
+                            ? "bg-emerald-500 text-white rounded-tr-none"
+                            : "bg-white text-slate-800 rounded-tl-none shadow-sm"
+                    }`}
+                >
+                  <p>{message.text}</p>
+                  <p className={`text-xs mt-1 ${message.sender === "user" ? "text-emerald-100" : "text-slate-400"}`}>
+                    {message.timestamp}
+                  </p>
+                </div>
+              </div>
+          ))}
+        </div>
+
+        {/* Message input */}
+        <div className="p-3 border-t bg-white">
+          <div className="flex items-center">
+            <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Escribe un mensaje..."
+                className="flex-1 bg-slate-100 border-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSendMessage()
+                  }
+                }}
+            />
+            <Button
+                onClick={handleSendMessage}
+                className="ml-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full h-10 w-10 p-0"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Bottom navigation */}
+        <BottomNavigation currentPath="/chats" />
+      </div>
   )
 }
