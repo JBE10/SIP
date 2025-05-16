@@ -4,11 +4,13 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Check, RefreshCw, X } from "lucide-react"
+import { ArrowLeft, RefreshCw } from "lucide-react"
 import { MatchModal } from "@/components/match-modal"
 import { SwipeCard } from "@/components/swipe-card"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAppContext } from "@/context/app-context"
+import { ProfileDetails } from "@/components/profile-details"
 
 export default function SwipePage() {
   const { getAvailableProfiles, addLikedProfile, addDislikedProfile, addMatch, resetViewedProfiles } = useAppContext()
@@ -17,7 +19,6 @@ export default function SwipePage() {
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState<any>(null)
-  const [direction, setDirection] = useState<"left" | "right" | null>(null)
 
   // Actualizar perfiles disponibles cuando cambia el contexto
   useEffect(() => {
@@ -39,23 +40,22 @@ export default function SwipePage() {
       setShowMatchModal(true)
     } else {
       addLikedProfile(currentProfile.id)
-      nextProfile("right")
     }
+
+    // Always move to next profile after a like action
+    nextProfile()
   }
 
   const handleDislike = () => {
     if (!currentProfile) return
     addDislikedProfile(currentProfile.id)
-    nextProfile("left")
+    nextProfile()
   }
 
-  const nextProfile = (dir: "left" | "right") => {
+  const nextProfile = () => {
     if (!isLastProfile) {
-      setDirection(dir)
-      // Pequeño retraso para permitir que la animación termine
       setTimeout(() => {
         setCurrentProfileIndex(currentProfileIndex + 1)
-        setDirection(null)
       }, 300)
     }
   }
@@ -83,24 +83,27 @@ export default function SwipePage() {
         >
           Descubrir
         </motion.h1>
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/filters">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-            </svg>
-            <span className="sr-only">Filtros</span>
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/filters">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              <span className="sr-only">Filtros</span>
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -158,37 +161,17 @@ export default function SwipePage() {
         )}
       </AnimatePresence>
 
-      <motion.div
-        className="flex justify-center gap-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-      >
-        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-14 w-14 rounded-full border-2 border-destructive text-destructive"
-            onClick={handleDislike}
-            disabled={isLastProfile || availableProfiles.length === 0}
-          >
-            <X className="h-6 w-6" />
-            <span className="sr-only">No me interesa</span>
-          </Button>
+      {/* Detalle de perfil */}
+      {currentProfile && !isLastProfile && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="mt-4"
+        >
+          <ProfileDetails profile={currentProfile} />
         </motion.div>
-        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-14 w-14 rounded-full border-2 border-primary text-primary"
-            onClick={handleLike}
-            disabled={isLastProfile || availableProfiles.length === 0}
-          >
-            <Check className="h-6 w-6" />
-            <span className="sr-only">Me interesa</span>
-          </Button>
-        </motion.div>
-      </motion.div>
+      )}
 
       <MatchModal isOpen={showMatchModal} onClose={() => setShowMatchModal(false)} matchedProfile={matchedProfile} />
     </div>

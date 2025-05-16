@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ProfileEditModal } from "@/components/profile-edit-modal"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { useAppContext } from "@/context/app-context"
@@ -41,10 +42,13 @@ export default function ProfilePage() {
           </Link>
         </Button>
         <h1 className="text-xl font-bold">Mi Perfil</h1>
-        <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
-          <Edit className="h-5 w-5" />
-          <span className="sr-only">Editar perfil</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
+            <Edit className="h-5 w-5" />
+            <span className="sr-only">Editar perfil</span>
+          </Button>
+        </div>
       </motion.div>
 
       <motion.div className="flex flex-col items-center gap-4" variants={item}>

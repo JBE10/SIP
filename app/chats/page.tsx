@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChatPreview } from "@/components/chat-preview"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, Search } from "lucide-react"
 import { motion } from "framer-motion"
 import { useAppContext } from "@/context/app-context"
@@ -47,7 +48,7 @@ export default function ChatsPage() {
         >
           Mensajes
         </motion.h1>
-        <div className="w-10" />
+        <ThemeToggle />
       </div>
 
       <motion.div

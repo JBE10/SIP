@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { motion } from "framer-motion"
 
 export default function Home() {
@@ -23,6 +24,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <motion.header
+        className="p-4 absolute top-0 right-0 z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <ThemeToggle />
+      </motion.header>
+
       <motion.main
         className="flex-1 flex flex-col items-center justify-center p-4 text-center gap-8"
         variants={container}

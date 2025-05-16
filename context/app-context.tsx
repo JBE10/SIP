@@ -35,6 +35,8 @@ type AppContextType = {
   getAvailableProfiles: () => Profile[]
   getMatches: () => Match[]
   resetViewedProfiles: () => void
+  fetchProfiles: () => Promise<void>
+  fetchMatches: () => Promise<void>
 }
 
 const defaultContext: AppContextType = {
@@ -59,6 +61,8 @@ const defaultContext: AppContextType = {
   getAvailableProfiles: () => [],
   getMatches: () => [],
   resetViewedProfiles: () => {},
+  fetchProfiles: async () => {},
+  fetchMatches: async () => {},
 }
 
 const AppContext = createContext<AppContextType>(defaultContext)
@@ -70,24 +74,99 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [likedProfiles, setLikedProfiles] = useState<string[]>([])
   const [dislikedProfiles, setDislikedProfiles] = useState<string[]>([])
   const [matches, setMatches] = useState<Match[]>([])
+  const [profiles, setProfiles] = useState<Profile[]>([])
   const [isNewSession, setIsNewSession] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const currentUser = defaultContext.currentUser
 
-  // Cargar datos guardados del localStorage al iniciar
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Solo cargamos los matches de localStorage, no los perfiles vistos
-      // Esto permite que los perfiles se "reinicien" en cada sesión
-      const savedMatches = localStorage.getItem("matches")
+  // API base URL
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
+  // Fetch profiles from Python backend
+  const fetchProfiles = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/profiles`)
+      const data = await response.json()
+
+      if (data.profiles) {
+        // Transform MongoDB _id to id for frontend compatibility
+        const transformedProfiles = data.profiles.map((profile: any) => ({
+          id: profile._id,
+          name: profile.name,
+          age: profile.age,
+          location: profile.location,
+          bio: profile.bio,
+          sports: profile.sports,
+          distance: profile.distance,
+          profilePicture: profile.profilePicture,
+        }))
+
+        setProfiles(transformedProfiles)
+      }
+    } catch (error) {
+      console.error("Error fetching profiles:", error)
+      // Fallback to mock data if API fails
+      setProfiles(mockProfiles)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Fetch matches from Python backend
+  const fetchMatches = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/matches?userId=${currentUser.id}`)
+      const data = await response.json()
+
+      if (data.matches) {
+        // We need to fetch profile details for each match
+        const matchesWithProfiles = await Promise.all(
+          data.matches.map(async (match: any) => {
+            const otherUserId = match.user1Id === currentUser.id ? match.user2Id : match.user1Id
+            const profileResponse = await fetch(`${API_URL}/api/profiles/${otherUserId}`)
+            const profileData = await profileResponse.json()
+
+            return {
+              id: match._id,
+              profile: {
+                id: profileData.profile._id,
+                name: profileData.profile.name,
+                age: profileData.profile.age,
+                location: profileData.profile.location,
+                bio: profileData.profile.bio,
+                sports: profileData.profile.sports,
+                distance: profileData.profile.distance,
+                profilePicture: profileData.profile.profilePicture,
+              },
+              timestamp: match.timestamp,
+              hasChat: match.hasChat,
+            }
+          }),
+        )
+
+        setMatches(matchesWithProfiles)
+      }
+    } catch (error) {
+      console.error("Error fetching matches:", error)
+      // Keep existing matches if API fails
+    }
+  }
+
+  // Load data on initial render
+  useEffect(() => {
+    fetchProfiles()
+
+    if (typeof window !== "undefined") {
+      // Load session data from localStorage
+      const savedMatches = localStorage.getItem("matches")
       if (savedMatches) setMatches(JSON.parse(savedMatches))
 
-      // Verificamos si es una nueva sesión
+      // Check if it's a new session
       const lastSessionDate = localStorage.getItem("lastSessionDate")
       const currentDate = new Date().toDateString()
 
       if (lastSessionDate !== currentDate) {
-        // Es una nueva sesión, reiniciamos los perfiles vistos
+        // It's a new session, reset viewed profiles
         setViewedProfiles([])
         setLikedProfiles([])
         setDislikedProfiles([])
@@ -95,7 +174,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         setIsNewSession(true)
       } else {
         setIsNewSession(false)
-        // Si no es una nueva sesión, cargamos los perfiles vistos para esta sesión
+        // If not a new session, load viewed profiles from sessionStorage
         const sessionViewedProfiles = sessionStorage.getItem("viewedProfiles")
         const sessionLikedProfiles = sessionStorage.getItem("likedProfiles")
         const sessionDislikedProfiles = sessionStorage.getItem("dislikedProfiles")
@@ -104,17 +183,18 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         if (sessionLikedProfiles) setLikedProfiles(JSON.parse(sessionLikedProfiles))
         if (sessionDislikedProfiles) setDislikedProfiles(JSON.parse(sessionDislikedProfiles))
       }
+
+      // Fetch matches from Python backend
+      fetchMatches()
     }
   }, [])
 
-  // Guardar datos en sessionStorage cuando cambian (solo para la sesión actual)
+  // Save session data when it changes
   useEffect(() => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem("viewedProfiles", JSON.stringify(viewedProfiles))
       sessionStorage.setItem("likedProfiles", JSON.stringify(likedProfiles))
       sessionStorage.setItem("dislikedProfiles", JSON.stringify(dislikedProfiles))
-
-      // Los matches sí se guardan en localStorage para persistir entre sesiones
       localStorage.setItem("matches", JSON.stringify(matches))
     }
   }, [viewedProfiles, likedProfiles, dislikedProfiles, matches])
@@ -139,22 +219,55 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-  const addMatch = (profile: Profile) => {
-    // Verificar si ya existe un match con este perfil
+  const addMatch = async (profile: Profile) => {
+    // Check if match already exists
     if (!matches.some((match) => match.id === profile.id)) {
-      const newMatch: Match = {
-        id: profile.id,
-        profile,
-        timestamp: new Date().toISOString(),
-        hasChat: true,
+      // Create match in Python backend
+      try {
+        const matchData = {
+          user1Id: currentUser.id,
+          user2Id: profile.id,
+          timestamp: new Date(),
+          hasChat: true,
+        }
+
+        const response = await fetch(`${API_URL}/api/matches`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(matchData),
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          const newMatch: Match = {
+            id: data.match._id,
+            profile,
+            timestamp: data.match.timestamp,
+            hasChat: data.match.hasChat,
+          }
+
+          setMatches([...matches, newMatch])
+        }
+      } catch (error) {
+        console.error("Error creating match:", error)
+        // Fallback to local state if API fails
+        const newMatch: Match = {
+          id: profile.id,
+          profile,
+          timestamp: new Date().toISOString(),
+          hasChat: true,
+        }
+        setMatches([...matches, newMatch])
       }
-      setMatches([...matches, newMatch])
     }
     addLikedProfile(profile.id)
   }
 
   const getAvailableProfiles = () => {
-    return mockProfiles.filter((profile) => !viewedProfiles.includes(profile.id))
+    return profiles.filter((profile) => !viewedProfiles.includes(profile.id))
   }
 
   const getMatches = () => {
@@ -185,6 +298,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         getAvailableProfiles,
         getMatches,
         resetViewedProfiles,
+        fetchProfiles,
+        fetchMatches,
       }}
     >
       {children}

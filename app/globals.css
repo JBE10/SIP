@@ -4,6 +4,38 @@
 
 @layer base {
   :root {
+    --background: 0 0% 95%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 142 70% 45%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 0 0% 85%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 142 70% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
+    --ring: 142 70% 45%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
     --background: 0 0% 7%;
     --foreground: 0 0% 98%;
 
@@ -84,8 +116,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -94,6 +126,7 @@
   font-weight: bold;
   opacity: 0;
   transition: opacity 0.2s ease;
+  z-index: 20;
 }
 
 .swipe-action-indicator.left {
@@ -108,9 +141,15 @@
   color: white;
 }
 
-.swipe-card.swiping-left .swipe-action-indicator.left,
-.swipe-card.swiping-right .swipe-action-indicator.right {
-  opacity: 1;
+.swipe-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+  z-index: 10;
 }
 
 /* Estilos adicionales para perfiles */
@@ -131,7 +170,6 @@
 
 .profile-badge {
   background-color: rgba(34, 197, 94, 0.2);
-  border: 1px solid rgba(34, 197, 94, 0.5);
   backdrop-filter: blur(4px);
 }
 
@@ -210,4 +248,20 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos tema oscuro/claro para las tarjetas de swipe */
+.dark .swipe-card {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.dark .profile-badge {
+  background-color: rgba(20, 150, 70, 0.3);
+  border: 1px solid rgba(20, 150, 70, 0.5);
+}
+
+.light .profile-badge {
+  background-color: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: rgba(0, 0, 0, 0.8);
 }

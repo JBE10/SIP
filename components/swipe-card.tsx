@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { MapPin, X, Check } from "lucide-react"
 import { motion, useAnimation, useMotionValue, useTransform } from "framer-motion"
 
@@ -34,7 +35,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
   // Umbral para considerar un swipe completo (en píxeles)
   const swipeThreshold = 100
 
-  const handleDragEnd = async (_, info) => {
+  const handleDragEnd = async (_, info: any) => {
     if (info.offset.x < -swipeThreshold) {
       setExitX(-500)
       await controls.start({
@@ -96,8 +97,53 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
         {/* Gradiente mejorado para mejor contraste */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
+        {/* Controles dentro de la tarjeta (estilo Tinder) */}
+        <div className="swipe-controls">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="z-20">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-14 w-14 rounded-full border-2 border-destructive bg-background/80 backdrop-blur-sm text-destructive"
+              onClick={() => {
+                setExitX(-500)
+                controls
+                  .start({
+                    x: -500,
+                    opacity: 0,
+                    transition: { duration: 0.3 },
+                  })
+                  .then(() => onSwipeLeft())
+              }}
+            >
+              <X className="h-6 w-6" />
+              <span className="sr-only">No me interesa</span>
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="z-20">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-14 w-14 rounded-full border-2 border-primary bg-background/80 backdrop-blur-sm text-primary"
+              onClick={() => {
+                setExitX(500)
+                controls
+                  .start({
+                    x: 500,
+                    opacity: 0,
+                    transition: { duration: 0.3 },
+                  })
+                  .then(() => onSwipeRight())
+              }}
+            >
+              <Check className="h-6 w-6" />
+              <span className="sr-only">Me interesa</span>
+            </Button>
+          </motion.div>
+        </div>
+
         {/* Contenido del perfil con mejor contraste */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
+        <div className="absolute bottom-0 left-0 right-0 p-6 pb-20 text-white z-10">
           <div className="mb-3">
             <h2 className="text-2xl font-bold text-white drop-shadow-md">
               {profile.name}, {profile.age}
@@ -115,11 +161,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
 
           <div className="flex flex-wrap gap-2">
             {profile.sports.map((sport) => (
-              <Badge
-                key={sport}
-                variant="secondary"
-                className="bg-white/20 text-white backdrop-blur-sm border border-white/30"
-              >
+              <Badge key={sport} variant="secondary" className="profile-badge">
                 {sport}
               </Badge>
             ))}
@@ -127,16 +169,10 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
         </div>
 
         {/* Indicadores de acción */}
-        <motion.div
-          className="absolute top-8 left-8 bg-destructive text-white p-3 rounded-full shadow-lg"
-          style={{ opacity: leftIndicatorOpacity }}
-        >
+        <motion.div className="swipe-action-indicator left" style={{ opacity: leftIndicatorOpacity }}>
           <X className="h-8 w-8" />
         </motion.div>
-        <motion.div
-          className="absolute top-8 right-8 bg-primary text-white p-3 rounded-full shadow-lg"
-          style={{ opacity: rightIndicatorOpacity }}
-        >
+        <motion.div className="swipe-action-indicator right" style={{ opacity: rightIndicatorOpacity }}>
           <Check className="h-8 w-8" />
         </motion.div>
       </div>

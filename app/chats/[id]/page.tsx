@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, MoreVertical, Send } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAppContext } from "@/context/app-context"
@@ -110,10 +111,13 @@ export default function ChatPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="h-5 w-5" />
-          <span className="sr-only">Más opciones</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-5 w-5" />
+            <span className="sr-only">Más opciones</span>
+          </Button>
+        </div>
       </motion.header>
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
