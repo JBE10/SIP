@@ -1,216 +1,196 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { ChevronLeft, Filter } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import ProfileCard from "@/components/profile-card"
-import MatchModal from "@/components/match-modal"
-import { useMobile } from "@/hooks/use-mobile"
-import { profiles } from "@/data/mock-profiles"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import SportSelector from "@/components/sport-selector"
-import BottomNavigation from "@/components/bottom-navigation"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { ArrowLeft, Check, RefreshCw, X } from "lucide-react"
+import { MatchModal } from "@/components/match-modal"
+import { SwipeCard } from "@/components/swipe-card"
+import { motion, AnimatePresence } from "framer-motion"
+import { useAppContext } from "@/context/app-context"
 
 export default function SwipePage() {
-  const router = useRouter()
-  const isMobile = useMobile()
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [direction, setDirection] = useState<string | null>(null)
-  const [showMatch, setShowMatch] = useState(false)
+  const { getAvailableProfiles, addLikedProfile, addDislikedProfile, addMatch, resetViewedProfiles } = useAppContext()
+
+  const [availableProfiles, setAvailableProfiles] = useState(getAvailableProfiles())
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
+  const [showMatchModal, setShowMatchModal] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState<any>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const startX = useRef(0)
-  const currentX = useRef(0)
-  const [isDragging, setIsDragging] = useState(false)
-  const [selectedSport, setSelectedSport] = useState<string | null>(null)
+  const [direction, setDirection] = useState<"left" | "right" | null>(null)
 
-  // Filter profiles based on selected sport
-  const filteredProfiles = selectedSport
-    ? profiles.filter((profile) => profile.sport.toLowerCase() === selectedSport.toLowerCase())
-    : profiles
-
-  // Reset current index when sport selection changes
+  // Actualizar perfiles disponibles cuando cambia el contexto
   useEffect(() => {
-    setCurrentIndex(0)
-  }, [selectedSport])
+    setAvailableProfiles(getAvailableProfiles())
+  }, [getAvailableProfiles])
 
-  const handleSwipe = (dir: string) => {
-    setDirection(dir)
+  const currentProfile = availableProfiles[currentProfileIndex]
+  const isLastProfile = !currentProfile || currentProfileIndex === availableProfiles.length - 1
 
-    // Simulate a match with 30% probability when swiping right
-    if (dir === "right" && Math.random() < 0.3) {
-      setMatchedProfile(filteredProfiles[currentIndex])
+  const handleLike = () => {
+    if (!currentProfile) return
+
+    // Simular un match con 50% de probabilidad
+    const isMatch = Math.random() > 0.5
+
+    if (isMatch) {
+      setMatchedProfile(currentProfile)
+      addMatch(currentProfile)
+      setShowMatchModal(true)
+    } else {
+      addLikedProfile(currentProfile.id)
+      nextProfile("right")
+    }
+  }
+
+  const handleDislike = () => {
+    if (!currentProfile) return
+    addDislikedProfile(currentProfile.id)
+    nextProfile("left")
+  }
+
+  const nextProfile = (dir: "left" | "right") => {
+    if (!isLastProfile) {
+      setDirection(dir)
+      // Pequeño retraso para permitir que la animación termine
       setTimeout(() => {
-        setShowMatch(true)
-      }, 500)
-    }
-
-    setTimeout(() => {
-      setDirection(null)
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % filteredProfiles.length)
-    }, 300)
-  }
-
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    setIsDragging(true)
-    if ("touches" in e) {
-      startX.current = e.touches[0].clientX
-      currentX.current = e.touches[0].clientX
-    } else {
-      startX.current = e.clientX
-      currentX.current = e.clientX
+        setCurrentProfileIndex(currentProfileIndex + 1)
+        setDirection(null)
+      }, 300)
     }
   }
 
-  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging) return
-
-    if ("touches" in e) {
-      currentX.current = e.touches[0].clientX
-    } else {
-      currentX.current = e.clientX
-    }
-
-    const diff = currentX.current - startX.current
-    if (cardRef.current) {
-      cardRef.current.style.transform = `translateX(${diff}px) rotate(${diff * 0.05}deg)`
-
-      // Add opacity to indicate like/dislike
-      if (diff > 0) {
-        cardRef.current.style.boxShadow = `0 0 10px 2px rgba(46, 213, 115, ${Math.min(diff / 100, 0.8)})`
-      } else if (diff < 0) {
-        cardRef.current.style.boxShadow = `0 0 10px 2px rgba(255, 71, 87, ${Math.min(Math.abs(diff) / 100, 0.8)})`
-      }
-    }
+  const handleReset = () => {
+    resetViewedProfiles()
+    setAvailableProfiles(getAvailableProfiles())
+    setCurrentProfileIndex(0)
   }
-
-  const handleTouchEnd = () => {
-    setIsDragging(false)
-    if (!cardRef.current) return
-
-    const diff = currentX.current - startX.current
-    const threshold = 100
-
-    if (diff > threshold) {
-      handleSwipe("right")
-    } else if (diff < -threshold) {
-      handleSwipe("left")
-    } else {
-      // Reset position if not swiped enough
-      cardRef.current.style.transform = ""
-      cardRef.current.style.boxShadow = ""
-    }
-  }
-
-  useEffect(() => {
-    if (!isDragging && cardRef.current) {
-      cardRef.current.style.transform = ""
-      cardRef.current.style.boxShadow = ""
-    }
-  }, [isDragging])
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b bg-white">
-        <Link href="/">
-          <Button variant="ghost" size="icon">
-            <ChevronLeft className="h-6 w-6 text-slate-600" />
-          </Button>
-        </Link>
-        <h1 className="text-xl font-bold text-emerald-600">SportMatch</h1>
-        <Link href="/filters">
-          <Button variant="ghost" size="icon">
-            <Filter className="h-6 w-6 text-slate-600" />
-          </Button>
-        </Link>
-      </header>
+    <div className="container max-w-md py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/menu">
+            <ArrowLeft className="h-5 w-5" />
+            <span className="sr-only">Volver</span>
+          </Link>
+        </Button>
+        <motion.h1
+          className="text-xl font-bold"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          Descubrir
+        </motion.h1>
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/filters">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            <span className="sr-only">Filtros</span>
+          </Link>
+        </Button>
+      </div>
 
-      {/* Sport Selector */}
-      <SportSelector selectedSport={selectedSport} onSelectSport={setSelectedSport} />
-
-      {/* Main content */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 relative">
-        {filteredProfiles.length > 0 ? (
-          <div
-            ref={cardRef}
-            className={`transition-transform duration-300 ${
-              direction === "left"
-                ? "-translate-x-[150%] rotate-[-20deg]"
-                : direction === "right"
-                  ? "translate-x-[150%] rotate-[20deg]"
-                  : ""
-            }`}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={isMobile ? undefined : handleTouchStart}
-            onMouseMove={isMobile ? undefined : handleTouchMove}
-            onMouseUp={isMobile ? undefined : handleTouchEnd}
-            onMouseLeave={isMobile ? undefined : handleTouchEnd}
+      <AnimatePresence mode="wait">
+        {isLastProfile || availableProfiles.length === 0 ? (
+          <motion.div
+            key="no-more-profiles"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.3 }}
           >
-            <ProfileCard profile={filteredProfiles[currentIndex]} />
-          </div>
+            <Card className="overflow-hidden h-[70vh] flex items-center justify-center">
+              <div className="p-6 text-center">
+                <h2 className="text-xl font-bold mb-2">No hay más perfiles</h2>
+                <p className="text-muted-foreground mb-4">
+                  Has visto todos los perfiles disponibles. Puedes reiniciar para ver todos los perfiles nuevamente.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button onClick={handleReset} className="w-full">
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Reiniciar perfiles
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button asChild variant="outline">
+                      <Link href="/filters">Ajustar filtros</Link>
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
         ) : (
-          <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <p className="text-lg text-slate-600">No hay perfiles para mostrar con este deporte.</p>
-            <p className="text-sm text-slate-400 mt-2">Prueba seleccionando otro deporte o ajustando tus filtros.</p>
-          </div>
-        )}
-
-        {/* Swipe buttons - Only show if there are profiles */}
-        {filteredProfiles.length > 0 && (
-          <div className="flex justify-center space-x-6 mt-8">
-            <Button
-              onClick={() => handleSwipe("left")}
-              className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M18 6L6 18M6 6L18 18"
-                  stroke="#FF4757"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+          <motion.div
+            key={`swipe-container-${currentProfileIndex}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="swipe-card-container"
+          >
+            <AnimatePresence>
+              {availableProfiles.slice(currentProfileIndex, currentProfileIndex + 3).map((profile, index) => (
+                <SwipeCard
+                  key={profile.id}
+                  profile={profile}
+                  isTop={index === 0}
+                  onSwipeLeft={handleDislike}
+                  onSwipeRight={handleLike}
                 />
-              </svg>
-            </Button>
-
-            <Button
-              onClick={() => handleSwipe("right")}
-              className="h-16 w-16 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M4.5 12.75L10.5 18.75L19.5 5.25"
-                  stroke="#2ED573"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-          </div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
-      </main>
+      </AnimatePresence>
 
-      {/* Bottom navigation */}
-      <BottomNavigation currentPath="/swipe" />
+      <motion.div
+        className="flex justify-center gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
+        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-14 w-14 rounded-full border-2 border-destructive text-destructive"
+            onClick={handleDislike}
+            disabled={isLastProfile || availableProfiles.length === 0}
+          >
+            <X className="h-6 w-6" />
+            <span className="sr-only">No me interesa</span>
+          </Button>
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-14 w-14 rounded-full border-2 border-primary text-primary"
+            onClick={handleLike}
+            disabled={isLastProfile || availableProfiles.length === 0}
+          >
+            <Check className="h-6 w-6" />
+            <span className="sr-only">Me interesa</span>
+          </Button>
+        </motion.div>
+      </motion.div>
 
-      {/* Match modal */}
-      {showMatch && matchedProfile && (
-        <MatchModal
-          profile={matchedProfile}
-          onClose={() => setShowMatch(false)}
-          onMessage={() => {
-            setShowMatch(false)
-            router.push("/chats")
-          }}
-        />
-      )}
+      <MatchModal isOpen={showMatchModal} onClose={() => setShowMatchModal(false)} matchedProfile={matchedProfile} />
     </div>
   )
 }

@@ -1,35 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-
-const sports = [
-  "Baloncesto",
-  "Fútbol",
-  "Tenis",
-  "Running",
-  "Ciclismo",
-  "Natación",
-  "Voleibol",
-  "Yoga",
-  "Golf",
-  "Senderismo",
-  "Escalada",
-  "Surf",
-]
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+import { SportSelector } from "@/components/sport-selector"
+import { ArrowLeft, Save } from "lucide-react"
 
 export default function FiltersPage() {
-  const [ageRange, setAgeRange] = useState([18, 45])
-  const [distance, setDistance] = useState(25)
-  const [gender, setGender] = useState("all")
-  const [selectedSports, setSelectedSports] = useState<string[]>([])
-  const [skillLevel, setSkillLevel] = useState("all")
+  const [distance, setDistance] = useState([10])
+  const [ageRange, setAgeRange] = useState([18, 40])
+  const [selectedSports, setSelectedSports] = useState<string[]>(["Fútbol", "Tenis"])
 
   const handleSportToggle = (sport: string) => {
     if (selectedSports.includes(sport)) {
@@ -40,139 +23,101 @@ export default function FiltersPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
-        <Link href="/swipe">
-          <Button variant="ghost" size="icon">
-            <ChevronLeft className="h-6 w-6 text-slate-600" />
-          </Button>
-        </Link>
-        <h1 className="text-xl font-bold text-slate-800">Filtros</h1>
-        <Button
-          variant="ghost"
-          className="text-emerald-600"
-          onClick={() => {
-            setAgeRange([18, 45])
-            setDistance(25)
-            setGender("all")
-            setSelectedSports([])
-            setSkillLevel("all")
-          }}
-        >
-          Reiniciar
+    <div className="container max-w-md py-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/menu">
+            <ArrowLeft className="h-5 w-5" />
+            <span className="sr-only">Volver</span>
+          </Link>
         </Button>
-      </header>
+        <h1 className="text-xl font-bold">Filtros</h1>
+        <div className="w-10" />
+      </div>
 
-      {/* Filters content */}
-      <div className="flex-1 p-4 space-y-6 max-w-md mx-auto w-full">
-        {/* Age Range */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-slate-800">Rango de edad</h2>
-            <span className="text-sm text-slate-500">
+      <Card>
+        <CardHeader>
+          <CardTitle>Deportes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SportSelector selectedSports={selectedSports} onToggleSport={handleSportToggle} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Distancia</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Slider value={distance} max={50} step={1} onValueChange={setDistance} />
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">0 km</span>
+            <span className="font-medium">{distance[0]} km</span>
+            <span className="text-sm text-muted-foreground">50 km</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Rango de edad</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Slider value={ageRange} min={18} max={65} step={1} onValueChange={setAgeRange} />
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">18</span>
+            <span className="font-medium">
               {ageRange[0]} - {ageRange[1]}
             </span>
+            <span className="text-sm text-muted-foreground">65+</span>
           </div>
-          <Slider
-            defaultValue={ageRange}
-            min={18}
-            max={65}
-            step={1}
-            onValueChange={(value) => setAgeRange(value as number[])}
-            className="my-4"
-          />
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Distance */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-slate-800">Distancia</h2>
-            <span className="text-sm text-slate-500">{distance} km</span>
-          </div>
-          <Slider
-            defaultValue={[distance]}
-            min={1}
-            max={100}
-            step={1}
-            onValueChange={(value) => setDistance(value[0])}
-            className="my-4"
-          />
-        </div>
-
-        {/* Gender */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Género</h2>
-          <RadioGroup defaultValue={gender} onValueChange={setGender} className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="gender-all" />
-              <Label htmlFor="gender-all">Todos</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="male" id="gender-male" />
-              <Label htmlFor="gender-male">Hombre</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="female" id="gender-female" />
-              <Label htmlFor="gender-female">Mujer</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="other" id="gender-other" />
-              <Label htmlFor="gender-other">Otro</Label>
-            </div>
-          </RadioGroup>
-        </div>
-
-        {/* Sports */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Deportes</h2>
-          <div className="flex flex-wrap gap-2">
-            {sports.map((sport) => (
-              <Badge
-                key={sport}
-                variant={selectedSports.includes(sport) ? "default" : "outline"}
-                className={`cursor-pointer ${
-                  selectedSports.includes(sport)
-                    ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                    : "bg-slate-100 text-slate-800 hover:bg-slate-200"
-                }`}
-                onClick={() => handleSportToggle(sport)}
+      <Card>
+        <CardHeader>
+          <CardTitle>Ubicación</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Ubicación actual</Label>
+            <div className="p-3 bg-muted rounded-md flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-primary"
               >
-                {sport}
-              </Badge>
-            ))}
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>Palermo, CABA, Argentina</span>
+            </div>
           </div>
-        </div>
-
-        {/* Skill Level */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Nivel de habilidad</h2>
-          <RadioGroup defaultValue={skillLevel} onValueChange={setSkillLevel} className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="skill-all" />
-              <Label htmlFor="skill-all">Todos los niveles</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="beginner" id="skill-beginner" />
-              <Label htmlFor="skill-beginner">Principiante</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="intermediate" id="skill-intermediate" />
-              <Label htmlFor="skill-intermediate">Intermedio</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="advanced" id="skill-advanced" />
-              <Label htmlFor="skill-advanced">Avanzado</Label>
-            </div>
-          </RadioGroup>
-        </div>
-
-        {/* Apply button */}
-        <Link href="/swipe" className="block">
-          <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 rounded-xl shadow-md">
-            Aplicar filtros
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" className="w-full">
+            Cambiar ubicación
           </Button>
-        </Link>
+        </CardFooter>
+      </Card>
+
+      <div className="flex gap-4">
+        <Button variant="outline" className="w-full" asChild>
+          <Link href="/swipe">Cancelar</Link>
+        </Button>
+        <Button className="w-full" asChild>
+          <Link href="/swipe">
+            <Save className="mr-2 h-4 w-4" />
+            Guardar filtros
+          </Link>
+        </Button>
       </div>
     </div>
   )

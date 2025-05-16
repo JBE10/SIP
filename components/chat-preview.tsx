@@ -1,48 +1,54 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+"use client"
 
-interface Chat {
-  id: number
-  name: string
-  avatar: string
-  lastMessage: string
-  time: string
-  unread: number
-  sport: string
-}
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { motion } from "framer-motion"
 
 interface ChatPreviewProps {
-  chat: Chat
+  chat: {
+    id: string
+    name: string
+    lastMessage: string
+    timestamp: string
+    unread: number
+    avatar: string
+  }
+  index: number
 }
 
-export default function ChatPreview({ chat }: ChatPreviewProps) {
+export function ChatPreview({ chat, index }: ChatPreviewProps) {
   return (
-    <div className="flex items-center p-4 hover:bg-slate-100 transition-colors">
-      <div className="relative">
-        <Avatar className="h-14 w-14">
-          <AvatarImage src={chat.avatar || "/placeholder.svg"} alt={chat.name} />
-          <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        {chat.unread > 0 && (
-          <div className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {chat.unread}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
+    >
+      <Link href={`/chats/${chat.id}`}>
+        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+          <Avatar className="border border-primary/20">
+            <AvatarImage src={chat.avatar || "/placeholder.svg"} alt={chat.name} />
+            <AvatarFallback>{chat.name.substring(0, 2)}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium truncate">{chat.name}</h3>
+              <span className="text-xs text-muted-foreground">{chat.timestamp}</span>
+            </div>
+            <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
           </div>
-        )}
-      </div>
-
-      <div className="ml-3 flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <h3 className="font-medium text-slate-800">{chat.name}</h3>
-            <Badge className="ml-2 bg-emerald-100 text-emerald-800 text-xs">{chat.sport}</Badge>
-          </div>
-          <span className="text-xs text-slate-500">{chat.time}</span>
+          {chat.unread > 0 && (
+            <motion.div
+              className="bg-primary text-primary-foreground text-xs rounded-full h-5 min-w-5 flex items-center justify-center px-1 pulse-animation"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 15 }}
+            >
+              {chat.unread}
+            </motion.div>
+          )}
         </div>
-
-        <p className={`text-sm truncate mt-1 ${chat.unread > 0 ? "font-medium text-slate-800" : "text-slate-500"}`}>
-          {chat.lastMessage}
-        </p>
-      </div>
-    </div>
+      </Link>
+    </motion.div>
   )
 }

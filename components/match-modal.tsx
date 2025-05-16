@@ -1,107 +1,124 @@
 "use client"
 
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { MessageCircle, X } from "lucide-react"
-
-interface Profile {
-  id: number
-  name: string
-  age: number
-  sport: string
-  level: string
-  images: string[]
-}
+import { MessageCircle } from "lucide-react"
+import Link from "next/link"
+import { motion } from "framer-motion"
+import { useAppContext } from "@/context/app-context"
 
 interface MatchModalProps {
-  profile: Profile
+  isOpen: boolean
   onClose: () => void
-  onMessage: () => void
+  matchedProfile: any
 }
 
-export default function MatchModal({ profile, onClose, onMessage }: MatchModalProps) {
+export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps) {
+  const { currentUser } = useAppContext()
+
+  if (!matchedProfile) return null
+
   return (
-      <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-2xl">
-          <div className="relative">
-            {/* Background pattern */}
-            <div className="absolute inset-0 bg-emerald-500 opacity-90">
-              <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  }}
-              />
-            </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md overflow-hidden">
+        <DialogHeader>
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <DialogTitle className="text-center text-2xl">¡Es un match!</DialogTitle>
+            <DialogDescription className="text-center">
+              A ti y a {matchedProfile.name} les gustaría practicar deportes juntos
+            </DialogDescription>
+          </motion.div>
+        </DialogHeader>
+        <div className="flex justify-center gap-4 py-6">
+          <motion.div
+            className="flex flex-col items-center"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Avatar className="h-24 w-24 border-2 border-primary shadow-lg shadow-primary/20">
+              <AvatarImage src={currentUser.profilePicture || "/placeholder.svg"} alt="Tu perfil" />
+              <AvatarFallback>{currentUser.name.substring(0, 2)}</AvatarFallback>
+            </Avatar>
+            <span className="mt-2 font-medium">Tú</span>
+          </motion.div>
 
-            {/* Close button */}
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 bg-white/20 rounded-full p-2 text-white hover:bg-white/30 z-10"
+          <motion.div
+            className="flex items-center text-primary"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 10,
+              delay: 0.5,
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="pulse-animation"
             >
-              <X className="h-5 w-5" />
-            </button>
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+          </motion.div>
 
-            {/* Content */}
-            <div className="relative z-10 flex flex-col items-center text-center p-6 pt-10 pb-8">
-              <div className="mb-6">
-                <h2 className="text-3xl font-bold text-white mb-2">¡Es un Match!</h2>
-                <p className="text-white/80">Tú y {profile.name} quieren jugar juntos</p>
-              </div>
-
-              <div className="flex items-center justify-center mb-8">
-                <div className="relative">
-                  <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
-                    <AvatarImage src="/placeholder.svg?height=200&width=200" alt="Tu perfil" />
-                    <AvatarFallback>Tú</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md">
-                    <Badge className="bg-emerald-100 text-emerald-800">Tú</Badge>
-                  </div>
-                </div>
-
-                <div className="w-10 h-10 mx-2 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M14 9L19 4M19 4V9M19 4H14M10 15L5 20M5 20V15M5 20H10"
-                        stroke="#10B981"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div className="relative">
-                  <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
-                    <AvatarImage src={profile.images[0] || "/placeholder.svg"} alt={profile.name} />
-                    <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md">
-                    <Badge className="bg-emerald-100 text-emerald-800">{profile.sport}</Badge>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 w-full">
-                <Button onClick={onMessage} className="w-full bg-white text-emerald-600 hover:bg-white/90">
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Enviar un mensaje
-                </Button>
-
-                <Button
-                    variant="outline"
-                    onClick={onClose}
-                    className="w-full border-white/30 text-white hover:bg-white/10 hover:text-white"
-                >
-                  Seguir deslizando
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          <motion.div
+            className="flex flex-col items-center"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Avatar className="h-24 w-24 border-2 border-primary shadow-lg shadow-primary/20">
+              <AvatarImage src={matchedProfile.profilePicture || "/placeholder.svg"} alt={matchedProfile.name} />
+              <AvatarFallback>{matchedProfile.name.substring(0, 2)}</AvatarFallback>
+            </Avatar>
+            <span className="mt-2 font-medium">{matchedProfile.name}</span>
+          </motion.div>
+        </div>
+        <DialogFooter className="flex-col sm:flex-col gap-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button asChild className="w-full">
+              <Link href={`/chats/${matchedProfile.id}`}>
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Enviar mensaje
+              </Link>
+            </Button>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.9 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Button variant="outline" onClick={onClose} className="w-full">
+              Seguir buscando
+            </Button>
+          </motion.div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
