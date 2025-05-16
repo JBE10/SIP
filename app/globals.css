@@ -149,7 +149,7 @@
   display: flex;
   justify-content: space-around;
   padding: 20px;
-  z-index: 10;
+  z-index: 30; /* Aumentado para asegurar que esté por encima de otros elementos */
 }
 
 /* Estilos adicionales para perfiles */
@@ -175,17 +175,22 @@
 
 /* Animaciones para elementos de UI */
 @keyframes pulse-green {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(34, 197, 94, 0.4));
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.6));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(34, 197, 94, 0.4));
   }
 }
 
 .pulse-animation {
-  animation: pulse-green 2s infinite;
+  animation: pulse-green 1.5s infinite;
 }
 
 /* Mejoras para la navegación */
@@ -264,4 +269,22 @@
   background-color: rgba(34, 197, 94, 0.2);
   border: 1px solid rgba(34, 197, 94, 0.4);
   color: rgba(0, 0, 0, 0.8);
+}
+
+/* Mejoras para los botones de swipe */
+.swipe-controls button {
+  transform: translateY(0);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 40;
+}
+
+.swipe-controls button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.swipe-controls button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

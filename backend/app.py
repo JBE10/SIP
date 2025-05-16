@@ -4,15 +4,24 @@ import os
 from dotenv import load_dotenv
 import json
 from bson.objectid import ObjectId
-from models.profile import Profile
-from models.match import Match
-from models.message import Message
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+
+# MongoDB connection
+from pymongo import MongoClient
+
+# Get MongoDB URI from environment variables
+mongo_uri = os.getenv("MONGODB_URI")
+if not mongo_uri:
+    raise ValueError("MONGODB_URI environment variable not set")
+
+client = MongoClient(mongo_uri)
+db = client[os.getenv("MONGODB_DB_NAME", "sportmatch")]
 
 # Helper function to convert ObjectId to string for JSON serialization
 def parse_json(data):
@@ -22,7 +31,7 @@ def parse_json(data):
 @app.route('/api/profiles', methods=['GET'])
 def get_profiles():
     try:
-        profiles = Profile.get_all()
+        profiles = list(db.profiles.find())
         return jsonify({"profiles": parse_json(profiles)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -30,7 +39,7 @@ def get_profiles():
 @app.route('/api/profiles/<id>', methods=['GET'])
 def get_profile(id):
     try:
-        profile = Profile.get_by_id(id)
+        profile = db.profiles.find_one({"_id": ObjectId(id)})
         if profile:
             return jsonify({"profile": parse_json(profile)})
         return jsonify({"error": "Profile not found"}), 404
@@ -41,33 +50,13 @@ def get_profile(id):
 def create_profile():
     try:
         profile_data = request.json
-        profile = Profile.create(profile_data)
-        return jsonify({"success": True, "profile": parse_json(profile)})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/profiles/<id>', methods=['PUT'])
-def update_profile(id):
-    try:
-        profile_data = request.json
-        profile = Profile.update(id, profile_data)
+        profile_data["createdAt"] = datetime.now()
+        profile_data["updatedAt"] = datetime.now()
         
-        if profile:
-            return jsonify({"success": True, "profile": parse_json(profile)})
+        result = db.profiles.insert_one(profile_data)
+        profile_data["_id"] = result.inserted_id
         
-        return jsonify({"error": "Profile not found or not modified"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/profiles/<id>', methods=['DELETE'])
-def delete_profile(id):
-    try:
-        success = Profile.delete(id)
-        
-        if success:
-            return jsonify({"success": True})
-        
-        return jsonify({"error": "Profile not found"}), 404
+        return jsonify({"success": True, "profile": parse_json(profile_data)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -79,7 +68,9 @@ def get_matches():
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
             
-        matches = Match.get_by_user_id(user_id)
+        matches = list(db.matches.find({
+            "$or": [{"user1Id": user_id}, {"user2Id": user_id}]
+        }))
         return jsonify({"matches": parse_json(matches)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -88,15 +79,20 @@ def get_matches():
 def create_match():
     try:
         match_data = request.json
-        match = Match.create(match_data)
-        return jsonify({"success": True, "match": parse_json(match)})
+        match_data["createdAt"] = datetime.now()
+        match_data["updatedAt"] = datetime.now()
+        
+        result = db.matches.insert_one(match_data)
+        match_data["_id"] = result.inserted_id
+        
+        return jsonify({"success": True, "match": parse_json(match_data)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/matches/<id>', methods=['GET'])
 def get_match(id):
     try:
-        match = Match.get_by_id(id)
+        match = db.matches.find_one({"_id": ObjectId(id)})
         if match:
             return jsonify({"match": parse_json(match)})
         return jsonify({"error": "Match not found"}), 404
@@ -111,7 +107,7 @@ def get_messages():
         if not match_id:
             return jsonify({"error": "Match ID is required"}), 400
             
-        messages = Message.get_by_match_id(match_id)
+        messages = list(db.messages.find({"matchId": match_id}).sort("timestamp", 1))
         return jsonify({"messages": parse_json(messages)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -120,8 +116,15 @@ def get_messages():
 def create_message():
     try:
         message_data = request.json
-        message = Message.create(message_data)
-        return jsonify({"success": True, "message": parse_json(message)})
+        message_data["timestamp"] = datetime.now()
+        message_data["createdAt"] = datetime.now()
+        message_data["updatedAt"] = datetime.now()
+        message_data["read"] = False
+        
+        result = db.messages.insert_one(message_data)
+        message_data["_id"] = result.inserted_id
+        
+        return jsonify({"success": True, "message": parse_json(message_data)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -134,8 +137,21 @@ def mark_messages_read():
         if not match_id or not user_id:
             return jsonify({"error": "Match ID and User ID are required"}), 400
             
-        modified_count = Message.mark_as_read(match_id, user_id)
-        return jsonify({"success": True, "modified_count": modified_count})
+        result = db.messages.update_many(
+            {
+                "matchId": match_id,
+                "receiverId": user_id,
+                "read": False
+            },
+            {
+                "$set": {
+                    "read": True,
+                    "updatedAt": datetime.now()
+                }
+            }
+        )
+        
+        return jsonify({"success": True, "modified_count": result.modified_count})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -144,15 +160,9 @@ def mark_messages_read():
 def seed_database():
     try:
         from seed_data import mock_profiles
-        from pymongo import MongoClient
-        
-        client = MongoClient(os.getenv("MONGODB_URI"))
-        db = client[os.getenv("MONGODB_DB_NAME", "sportmatch")]
         
         # Check if profiles collection is empty
         if db.profiles.count_documents({}) == 0:
-            from datetime import datetime
-            
             profiles = []
             for profile in mock_profiles:
                 profile["createdAt"] = datetime.now()

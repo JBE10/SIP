@@ -14,6 +14,8 @@ class Profile:
     
     @staticmethod
     def get_by_id(id):
+        if not ObjectId.is_valid(id):
+            return None
         return db.profiles.find_one({"_id": ObjectId(id)})
     
     @staticmethod
@@ -28,6 +30,9 @@ class Profile:
     
     @staticmethod
     def update(id, profile_data):
+        if not ObjectId.is_valid(id):
+            return None
+            
         profile_data["updatedAt"] = datetime.now()
         
         result = db.profiles.update_one(
@@ -42,5 +47,8 @@ class Profile:
     
     @staticmethod
     def delete(id):
+        if not ObjectId.is_valid(id):
+            return False
+            
         result = db.profiles.delete_one({"_id": ObjectId(id)})
         return result.deleted_count > 0

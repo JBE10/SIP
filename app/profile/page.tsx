@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -58,11 +59,13 @@ export default function ProfilePage() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
-          <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary">
-            <img
-              src={currentUser.profilePicture || "/placeholder.svg"}
+          <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary relative">
+            <Image
+              src={currentUser.profilePicture || "/placeholder.svg?height=96&width=96"}
               alt="Foto de perfil"
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           </div>
         </motion.div>

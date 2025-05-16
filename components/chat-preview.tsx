@@ -27,7 +27,7 @@ export function ChatPreview({ chat, index }: ChatPreviewProps) {
       <Link href={`/chats/${chat.id}`}>
         <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
           <Avatar className="border border-primary/20">
-            <AvatarImage src={chat.avatar || "/placeholder.svg"} alt={chat.name} />
+            <AvatarImage src={chat.avatar || "/placeholder.svg?height=40&width=40"} alt={chat.name} />
             <AvatarFallback>{chat.name.substring(0, 2)}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">

@@ -21,6 +21,7 @@ def seed_database():
         
         # Check if profiles collection is empty
         if db.profiles.count_documents({}) == 0:
+            print("Seeding profiles collection...")
             profiles = []
             for profile in mock_profiles:
                 profile["createdAt"] = datetime.now()
@@ -34,6 +35,8 @@ def seed_database():
                 print("No profiles to insert")
         else:
             print("Profiles collection is not empty. Skipping seed.")
+            
+        print("Database seeding completed successfully!")
             
     except Exception as e:
         print(f"Error seeding database: {str(e)}")

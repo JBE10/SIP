@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SportSelector } from "@/components/sport-selector"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -42,6 +43,12 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         <DialogHeader>
           <DialogTitle>Editar perfil</DialogTitle>
         </DialogHeader>
+        <div className="flex justify-center mb-4">
+          <Avatar className="h-20 w-20 border-2 border-primary">
+            <AvatarImage src={profile.profilePicture || "/placeholder.svg?height=80&width=80"} alt={profile.name} />
+            <AvatarFallback>{profile.name.substring(0, 2)}</AvatarFallback>
+          </Avatar>
+        </div>
         <Tabs defaultValue="info">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="info">Información</TabsTrigger>

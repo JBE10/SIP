@@ -1,10 +1,13 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { MapPin, X, Check } from "lucide-react"
 import { motion, useAnimation, useMotionValue, useTransform } from "framer-motion"
+import Image from "next/image"
 
 interface SwipeCardProps {
   profile: {
@@ -66,6 +69,30 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
     controls.set({ x: 0, opacity: 1 })
   }, [profile.id, controls, x])
 
+  // Función para manejar el botón de dislike
+  const handleDislikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation() // Evitar propagación del evento
+    setExitX(-500)
+    await controls.start({
+      x: -500,
+      opacity: 0,
+      transition: { duration: 0.3 },
+    })
+    onSwipeLeft()
+  }
+
+  // Función para manejar el botón de like
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation() // Evitar propagación del evento
+    setExitX(500)
+    await controls.start({
+      x: 500,
+      opacity: 0,
+      transition: { duration: 0.3 },
+    })
+    onSwipeRight()
+  }
+
   return (
     <motion.div
       className="swipe-card"
@@ -87,11 +114,17 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
       <div className="relative h-full rounded-lg overflow-hidden">
         {/* Imagen de fondo */}
         <div className="absolute inset-0">
-          <img
-            src={profile.profilePicture || "/placeholder.svg"}
-            alt={profile.name}
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-          />
+          <div className="h-full w-full relative">
+            <Image
+              src={profile.profilePicture || "/placeholder.svg?height=600&width=400"}
+              alt={profile.name}
+              fill
+              className="object-cover transition-transform duration-300 hover:scale-105"
+              priority={isTop}
+              sizes="(max-width: 768px) 100vw, 500px"
+              unoptimized
+            />
+          </div>
         </div>
 
         {/* Gradiente mejorado para mejor contraste */}
@@ -104,16 +137,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
               variant="outline"
               size="icon"
               className="h-14 w-14 rounded-full border-2 border-destructive bg-background/80 backdrop-blur-sm text-destructive"
-              onClick={() => {
-                setExitX(-500)
-                controls
-                  .start({
-                    x: -500,
-                    opacity: 0,
-                    transition: { duration: 0.3 },
-                  })
-                  .then(() => onSwipeLeft())
-              }}
+              onClick={handleDislikeClick}
             >
               <X className="h-6 w-6" />
               <span className="sr-only">No me interesa</span>
@@ -125,16 +149,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
               variant="outline"
               size="icon"
               className="h-14 w-14 rounded-full border-2 border-primary bg-background/80 backdrop-blur-sm text-primary"
-              onClick={() => {
-                setExitX(500)
-                controls
-                  .start({
-                    x: 500,
-                    opacity: 0,
-                    transition: { duration: 0.3 },
-                  })
-                  .then(() => onSwipeRight())
-              }}
+              onClick={handleLikeClick}
             >
               <Check className="h-6 w-6" />
               <span className="sr-only">Me interesa</span>

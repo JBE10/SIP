@@ -16,6 +16,8 @@ class Match:
     
     @staticmethod
     def get_by_id(id):
+        if not ObjectId.is_valid(id):
+            return None
         return db.matches.find_one({"_id": ObjectId(id)})
     
     @staticmethod
@@ -30,6 +32,9 @@ class Match:
     
     @staticmethod
     def update(id, match_data):
+        if not ObjectId.is_valid(id):
+            return None
+            
         match_data["updatedAt"] = datetime.now()
         
         result = db.matches.update_one(
@@ -44,5 +49,8 @@ class Match:
     
     @staticmethod
     def delete(id):
+        if not ObjectId.is_valid(id):
+            return False
+            
         result = db.matches.delete_one({"_id": ObjectId(id)})
         return result.deleted_count > 0

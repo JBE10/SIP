@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin } from "lucide-react"
+import Image from "next/image"
 
 interface ProfileCardProps {
   profile: {
@@ -19,11 +20,16 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   return (
     <Card className="overflow-hidden h-[70vh] relative group">
       <div className="absolute inset-0 overflow-hidden">
-        <img
-          src={profile.profilePicture || "/placeholder.svg"}
-          alt={profile.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        <div className="relative h-full w-full">
+          <Image
+            src={profile.profilePicture || "/placeholder.svg?height=600&width=400"}
+            alt={profile.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 500px"
+            unoptimized
+          />
+        </div>
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
