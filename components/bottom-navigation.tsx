@@ -28,6 +28,8 @@ export default function BottomNavigation({ currentPath }: BottomNavigationProps)
                     <MapPin className="h-6 w-6" />
                     <span className="text-xs mt-1">Descubrir</span>
                 </Button>
+
+
             </Link>
             <Link href="/chats">
                 <Button
