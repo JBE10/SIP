@@ -1,35 +1,36 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { MessageSquare } from "lucide-react"
+import type { Profile } from "@/context/app-context"
 
 interface MatchModalProps {
   isOpen: boolean
   onClose: () => void
-  matchedProfile: any
+  matchedProfile: Profile
 }
 
 export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps) {
-  const [showAnimation, setShowAnimation] = useState(false)
-
+  // Asegurarse de que el modal se cierre cuando se desmonte el componente
   useEffect(() => {
-    if (isOpen) {
-      setShowAnimation(true)
-    } else {
-      setShowAnimation(false)
+    return () => {
+      if (isOpen) {
+        onClose()
+      }
     }
-  }, [isOpen])
-
-  if (!matchedProfile) return null
+  }, [isOpen, onClose])
 
   return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md bg-gradient-to-b from-pink-500 to-purple-600 border-0 text-white">
+          <DialogTitle className="sr-only">Match encontrado</DialogTitle>
+          <DialogDescription className="sr-only">Has hecho match con {matchedProfile.name}</DialogDescription>
+
           <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
@@ -42,57 +43,59 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
             </motion.div>
 
             <div className="relative w-full h-40 mb-8">
-              <AnimatePresence>
-                {showAnimation && (
-                    <>
-                      <motion.div
-                          className="absolute left-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
-                          initial={{ x: -100, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ duration: 0.5 }}
-                      >
-                        <Image src="/images/profile1.png" alt="Tu perfil" fill className="object-cover" unoptimized />
-                      </motion.div>
+              <motion.div
+                  className="absolute left-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
+                  initial={{ x: -100, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+              >
+                <Image
+                    src="/images/profile1.png"
+                    alt="Tu perfil"
+                    width={112}
+                    height={112}
+                    className="object-cover"
+                    unoptimized
+                />
+              </motion.div>
 
-                      <motion.div
-                          className="absolute right-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
-                          initial={{ x: 100, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ duration: 0.5 }}
-                      >
-                        <Image
-                            src={matchedProfile.profilePicture || `/placeholder.svg?height=200&width=200`}
-                            alt={matchedProfile.name}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                        />
-                      </motion.div>
+              <motion.div
+                  className="absolute right-1/4 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
+                  initial={{ x: 100, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+              >
+                <Image
+                    src={matchedProfile.profilePicture || `/placeholder.svg?height=112&width=112`}
+                    alt={matchedProfile.name}
+                    width={112}
+                    height={112}
+                    className="object-cover"
+                    unoptimized
+                />
+              </motion.div>
 
-                      <motion.div
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: 0.3, duration: 0.5 }}
-                      >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="60"
-                            height="60"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-white drop-shadow-lg heart-pulse"
-                        >
-                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                        </svg>
-                      </motion.div>
-                    </>
-                )}
-              </AnimatePresence>
+              <motion.div
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-white drop-shadow-lg heart-pulse"
+                >
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+              </motion.div>
             </div>
 
             <div className="flex flex-col gap-3 w-full">

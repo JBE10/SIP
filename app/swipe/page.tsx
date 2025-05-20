@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -11,18 +11,13 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { motion, AnimatePresence } from "framer-motion"
 import { useApp } from "@/context/app-context"
 import { ProfileDetails } from "@/components/profile-details"
+import type { Profile } from "@/context/app-context"
 
 export default function SwipePage() {
-  const { availableProfiles, addLikedProfile, addDislikedProfile, getAvailableProfiles } = useApp()
-
+  const { availableProfiles, addLikedProfile, addDislikedProfile, resetProfiles } = useApp()
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
   const [showMatchModal, setShowMatchModal] = useState(false)
-  const [matchedProfile, setMatchedProfile] = useState<any>(null)
-
-  // Actualizar perfiles disponibles cuando cambia el contexto
-  useEffect(() => {
-    getAvailableProfiles()
-  }, [getAvailableProfiles])
+  const [matchedProfile, setMatchedProfile] = useState<Profile | null>(null)
 
   const currentProfile = availableProfiles[currentProfileIndex]
   const isLastProfile = !currentProfile || currentProfileIndex === availableProfiles.length - 1
@@ -38,7 +33,7 @@ export default function SwipePage() {
       setShowMatchModal(true)
     }
 
-    // Always move to next profile after a like action
+    // Siempre avanzar al siguiente perfil después de una acción
     nextProfile()
   }
 
@@ -56,8 +51,8 @@ export default function SwipePage() {
     }
   }
 
-  const handleReset = async () => {
-    await getAvailableProfiles()
+  const handleReset = () => {
+    resetProfiles()
     setCurrentProfileIndex(0)
   }
 
@@ -168,7 +163,9 @@ export default function SwipePage() {
             </motion.div>
         )}
 
-        <MatchModal isOpen={showMatchModal} onClose={() => setShowMatchModal(false)} matchedProfile={matchedProfile} />
+        {matchedProfile && (
+            <MatchModal isOpen={showMatchModal} onClose={() => setShowMatchModal(false)} matchedProfile={matchedProfile} />
+        )}
       </div>
   )
 }

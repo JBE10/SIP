@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
 import { mockProfiles } from "@/data/mock-profiles"
 
-// Definir tipos
+// Tipos
 export interface Profile {
   id: string
   name: string
@@ -18,207 +18,126 @@ export interface Profile {
 
 interface Match {
   id: string
-  user1Id: string
-  user2Id: string
+  profile: Profile
   timestamp: string
-  otherUser?: Profile
-}
-
-interface Message {
-  id: string
-  matchId: string
-  senderId: string
-  receiverId: string
-  content: string
-  timestamp: string
-  read: boolean
 }
 
 interface AppContextType {
-  currentUser: Profile | null
   availableProfiles: Profile[]
-  matches: Match[]
   likedProfiles: string[]
   dislikedProfiles: string[]
-  loading: boolean
-  getAvailableProfiles: () => Promise<void>
-  getMatches: () => Promise<void>
-  getMessages: (matchId: string) => Promise<Message[]>
-  sendMessage: (matchId: string, content: string) => Promise<void>
-  markMessagesAsRead: (matchId: string) => Promise<void>
+  matches: Match[]
+  currentUser: Profile
   addLikedProfile: (profileId: string) => Promise<boolean>
   addDislikedProfile: (profileId: string) => void
-  updateProfile: (profile: Partial<Profile>) => Promise<void>
+  resetProfiles: () => void
 }
 
+// Crear el contexto
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<Profile | null>(null)
+// Proveedor del contexto
+export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [availableProfiles, setAvailableProfiles] = useState<Profile[]>([])
-  const [matches, setMatches] = useState<Match[]>([])
   const [likedProfiles, setLikedProfiles] = useState<string[]>([])
   const [dislikedProfiles, setDislikedProfiles] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
+  const [matches, setMatches] = useState<Match[]>([])
 
-  // Inicializar con un usuario actual simulado
+  const currentUser: Profile = {
+    id: "current-user",
+    name: "Tomás",
+    age: 28,
+    location: "Palermo, Buenos Aires",
+    bio: "Apasionado del deporte y la vida al aire libre. Busco compañeros para practicar tenis y running regularmente.",
+    sports: ["Tenis", "Running", "Natación", "Yoga"],
+    distance: 0,
+    profilePicture: "/images/profile1.png",
+  }
+
+  // Inicializar perfiles disponibles
   useEffect(() => {
-    const mockCurrentUser: Profile = {
-      id: "current-user",
-      name: "Tu Nombre",
-      age: 25,
-      location: "Tu Ubicación",
-      bio: "Tu biografía aquí. Describe tus intereses deportivos y lo que buscas.",
-      sports: ["Fútbol", "Running", "Tenis"],
-      distance: 0,
-      profilePicture: "/images/profile1.png",
+    // Filtrar perfiles ya likeados o dislikeados
+    const filtered = mockProfiles.filter(
+        (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
+    )
+    setAvailableProfiles(filtered)
+  }, [likedProfiles, dislikedProfiles])
+
+  // Cargar datos guardados
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedLiked = localStorage.getItem("likedProfiles")
+      const savedDisliked = localStorage.getItem("dislikedProfiles")
+      const savedMatches = localStorage.getItem("matches")
+
+      if (savedLiked) setLikedProfiles(JSON.parse(savedLiked))
+      if (savedDisliked) setDislikedProfiles(JSON.parse(savedDisliked))
+      if (savedMatches) setMatches(JSON.parse(savedMatches))
     }
-    setCurrentUser(mockCurrentUser)
-    getAvailableProfiles()
-    getMatches()
-    setLoading(false)
   }, [])
 
-  const getAvailableProfiles = async () => {
-    try {
-      // Filtrar perfiles ya likeados o dislikeados
-      const filteredProfiles = mockProfiles.filter(
-        (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
-      )
-      setAvailableProfiles(filteredProfiles)
-    } catch (error) {
-      console.error("Error fetching profiles:", error)
+  // Guardar datos cuando cambian
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("likedProfiles", JSON.stringify(likedProfiles))
+      localStorage.setItem("dislikedProfiles", JSON.stringify(dislikedProfiles))
+      localStorage.setItem("matches", JSON.stringify(matches))
     }
-  }
+  }, [likedProfiles, dislikedProfiles, matches])
 
-  const getMatches = async () => {
-    try {
-      const response = await fetch(`/api/matches?userId=current-user`)
-      const data = await response.json()
-      setMatches(data.matches || [])
-    } catch (error) {
-      console.error("Error fetching matches:", error)
-    }
-  }
-
-  const getMessages = async (matchId: string): Promise<Message[]> => {
-    try {
-      const response = await fetch(`/api/messages?matchId=${matchId}`)
-      const data = await response.json()
-      return data.messages || []
-    } catch (error) {
-      console.error("Error fetching messages:", error)
-      return []
-    }
-  }
-
-  const sendMessage = async (matchId: string, content: string) => {
-    if (!currentUser) return
-
-    try {
-      await fetch("/api/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          matchId,
-          senderId: currentUser.id,
-          receiverId: matches.find((m) => m.id === matchId)?.otherUser?.id || "",
-          content,
-        }),
-      })
-    } catch (error) {
-      console.error("Error sending message:", error)
-    }
-  }
-
-  const markMessagesAsRead = async (matchId: string) => {
-    if (!currentUser) return
-
-    try {
-      await fetch(`/api/messages/read?matchId=${matchId}&userId=${currentUser.id}`, {
-        method: "PATCH",
-      })
-    } catch (error) {
-      console.error("Error marking messages as read:", error)
-    }
-  }
-
-  const addLikedProfile = async (profileId: string): Promise<boolean> => {
+  // Funciones memoizadas para evitar recreaciones
+  const addLikedProfile = useCallback(async (profileId: string): Promise<boolean> => {
     setLikedProfiles((prev) => [...prev, profileId])
 
-    // Simular un match con una probabilidad del 70%
+    // Simular un match con 70% de probabilidad
     const isMatch = Math.random() < 0.7
 
     if (isMatch) {
-      // Crear un nuevo match
-      try {
-        const response = await fetch("/api/matches", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user1Id: "current-user",
-            user2Id: profileId,
-          }),
-        })
-
-        if (response.ok) {
-          await getMatches()
+      // Encontrar el perfil completo
+      const profile = mockProfiles.find((p) => p.id === profileId)
+      if (profile) {
+        const newMatch: Match = {
+          id: `match-${Date.now()}`,
+          profile,
+          timestamp: new Date().toISOString(),
         }
-      } catch (error) {
-        console.error("Error creating match:", error)
+        setMatches((prev) => [...prev, newMatch])
       }
     }
 
-    // Actualizar perfiles disponibles
-    await getAvailableProfiles()
-
     return isMatch
-  }
+  }, [])
 
-  const addDislikedProfile = async (profileId: string) => {
+  const addDislikedProfile = useCallback((profileId: string) => {
     setDislikedProfiles((prev) => [...prev, profileId])
-    await getAvailableProfiles()
-  }
+  }, [])
 
-  const updateProfile = async (profile: Partial<Profile>) => {
-    if (!currentUser) return
-
-    try {
-      const updatedProfile = { ...currentUser, ...profile }
-      setCurrentUser(updatedProfile)
-    } catch (error) {
-      console.error("Error updating profile:", error)
-    }
-  }
+  const resetProfiles = useCallback(() => {
+    setLikedProfiles([])
+    setDislikedProfiles([])
+    localStorage.removeItem("likedProfiles")
+    localStorage.removeItem("dislikedProfiles")
+  }, [])
 
   const value = {
-    currentUser,
     availableProfiles,
-    matches,
     likedProfiles,
     dislikedProfiles,
-    loading,
-    getAvailableProfiles,
-    getMatches,
-    getMessages,
-    sendMessage,
-    markMessagesAsRead,
+    matches,
+    currentUser,
     addLikedProfile,
     addDislikedProfile,
-    updateProfile,
+    resetProfiles,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
 
+// Hook personalizado para usar el contexto
 export const useApp = () => {
   const context = useContext(AppContext)
   if (context === undefined) {
-    throw new Error("useApp must be used within an AppProvider")
+    throw new Error("useApp debe ser usado dentro de un AppProvider")
   }
   return context
 }
