@@ -2,12 +2,11 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { MapPin, X, Check } from "lucide-react"
-import { motion, useAnimation, useMotionValue, useTransform } from "framer-motion"
+import { useState } from "react"
 import Image from "next/image"
+import { Card } from "@/components/ui/card"
+import { motion, useMotionValue, useTransform, type PanInfo } from "framer-motion"
+import { X, Heart } from "lucide-react"
 
 interface SwipeCardProps {
   profile: {
@@ -17,7 +16,6 @@ interface SwipeCardProps {
     location: string
     bio: string
     sports: string[]
-    distance: number
     profilePicture: string
   }
   isTop: boolean
@@ -27,170 +25,106 @@ interface SwipeCardProps {
 
 export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
   const [exitX, setExitX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
 
-  // Motion values para el deslizamiento
+  // Motion values for the card
   const x = useMotionValue(0)
   const rotate = useTransform(x, [-200, 0, 200], [-20, 0, 20])
-  const leftIndicatorOpacity = useTransform(x, [-100, -20, 0], [1, 0, 0])
-  const rightIndicatorOpacity = useTransform(x, [0, 20, 100], [0, 0, 1])
-  const controls = useAnimation()
+  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0])
 
-  // Umbral para considerar un swipe completo (en píxeles)
-  const swipeThreshold = 100
+  // Scale for the like/dislike buttons
+  const likeScale = useTransform(x, [0, 150], [1, 1.5])
+  const dislikeScale = useTransform(x, [-150, 0], [1.5, 1])
 
-  const handleDragEnd = async (_, info: any) => {
-    if (info.offset.x < -swipeThreshold) {
-      setExitX(-500)
-      await controls.start({
-        x: -500,
-        opacity: 0,
-        transition: { duration: 0.3 },
-      })
-      onSwipeLeft()
-    } else if (info.offset.x > swipeThreshold) {
-      setExitX(500)
-      await controls.start({
-        x: 500,
-        opacity: 0,
-        transition: { duration: 0.3 },
-      })
+  // Handle drag end
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setIsDragging(false)
+
+    if (info.offset.x > 100) {
+      setExitX(200)
       onSwipeRight()
-    } else {
-      controls.start({
-        x: 0,
-        transition: { type: "spring", stiffness: 300, damping: 20 },
-      })
+    } else if (info.offset.x < -100) {
+      setExitX(-200)
+      onSwipeLeft()
     }
   }
 
-  // Resetear la posición cuando cambia el perfil
-  useEffect(() => {
-    x.set(0)
-    controls.set({ x: 0, opacity: 1 })
-  }, [profile.id, controls, x])
-
-  // Función para manejar el botón de dislike
-  const handleDislikeClick = async (e: React.MouseEvent) => {
-    e.stopPropagation() // Evitar propagación del evento
-    setExitX(-500)
-    await controls.start({
-      x: -500,
-      opacity: 0,
-      transition: { duration: 0.3 },
-    })
-    onSwipeLeft()
-  }
-
-  // Función para manejar el botón de like
-  const handleLikeClick = async (e: React.MouseEvent) => {
-    e.stopPropagation() // Evitar propagación del evento
-    setExitX(500)
-    await controls.start({
-      x: 500,
-      opacity: 0,
-      transition: { duration: 0.3 },
-    })
+  // Handle like button click
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setExitX(200)
     onSwipeRight()
   }
 
+  // Handle dislike button click
+  const handleDislikeClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setExitX(-200)
+    onSwipeLeft()
+  }
+
   return (
-    <motion.div
-      className="swipe-card"
-      style={{
-        x,
-        rotate,
-        zIndex: isTop ? 10 : 0,
-      }}
-      drag={isTop ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      onDragEnd={handleDragEnd}
-      animate={controls}
-      whileTap={{ scale: 1.02 }}
-      initial={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.8 }}
-      animate={{ scale: isTop ? 1 : 0.95, opacity: isTop ? 1 : 0.8 }}
-      transition={{ duration: 0.2 }}
-      exit={{ x: exitX, opacity: 0, transition: { duration: 0.2 } }}
-    >
-      <div className="relative h-full rounded-lg overflow-hidden">
-        {/* Imagen de fondo */}
-        <div className="absolute inset-0">
-          <div className="h-full w-full relative">
+      <motion.div
+          className={`absolute w-full ${isTop ? "z-10" : "z-0"}`}
+          style={{ x, rotate, opacity }}
+          drag={isTop ? "x" : false}
+          dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={handleDragEnd}
+          animate={{ x: exitX }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <Card className="overflow-hidden h-[70vh] relative">
+          <div className="relative w-full h-full">
             <Image
-              src={profile.profilePicture || "/placeholder.svg?height=600&width=400"}
-              alt={profile.name}
-              fill
-              className="object-cover transition-transform duration-300 hover:scale-105"
-              priority={isTop}
-              sizes="(max-width: 768px) 100vw, 500px"
-              unoptimized
+                src={profile.profilePicture || `/placeholder.svg?height=800&width=600`}
+                alt={profile.name}
+                fill
+                className="object-cover"
+                priority
+                unoptimized
             />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+              <h3 className="text-2xl font-bold mb-1">
+                {profile.name}, {profile.age}
+              </h3>
+              <p className="text-sm mb-2">{profile.location}</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {profile.sports.map((sport) => (
+                    <span key={sport} className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                  {sport}
+                </span>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Gradiente mejorado para mejor contraste */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+        {isTop && (
+            <>
+              {/* Dislike button */}
+              <motion.button
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-lg z-20"
+                  style={{ scale: dislikeScale }}
+                  onClick={handleDislikeClick}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+              >
+                <X className="h-8 w-8 text-red-500" />
+              </motion.button>
 
-        {/* Controles dentro de la tarjeta (estilo Tinder) */}
-        <div className="swipe-controls">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="z-20">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14 rounded-full border-2 border-destructive bg-background/80 backdrop-blur-sm text-destructive"
-              onClick={handleDislikeClick}
-            >
-              <X className="h-6 w-6" />
-              <span className="sr-only">No me interesa</span>
-            </Button>
-          </motion.div>
-
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="z-20">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14 rounded-full border-2 border-primary bg-background/80 backdrop-blur-sm text-primary"
-              onClick={handleLikeClick}
-            >
-              <Check className="h-6 w-6" />
-              <span className="sr-only">Me interesa</span>
-            </Button>
-          </motion.div>
-        </div>
-
-        {/* Contenido del perfil con mejor contraste */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 pb-20 text-white z-10">
-          <div className="mb-3">
-            <h2 className="text-2xl font-bold text-white drop-shadow-md">
-              {profile.name}, {profile.age}
-            </h2>
-            <p className="flex items-center gap-1 text-white/90 drop-shadow-md">
-              <MapPin className="h-4 w-4" />
-              {profile.location} • a {profile.distance} km
-            </p>
-          </div>
-
-          {/* Fondo semi-transparente para la bio para mejorar legibilidad */}
-          <div className="bg-black/40 p-3 rounded-lg mb-4 backdrop-blur-sm">
-            <p className="text-white">{profile.bio}</p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {profile.sports.map((sport) => (
-              <Badge key={sport} variant="secondary" className="profile-badge">
-                {sport}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Indicadores de acción */}
-        <motion.div className="swipe-action-indicator left" style={{ opacity: leftIndicatorOpacity }}>
-          <X className="h-8 w-8" />
-        </motion.div>
-        <motion.div className="swipe-action-indicator right" style={{ opacity: rightIndicatorOpacity }}>
-          <Check className="h-8 w-8" />
-        </motion.div>
-      </div>
-    </motion.div>
+              {/* Like button */}
+              <motion.button
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-lg z-20"
+                  style={{ scale: likeScale }}
+                  onClick={handleLikeClick}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+              >
+                <Heart className="h-8 w-8 text-green-500" />
+              </motion.button>
+            </>
+        )}
+      </motion.div>
   )
 }
