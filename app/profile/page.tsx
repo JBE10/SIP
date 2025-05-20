@@ -11,11 +11,11 @@ import { ProfileEditModal } from "@/components/profile-edit-modal"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
-import { useAppContext } from "@/context/app-context"
+import { useApp } from "@/context/app-context"
 
 export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const { currentUser } = useAppContext()
+  const { currentUser } = useApp()
 
   const container = {
     hidden: { opacity: 0 },

@@ -58,7 +58,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Filtrar perfiles ya likeados o dislikeados
     const filtered = mockProfiles.filter(
-        (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
+      (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
     )
     setAvailableProfiles(filtered)
   }, [likedProfiles, dislikedProfiles])
