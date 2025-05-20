@@ -111,6 +111,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               </motion.div>
             </div>
           </div>
+
         </DialogContent>
       </Dialog>
   )
