@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { MessageSquare } from "lucide-react"
+import { MessageSquare, Handshake } from "lucide-react"
 import type { Profile } from "@/context/app-context"
 
 interface MatchModalProps {
@@ -25,6 +25,8 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
     }
   }, [isOpen, onClose])
 
+  if (!matchedProfile) return null
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-pink-500 to-purple-600 border-0 text-white">
@@ -39,7 +41,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
             className="mb-6"
           >
             <h2 className="text-3xl font-bold mb-2">¡Es un match!</h2>
-            <p className="text-white/80">Tú y {matchedProfile.name} se han gustado mutuamente</p>
+            <p className="text-white/80">Tú y {matchedProfile.name} quieren practicar deportes juntos</p>
           </motion.div>
 
           <div className="relative w-full h-40 mb-8">
@@ -75,26 +77,14 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               />
             </motion.div>
 
+            {/* Reemplazamos el corazón por un apretón de manos */}
             <motion.div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-white rounded-full p-3"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="60"
-                height="60"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-white drop-shadow-lg heart-pulse"
-              >
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-              </svg>
+              <Handshake className="h-10 w-10 text-purple-600 handshake-pulse" />
             </motion.div>
           </div>
 

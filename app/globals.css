@@ -193,6 +193,29 @@
   animation: pulse-green 1.5s infinite;
 }
 
+/* Animación para el apretón de manos */
+@keyframes handshake {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.handshake-pulse {
+  animation: handshake 1.5s infinite, pulse-green 2s infinite;
+}
+
 /* Mejoras para la navegación */
 .nav-item {
   position: relative;

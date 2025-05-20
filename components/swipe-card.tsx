@@ -6,7 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { Card } from "@/components/ui/card"
 import { motion, useMotionValue, useTransform, type PanInfo } from "framer-motion"
-import { X, Heart } from "lucide-react"
+import { X, Handshake } from "lucide-react"
 
 interface SwipeCardProps {
   profile: {
@@ -102,7 +102,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
 
       {isTop && (
         <>
-          {/* Dislike button */}
+          {/* Dislike button - Cambiado a X */}
           <motion.button
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-lg z-20"
             style={{ scale: dislikeScale }}
@@ -113,7 +113,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
             <X className="h-8 w-8 text-red-500" />
           </motion.button>
 
-          {/* Like button */}
+          {/* Like button - Cambiado a apretón de manos */}
           <motion.button
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-lg z-20"
             style={{ scale: likeScale }}
@@ -121,7 +121,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <Heart className="h-8 w-8 text-green-500" />
+            <Handshake className="h-8 w-8 text-green-500" />
           </motion.button>
         </>
       )}
