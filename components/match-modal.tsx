@@ -31,6 +31,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
           <DialogDescription className="sr-only">Has hecho match con {matchedProfile.name}</DialogDescription>
 
           <div className="flex flex-col items-center justify-center py-6 px-4 text-center">
+            {/* Título y subtítulo */}
             <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -41,9 +42,9 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               <p className="text-white/80">Tú y {matchedProfile.name} quieren practicar deportes juntos</p>
             </motion.div>
 
-            {/* Apretón de manos arriba */}
+            {/* Apretón de manos */}
             <motion.div
-                className="relative z-30 mb-6"
+                className="mb-6"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
@@ -53,11 +54,10 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               </div>
             </motion.div>
 
-            {/* Contenedor de fotos con altura fija y margen inferior grande */}
-            <div className="relative w-full flexx justify-center mb-12 h-32">
-              {/* Primera foto (tu perfil) */}
+            {/* Fotos de perfil - Usando flex en lugar de posicionamiento absoluto */}
+            <div className="flex justify-center items-center gap-4 mb-10">
               <motion.div
-                  className="absolute left-1/2 -translate-x-[120px] z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
+                  className="rounded-full overflow-hidden border-4 border-white w-24 h-24 flex-shrink-0"
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5 }}
@@ -65,33 +65,32 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
                 <Image
                     src="/images/profile1.png"
                     alt="Tu perfil"
-                    width={112}
-                    height={112}
-                    className="object-cover"
+                    width={96}
+                    height={96}
+                    className="object-cover w-full h-full"
                     unoptimized
                 />
               </motion.div>
 
-              {/* Segunda foto (perfil del match) */}
               <motion.div
-                  className="absolute left-1/2 translate-x-[20px] z-10 rounded-full overflow-hidden border-4 border-white w-28 h-28"
+                  className="rounded-full overflow-hidden border-4 border-white w-24 h-24 flex-shrink-0"
                   initial={{ x: 50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.5 }}
               >
                 <Image
-                    src={matchedProfile.profilePicture || `/placeholder.svg?height=112&width=112`}
+                    src={matchedProfile.profilePicture || `/placeholder.svg?height=96&width=96`}
                     alt={matchedProfile.name}
-                    width={112}
-                    height={112}
-                    className="object-cover"
+                    width={96}
+                    height={96}
+                    className="object-cover w-full h-full"
                     unoptimized
                 />
               </motion.div>
             </div>
 
-            {/* Botones con margen superior para separarlos de las fotos */}
-            <div className="flex flex-col gap-3 w-full mt-4">
+            {/* Botones */}
+            <div className="flex flex-col gap-3 w-full">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
                 <Button asChild className="w-full bg-white text-purple-600 hover:bg-white/90">
                   <Link href={`/chats`}>
