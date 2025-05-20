@@ -15,21 +15,31 @@ export interface Profile {
 }
 
 export async function getProfiles(): Promise<Profile[]> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  return db.collection("profiles").find({}).sort({ createdAt: -1 }).toArray() as Promise<Profile[]>
+    return db.collection("profiles").find({}).sort({ createdAt: -1 }).toArray() as Promise<Profile[]>
+  } catch (error) {
+    console.error("Error in getProfiles:", error)
+    return []
+  }
 }
 
 export async function getProfileById(id: string): Promise<Profile | null> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  if (ObjectId.isValid(id)) {
-    return db.collection("profiles").findOne({ _id: new ObjectId(id) }) as Promise<Profile | null>
+    if (ObjectId.isValid(id)) {
+      return db.collection("profiles").findOne({ _id: new ObjectId(id) }) as Promise<Profile | null>
+    }
+
+    return null
+  } catch (error) {
+    console.error("Error in getProfileById:", error)
+    return null
   }
-
-  return null
 }
 
 export async function createProfile(profileData: Omit<Profile, "_id" | "createdAt" | "updatedAt">): Promise<Profile> {
@@ -52,23 +62,28 @@ export async function createProfile(profileData: Omit<Profile, "_id" | "createdA
 }
 
 export async function updateProfile(id: string, profileData: Partial<Profile>): Promise<Profile | null> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  if (!ObjectId.isValid(id)) {
+    if (!ObjectId.isValid(id)) {
+      return null
+    }
+
+    const result = await db.collection("profiles").findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...profileData,
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: "after" },
+    )
+
+    return result as unknown as Profile
+  } catch (error) {
+    console.error("Error in updateProfile:", error)
     return null
   }
-
-  const result = await db.collection("profiles").findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    {
-      $set: {
-        ...profileData,
-        updatedAt: new Date(),
-      },
-    },
-    { returnDocument: "after" },
-  )
-
-  return result as unknown as Profile
 }

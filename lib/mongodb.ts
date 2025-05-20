@@ -1,17 +1,13 @@
-import { MongoClient, ServerApiVersion } from "mongodb"
+import { MongoClient } from "mongodb"
 
 if (!process.env.MONGODB_URI) {
-  throw new Error("Please add your MongoDB URI to .env.local")
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env.local or in your Vercel project settings",
+  )
 }
 
 const uri = process.env.MONGODB_URI
-const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-}
+const options = {}
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>

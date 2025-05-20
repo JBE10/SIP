@@ -12,16 +12,21 @@ export interface Match {
 }
 
 export async function getMatchesByUserId(userId: string): Promise<Match[]> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  return db
-    .collection("matches")
-    .find({
-      $or: [{ user1Id: userId }, { user2Id: userId }],
-    })
-    .sort({ createdAt: -1 })
-    .toArray() as Promise<Match[]>
+    return db
+      .collection("matches")
+      .find({
+        $or: [{ user1Id: userId }, { user2Id: userId }],
+      })
+      .sort({ createdAt: -1 })
+      .toArray() as Promise<Match[]>
+  } catch (error) {
+    console.error("Error in getMatchesByUserId:", error)
+    return []
+  }
 }
 
 export async function createMatch(matchData: Omit<Match, "_id" | "createdAt" | "updatedAt">): Promise<Match> {
@@ -44,12 +49,17 @@ export async function createMatch(matchData: Omit<Match, "_id" | "createdAt" | "
 }
 
 export async function getMatchById(id: string): Promise<Match | null> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  if (ObjectId.isValid(id)) {
-    return db.collection("matches").findOne({ _id: new ObjectId(id) }) as Promise<Match | null>
+    if (ObjectId.isValid(id)) {
+      return db.collection("matches").findOne({ _id: new ObjectId(id) }) as Promise<Match | null>
+    }
+
+    return null
+  } catch (error) {
+    console.error("Error in getMatchById:", error)
+    return null
   }
-
-  return null
 }

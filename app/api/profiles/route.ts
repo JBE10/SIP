@@ -1,25 +1,28 @@
 import { NextResponse } from "next/server"
-import { getProfiles, createProfile } from "@/models/Profile"
+import { mockProfiles } from "@/data/mock-profiles"
 
 export async function GET() {
   try {
-    const profiles = await getProfiles()
-    return NextResponse.json({ profiles })
+    return NextResponse.json({ profiles: mockProfiles })
   } catch (error) {
-    console.error("Error fetching profiles:", error)
-    return NextResponse.json({ error: "Failed to fetch profiles" }, { status: 500 })
+    return NextResponse.json({ error: "Error fetching profiles" }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
-    const profile = await createProfile(data)
-    return NextResponse.json({ success: true, profile })
+    const profile = await request.json()
+    // En una aplicación real, aquí guardaríamos el perfil en la base de datos
+    // Para esta versión simplificada, solo devolvemos el perfil con un ID generado
+    const newProfile = {
+      ...profile,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    return NextResponse.json({ success: true, profile: newProfile })
   } catch (error) {
-    console.error("Error creating profile:", error)
-    return NextResponse.json({ error: "Failed to create profile" }, { status: 500 })
+    return NextResponse.json({ error: "Error creating profile" }, { status: 500 })
   }
 }
-
-export default { GET, POST }

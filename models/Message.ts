@@ -14,10 +14,15 @@ export interface Message {
 }
 
 export async function getMessagesByMatchId(matchId: string): Promise<Message[]> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  return db.collection("messages").find({ matchId }).sort({ timestamp: 1 }).toArray() as Promise<Message[]>
+    return db.collection("messages").find({ matchId }).sort({ timestamp: 1 }).toArray() as Promise<Message[]>
+  } catch (error) {
+    console.error("Error in getMessagesByMatchId:", error)
+    return []
+  }
 }
 
 export async function createMessage(messageData: Omit<Message, "_id" | "createdAt" | "updatedAt">): Promise<Message> {
@@ -40,20 +45,24 @@ export async function createMessage(messageData: Omit<Message, "_id" | "createdA
 }
 
 export async function markMessagesAsRead(matchId: string, userId: string): Promise<void> {
-  const client = await clientPromise
-  const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
+  try {
+    const client = await clientPromise
+    const db = client.db(process.env.MONGODB_DB_NAME || "sportmatch")
 
-  await db.collection("messages").updateMany(
-    {
-      matchId,
-      receiverId: userId,
-      read: false,
-    },
-    {
-      $set: {
-        read: true,
-        updatedAt: new Date(),
+    await db.collection("messages").updateMany(
+      {
+        matchId,
+        receiverId: userId,
+        read: false,
       },
-    },
-  )
+      {
+        $set: {
+          read: true,
+          updatedAt: new Date(),
+        },
+      },
+    )
+  } catch (error) {
+    console.error("Error in markMessagesAsRead:", error)
+  }
 }
