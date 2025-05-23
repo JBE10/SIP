@@ -111,6 +111,7 @@ export default function Home() {
                   className="border-t py-4 text-center text-sm text-muted-foreground"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
+
                   transition={{ delay: 1.2 }}
               >
                 © 2025 SportMatch - Todos los derechos reservados
