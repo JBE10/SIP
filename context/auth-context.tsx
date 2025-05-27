@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!user && !isAuthRoute && !isPublicRoute) {
         router.push("/login")
       } else if (user && isAuthRoute) {
-        router.push("/menu")
+        router.push("/swipe")
       }
     }
   }, [user, isLoading, pathname, router])

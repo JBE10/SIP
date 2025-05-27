@@ -26,29 +26,24 @@ export default function LoginPage() {
     setError("")
 
     try {
-      // Simulación de autenticación
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch("http://localhost:4000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      // Credenciales de prueba
-      if (email === "demo@sportmatch.com" && password === "password") {
-        // Guardar estado de inicio de sesión
-        localStorage.setItem("isLoggedIn", "true")
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: "current-user",
-            name: "Tomás",
-            email: "demo@sportmatch.com",
-          }),
-        )
+      const data = await response.json();
 
-        // Redirigir al usuario a la página principal
-        router.push("/menu")
+      if (response.ok) {
+        // Guardar usuario en localStorage
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/swipe");
       } else {
-        setError("Credenciales incorrectas. Prueba con demo@sportmatch.com / password")
+        setError(data.message || "Credenciales incorrectas");
       }
     } catch (err) {
-      setError("Error al iniciar sesión. Inténtalo de nuevo.")
+      setError("Error al conectar con el servidor");
     } finally {
       setIsLoading(false)
     }
