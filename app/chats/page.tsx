@@ -1,17 +1,18 @@
 "use client"
 
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChatPreview } from "@/components/chat-preview"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { ArrowLeft, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import { motion } from "framer-motion"
-import { useAppContext } from "@/context/app-context"
+import { useApp } from "@/context/app-context"
 import { useState, useEffect } from "react"
+import { BottomNavigation } from "@/components/bottom-navigation"
+import Link from "next/link"
 
 export default function ChatsPage() {
-  const { matches } = useAppContext()
+  const { matches } = useApp()
   const [searchTerm, setSearchTerm] = useState("")
   const [filteredMatches, setFilteredMatches] = useState(matches)
 
@@ -32,62 +33,59 @@ export default function ChatsPage() {
   }))
 
   return (
-    <div className="container max-w-md py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/menu">
-            <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Volver</span>
-          </Link>
-        </Button>
-        <motion.h1
-          className="text-xl font-bold"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          Mensajes
-        </motion.h1>
-        <ThemeToggle />
-      </div>
-
-      <motion.div
-        className="relative"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="Buscar conversaciones"
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </motion.div>
-
-      <div className="space-y-2">
-        {chats.length > 0 ? (
-          chats.map((chat, index) => <ChatPreview key={chat.id} chat={chat} index={index} />)
-        ) : (
-          <motion.div
-            className="text-center py-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+    <>
+      <div className="container max-w-md py-6 space-y-6 pb-32">
+        <div className="flex items-center justify-between">
+          <motion.h1
+            className="text-2xl font-bold"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-lg font-semibold mb-2">No tienes mensajes</h2>
-            <p className="text-muted-foreground mb-4">
-              Cuando hagas match con alguien, podrás iniciar una conversación aquí.
-            </p>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild>
-                <Link href="/swipe">Descubrir personas</Link>
-              </Button>
+            Mensajes
+          </motion.h1>
+          <ThemeToggle />
+        </div>
+
+        <motion.div
+          className="relative"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Buscar conversaciones"
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </motion.div>
+
+        <div className="space-y-2">
+          {chats.length > 0 ? (
+            chats.map((chat, index) => <ChatPreview key={chat.id} chat={chat} index={index} />)
+          ) : (
+            <motion.div
+              className="text-center py-12"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-lg font-semibold mb-2">No tienes mensajes</h2>
+              <p className="text-muted-foreground mb-4">
+                Cuando hagas match con alguien, podrás iniciar una conversación aquí.
+              </p>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button asChild>
+                  <Link href="/swipe">Descubrir personas</Link>
+                </Button>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+      <BottomNavigation />
+    </>
   )
 }

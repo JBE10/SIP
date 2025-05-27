@@ -2,7 +2,50 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect, useCallback } from "react"
-import { mockProfiles } from "@/data/mock-profiles"
+
+// Datos de prueba simplificados
+const mockProfiles = [
+  {
+    id: "1",
+    name: "Mauro Brero",
+    age: 28,
+    location: "Palermo, CABA",
+    bio: "Fanático del fútbol y jugador de Boca Juniors amateur. Busco compañeros para jugar los fines de semana.",
+    sports: ["Fútbol", "Running", "Tenis"],
+    distance: 2.5,
+    profilePicture: "/images/profile2.png",
+  },
+  {
+    id: "2",
+    name: "Damian Dalla Vía",
+    age: 26,
+    location: "Belgrano, CABA",
+    bio: "Estudiante de educación física. Me gusta entrenar en el gimnasio y jugar al tenis.",
+    sports: ["Tenis", "Gimnasio", "Natación"],
+    distance: 3.8,
+    profilePicture: "/images/profile3.png",
+  },
+  {
+    id: "3",
+    name: "Elias Ojeda",
+    age: 25,
+    location: "Recoleta, CABA",
+    bio: "Apasionado del básquet y el running. Entreno 4 veces por semana.",
+    sports: ["Básquet", "Running", "Ciclismo"],
+    distance: 1.7,
+    profilePicture: "/images/profile4.png",
+  },
+  {
+    id: "4",
+    name: "Sofia Martinez",
+    age: 24,
+    location: "Villa Crespo, CABA",
+    bio: "Yoga instructor y amante del running. Busco compañeras para entrenar juntas.",
+    sports: ["Yoga", "Running", "Pilates"],
+    distance: 4.2,
+    profilePicture: "/images/profile5.jpeg",
+  },
+]
 
 // Tipos
 export interface Profile {
@@ -58,12 +101,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Filtrar perfiles ya likeados o dislikeados
     const filtered = mockProfiles.filter(
-        (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
+      (profile) => !likedProfiles.includes(profile.id) && !dislikedProfiles.includes(profile.id),
     )
     setAvailableProfiles(filtered)
   }, [likedProfiles, dislikedProfiles])
 
-  // Cargar datos guardados
+  // Cargar datos guardados del localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedLiked = localStorage.getItem("likedProfiles")

@@ -10,10 +10,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, MoreVertical, Send } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAppContext } from "@/context/app-context"
+import { useApp } from "@/context/app-context"
 
 export default function ChatPage({ params }: { params: { id: string } }) {
-  const { matches } = useAppContext()
+  const { matches } = useApp()
   const [messages, setMessages] = useState<any[]>([])
   const [newMessage, setNewMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
