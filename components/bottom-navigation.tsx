@@ -30,8 +30,8 @@ export function BottomNavigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 shadow-lg">
-      <div className="flex justify-around items-center py-3 px-4 max-w-md mx-auto">
+    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-900 border border-gray-700 rounded-t-3xl shadow-2xl z-50">
+      <div className="flex justify-around items-center py-4 px-6">
         {navItems.map((item) => {
           const Icon = item.icon
           return (
@@ -39,10 +39,10 @@ export function BottomNavigation() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 min-w-[70px]",
+                "flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 min-w-[70px]",
                 item.active
-                  ? "text-primary bg-primary/15 scale-105"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent hover:scale-105",
+                  ? "text-white bg-white/20 scale-105"
+                  : "text-gray-400 hover:text-white hover:bg-white/10 hover:scale-105",
               )}
             >
               <Icon className={cn("h-6 w-6", item.active && "scale-110")} />
@@ -53,9 +53,10 @@ export function BottomNavigation() {
       </div>
 
       {/* Footer text */}
-      <div className="text-center py-2 text-xs text-muted-foreground border-t bg-background/50">
-        © 2025 SportMatch - Todos los derechos reservados
+      <div className="text-center py-2 text-xs text-gray-500 border-t border-gray-700 bg-gray-800/50 rounded-b-3xl">
+        © 2025 SportMatch
       </div>
     </nav>
   )
 }
+  
