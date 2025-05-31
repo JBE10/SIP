@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -11,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { mockLogin } from "@/data/mockData"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,24 +26,18 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
+      const user = mockLogin(email, password);
+      
+      if (user) {
         // Guardar usuario en localStorage
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(user));
         router.push("/swipe");
       } else {
-        setError(data.message || "Credenciales incorrectas");
+        setError("Credenciales incorrectas");
       }
     } catch (err) {
-      setError("Error al conectar con el servidor");
+      setError("Error al iniciar sesión");
     } finally {
       setIsLoading(false)
     }

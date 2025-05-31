@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { mockRegister } from "@/data/mockData"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [description, setDescription] = useState("")
+  const [sport, setSport] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -33,19 +36,16 @@ export default function RegisterPage() {
     }
 
     try {
-      // Simulación de registro
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const newUser = mockRegister({
+        name,
+        email,
+        description,
+        sport,
+      })
 
       // Guardar estado de registro
       localStorage.setItem("isLoggedIn", "true")
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: "current-user",
-          name,
-          email,
-        }),
-      )
+      localStorage.setItem("user", JSON.stringify(newUser))
 
       // Redirigir al usuario a la página principal
       router.push("/swipe")
@@ -89,6 +89,26 @@ export default function RegisterPage() {
                 placeholder="tu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Descripción</Label>
+              <Input
+                id="description"
+                placeholder="Cuéntanos sobre ti"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sport">Deporte principal</Label>
+              <Input
+                id="sport"
+                placeholder="Tu deporte favorito"
+                value={sport}
+                onChange={(e) => setSport(e.target.value)}
                 required
               />
             </div>
