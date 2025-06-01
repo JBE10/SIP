@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { mockLogin } from "@/data/mockData"
+import { useAuth } from "@/context/auth-context"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -26,18 +27,16 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const user = mockLogin(email, password);
+      const success = await login(email, password)
       
-      if (user) {
-        // Guardar usuario en localStorage
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("user", JSON.stringify(user));
-        router.push("/swipe");
+      if (success) {
+        router.push("/swipe")
       } else {
-        setError("Credenciales incorrectas");
+        setError("Credenciales incorrectas")
       }
     } catch (err) {
-      setError("Error al iniciar sesión");
+      console.error("Error en login:", err)
+      setError("Error al iniciar sesión")
     } finally {
       setIsLoading(false)
     }

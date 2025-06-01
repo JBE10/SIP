@@ -2,12 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-
-interface User {
-  id: string
-  name: string
-  email: string
-}
+import { mockLogin, mockRegister, type User } from "@/data/mockData"
 
 interface AuthContextType {
   user: User | null
@@ -15,7 +10,7 @@ interface AuthContextType {
   isLoading: boolean
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (userData: Omit<User, 'id'>) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -60,40 +55,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, isLoading, pathname, router])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulación de autenticación
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Credenciales de prueba
-    if (email === "demo@sportmatch.com" && password === "password") {
-      const userData = {
-        id: "current-user",
-        name: "Tomás",
-        email: "demo@sportmatch.com",
+    try {
+      const userData = mockLogin(email, password)
+      if (userData) {
+        setUser(userData)
+        localStorage.setItem("isLoggedIn", "true")
+        localStorage.setItem("user", JSON.stringify(userData))
+        return true
       }
-
-      setUser(userData)
-      localStorage.setItem("isLoggedIn", "true")
-      localStorage.setItem("user", JSON.stringify(userData))
-      return true
+      return false
+    } catch (error) {
+      console.error("Error during login:", error)
+      return false
     }
-
-    return false
   }
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulación de registro
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const userData = {
-      id: "current-user",
-      name,
-      email,
+  const register = async (userData: Omit<User, 'id'>): Promise<boolean> => {
+    try {
+      const newUser = mockRegister(userData)
+      setUser(newUser)
+      localStorage.setItem("isLoggedIn", "true")
+      localStorage.setItem("user", JSON.stringify(newUser))
+      return true
+    } catch (error) {
+      console.error("Error during registration:", error)
+      return false
     }
-
-    setUser(userData)
-    localStorage.setItem("isLoggedIn", "true")
-    localStorage.setItem("user", JSON.stringify(userData))
-    return true
   }
 
   const logout = () => {
