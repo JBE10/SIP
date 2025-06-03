@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,14 +11,39 @@ import { ProfileEditModal } from "@/components/profile-edit-modal"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
-import { useApp } from "@/context/app-context"
-import { useAuth } from "@/context/auth-context"
 import { BottomNavigation } from "@/components/bottom-navigation"
 
 export default function ProfilePage() {
+  const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const { currentUser } = useApp()
-  const { user, logout } = useAuth()
+  const [userData, setUserData] = useState<any>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (!token) {
+      router.push("/login")
+      return
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        if (!res.ok) throw new Error("Token inválido")
+
+        const data = await res.json()
+        setUserData(data)
+      } catch (err) {
+        console.error(err)
+        router.push("/login")
+      }
+    }
+
+    fetchUser()
+  }, [router])
 
   const container = {
     hidden: { opacity: 0 },
@@ -35,14 +61,11 @@ export default function ProfilePage() {
     show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   }
 
+  if (!userData) return null
+
   return (
     <>
-      <motion.div
-        className="container max-w-md py-6 space-y-6 pb-32"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
+      <motion.div className="container max-w-md py-6 space-y-6 pb-32" variants={container} initial="hidden" animate="show">
         <motion.div className="flex items-center justify-between" variants={item}>
           <h1 className="text-2xl font-bold">Mi Perfil</h1>
           <div className="flex items-center gap-2">
@@ -63,7 +86,7 @@ export default function ProfilePage() {
           >
             <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary relative">
               <Image
-                src={currentUser.profilePicture || "/placeholder.svg?height=96&width=96"}
+                src={userData?.foto_url || "/placeholder.svg?height=96&width=96"}
                 alt="Foto de perfil"
                 fill
                 className="object-cover"
@@ -72,12 +95,10 @@ export default function ProfilePage() {
             </div>
           </motion.div>
           <div className="text-center">
-            <h2 className="text-xl font-bold">
-              {currentUser.name}, {currentUser.age}
-            </h2>
+            <h2 className="text-xl font-bold">{userData.username}</h2>
             <p className="text-muted-foreground flex items-center justify-center gap-1">
               <MapPin className="h-4 w-4" />
-              {currentUser.location}
+              {userData.ubicacion || "Ubicación no especificada"}
             </p>
           </div>
         </motion.div>
@@ -88,7 +109,7 @@ export default function ProfilePage() {
               <CardTitle>Sobre mí</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>{currentUser.bio}</p>
+              <p>{userData.descripcion || "Sin descripción"}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -101,7 +122,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {currentUser.sports.map((sport, index) => (
+                {(userData.deportes_preferidos || "").split(",").map((sport: string, index: number) => (
                   <motion.div
                     key={sport}
                     className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
@@ -110,7 +131,7 @@ export default function ProfilePage() {
                     transition={{ delay: 0.3 + index * 0.1 }}
                     whileHover={{ scale: 1.1 }}
                   >
-                    {sport}
+                    {sport.trim()}
                   </motion.div>
                 ))}
               </div>
@@ -133,15 +154,15 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nombre</Label>
-                <Input id="name" value={user?.name || currentUser.name} readOnly />
+                <Input id="name" value={userData.username} readOnly />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
-                <Input id="email" type="email" value={user?.email || "demo@sportmatch.com"} readOnly />
+                <Input id="email" type="email" value={userData.email} readOnly />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location">Ubicación</Label>
-                <Input id="location" value={currentUser.location} readOnly />
+                <Input id="location" value={userData.ubicacion || "No especificada"} readOnly />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
@@ -151,7 +172,10 @@ export default function ProfilePage() {
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
-                <Button variant="destructive" className="w-full" onClick={logout}>
+                <Button variant="destructive" className="w-full" onClick={() => {
+                  localStorage.removeItem("token")
+                  router.push("/login")
+                }}>
                   Cerrar sesión
                 </Button>
               </motion.div>
@@ -159,7 +183,7 @@ export default function ProfilePage() {
           </Card>
         </motion.div>
 
-        <ProfileEditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} profile={currentUser} />
+        <ProfileEditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} profile={userData} />
       </motion.div>
       <BottomNavigation />
     </>

@@ -56,30 +56,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const userData = mockLogin(email, password)
-      if (userData) {
-        setUser(userData)
-        localStorage.setItem("isLoggedIn", "true")
-        localStorage.setItem("user", JSON.stringify(userData))
-        return true
+      const mockUser = await mockLogin(email, password);
+      if (mockUser) {
+        setUser(mockUser);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("user", JSON.stringify(mockUser));
+        return true;
       }
-      return false
+      return false;
     } catch (error) {
-      console.error("Error during login:", error)
-      return false
+      console.error("Error during login:", error);
+      return false;
     }
   }
 
   const register = async (userData: Omit<User, 'id'>): Promise<boolean> => {
     try {
-      const newUser = mockRegister(userData)
-      setUser(newUser)
-      localStorage.setItem("isLoggedIn", "true")
-      localStorage.setItem("user", JSON.stringify(newUser))
-      return true
+      const mockUser = await mockRegister(userData);
+      setUser(mockUser);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("user", JSON.stringify(mockUser));
+      return true;
     } catch (error) {
-      console.error("Error during registration:", error)
-      return false
+      console.error("Error during registration:", error);
+      return false;
     }
   }
 
