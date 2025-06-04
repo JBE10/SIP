@@ -1,11 +1,15 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
 
-# Usar SQLite en lugar de MySQL
-DATABASE_URL = "sqlite:///./sportmatch.db"
+load_dotenv()  # Carga variables desde .env
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Crear el motor de conexión
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 
 # Crear sesión de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

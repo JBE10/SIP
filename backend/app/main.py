@@ -6,6 +6,8 @@ from . import models
 from . import schemas
 from . import auth
 from . import database
+from .database import Base, engine
+import app.models  # Importar para que registre las tablas
 from fastapi.staticfiles import StaticFiles
 import os
 import uuid
@@ -13,10 +15,18 @@ import shutil
 
 app = FastAPI()
 
-# Configurar CORS
+Base.metadata.create_all(bind=engine)  # Crea las tablas
+
+# CORS para permitir conexión desde Vercel
+origins = [
+    "https://sportsmatch.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
