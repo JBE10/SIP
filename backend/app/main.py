@@ -15,7 +15,14 @@ import shutil
 
 app = FastAPI()
 
-Base.metadata.create_all(bind=engine)  # Crea las tablas
+# Crear las tablas en la base de datos - CON LOGGING
+print("🔄 Conectando a la base de datos...")
+try:
+    print("📋 Creando tablas en la base de datos...")
+    Base.metadata.create_all(bind=engine)
+    print("✅ Tablas creadas exitosamente!")
+except Exception as e:
+    print(f"❌ Error creando tablas: {e}")
 
 # CORS para permitir conexión desde Vercel
 origins = [
@@ -31,9 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Crear las tablas en la base de datos
-models.Base.metadata.create_all(bind=database.engine)
 
 # Dependencia para obtener la sesión de la base de datos
 def get_db():

@@ -8,6 +8,9 @@ load_dotenv()  # Carga variables desde .env
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Logging para verificar conexión
+print(f"🔗 DATABASE_URL cargada: {DATABASE_URL[:30]}..." if DATABASE_URL else "❌ DATABASE_URL no encontrada")
+
 # Crear el motor de conexión
 engine = create_engine(DATABASE_URL)
 
