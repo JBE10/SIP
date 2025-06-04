@@ -2,10 +2,10 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-import models
-import schemas
-import auth
-import database
+from . import models
+from . import schemas
+from . import auth
+from . import database
 
 app = FastAPI()
 
