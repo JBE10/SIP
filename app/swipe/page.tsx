@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useApp } from "@/context/app-context"
 import { ProfileDetails } from "@/components/profile-details"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/src/context/auth-context"
+import { useAuth } from "@/context/auth-context"
 import type { Profile } from "@/context/app-context"
 
 export default function SwipePage() {

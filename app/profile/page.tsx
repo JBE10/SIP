@@ -12,7 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/src/context/auth-context"
+import { useAuth } from "@/context/auth-context"
 
 export default function ProfilePage() {
     const router = useRouter()

@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { motion } from "framer-motion"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/src/context/auth-context"
+import { useAuth } from "@/context/auth-context"
 import { LoadingSpinner } from "@/components/loading-spinner"
 
 export default function Home() {

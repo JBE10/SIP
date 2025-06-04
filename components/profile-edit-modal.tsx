@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import type { User } from "@/src/context/auth-context"
-import { useAuth } from "@/src/context/auth-context"
+import type { User } from "@/context/auth-context"
+import { useAuth } from "@/context/auth-context"
 
 interface ProfileEditModalProps {
   isOpen: boolean
