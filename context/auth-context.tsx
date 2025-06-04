@@ -1,48 +1,39 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { mockLogin, mockRegister, type User } from "@/data/mockData"
+import { mockAuth, mockUser } from "../src/data/mockUser"
 
 interface AuthContextType {
-  user: User | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  login: (email: string, password: string) => Promise<boolean>
+  user: any
+  token: string | null
+  login: (email: string, password: string) => Promise<void>
   logout: () => void
-  register: (userData: Omit<User, 'id'>) => Promise<boolean>
+  isAuthenticated: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
-  // Cargar usuario del localStorage al iniciar
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user")
-      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
-
-      if (isLoggedIn && storedUser) {
-        try {
-          setUser(JSON.parse(storedUser))
-        } catch (error) {
-          console.error("Error parsing stored user:", error)
-          localStorage.removeItem("user")
-          localStorage.removeItem("isLoggedIn")
-        }
-      }
+    // Simular verificación de token al cargar
+    const storedToken = localStorage.getItem("token")
+    if (storedToken) {
+      setToken(storedToken)
+      setUser(mockUser)
+      setIsAuthenticated(true)
     }
-    setIsLoading(false)
   }, [])
 
   // Redirigir según el estado de autenticación
   useEffect(() => {
-    if (!isLoading && typeof window !== "undefined") {
+    if (!isAuthenticated && typeof window !== "undefined") {
       const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password"
       const isPublicRoute = pathname === "/"
 
@@ -52,41 +43,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push("/swipe")
       }
     }
-  }, [user, isLoading, pathname, router])
+  }, [user, isAuthenticated, pathname, router])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const mockUser = await mockLogin(email, password);
-      if (mockUser) {
-        setUser(mockUser);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("user", JSON.stringify(mockUser));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Error during login:", error);
-      return false;
-    }
-  }
-
-  const register = async (userData: Omit<User, 'id'>): Promise<boolean> => {
-    try {
-      const mockUser = await mockRegister(userData);
-      setUser(mockUser);
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      return true;
-    } catch (error) {
-      console.error("Error during registration:", error);
-      return false;
-    }
+  const login = async (email: string, password: string) => {
+    // Simular login exitoso
+    setToken(mockAuth.token)
+    setUser(mockAuth.user)
+    setIsAuthenticated(true)
+    localStorage.setItem("token", mockAuth.token)
   }
 
   const logout = () => {
+    setToken(null)
     setUser(null)
-    localStorage.removeItem("isLoggedIn")
-    localStorage.removeItem("user")
+    setIsAuthenticated(false)
+    localStorage.removeItem("token")
     localStorage.removeItem("likedProfiles")
     localStorage.removeItem("dislikedProfiles")
     localStorage.removeItem("matches")
@@ -94,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )

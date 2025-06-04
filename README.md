@@ -40,6 +40,12 @@ A web application to find sports partners in your area.
 - Profile customization
 - Dark/Light theme support
 
+## Mock User Credentials
+
+For testing purposes, you can use these credentials:
+- Email: test@example.com
+- Password: any password will work
+
 ## Technologies Used
 
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS
