@@ -1,4 +1,4 @@
-#!/Users/juanbautistaespino/Documents/SIP/sports-match/backend/venv/bin/python3
+#!/Users/juanbautistaespino/Documents/SIP/sports-match/backend/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys

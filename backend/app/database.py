@@ -11,8 +11,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Logging para verificar conexión
 print(f"🔗 DATABASE_URL cargada: {DATABASE_URL[:30]}..." if DATABASE_URL else "❌ DATABASE_URL no encontrada")
 
-# Crear el motor de conexión
-engine = create_engine(DATABASE_URL)
+# Si no hay DATABASE_URL o falla PostgreSQL, usar SQLite local para testing
+if not DATABASE_URL or DATABASE_URL.startswith("postgresql"):
+    # Para testing local, usar SQLite
+    LOCAL_DATABASE_URL = "sqlite:///./sportmatch.db"
+    print(f"🔄 Usando SQLite local para testing: {LOCAL_DATABASE_URL}")
+    engine = create_engine(LOCAL_DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(DATABASE_URL)
 
 # Crear sesión de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

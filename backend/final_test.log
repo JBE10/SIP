@@ -1,0 +1,17 @@
+INFO:     Will watch for changes in these directories: ['/Users/juanbautistaespino/Documents/SIP/sports-match/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [15791] using StatReload
+INFO:     Started server process [15797]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🔗 DATABASE_URL cargada: postgresql://postgres:SjPLUpHF...
+🔄 Usando SQLite local para testing: sqlite:///./sportmatch.db
+🔄 Conectando a la base de datos...
+📋 Creando tablas en la base de datos...
+✅ Tablas creadas exitosamente!
+INFO:     127.0.0.1:49645 - "GET /docs HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [15797]
+INFO:     Stopping reloader process [15791]
