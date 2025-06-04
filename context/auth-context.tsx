@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       formData.append("username", email)
       formData.append("password", password)
 
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch("http://localhost:8001/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { access_token } = await response.json()
       localStorage.setItem("token", access_token)
 
-      const userResponse = await fetch("http://localhost:8000/users/me", {
+      const userResponse = await fetch("http://localhost:8001/users/me", {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: "application/json"
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
       }
 
-      const res = await fetch("http://localhost:8000/auth/register", {
+      const res = await fetch("http://localhost:8001/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
