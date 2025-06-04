@@ -147,7 +147,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       const formData = new FormData();
       formData.append("file", selectedFile);
 
-      const res = await fetch("http://localhost:8000/users/upload-photo", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/upload-photo`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
