@@ -22,8 +22,8 @@ export default function SwipePage() {
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [matchedProfile, setMatchedProfile] = useState<Profile | null>(null)
 
-  const currentProfile = availableProfiles[currentProfileIndex]
-  const isLastProfile = !currentProfile || currentProfileIndex === availableProfiles.length - 1
+  const currentProfile = availableProfiles?.[currentProfileIndex]
+  const isLastProfile = !currentProfile || currentProfileIndex === (availableProfiles?.length ?? 0) - 1
 
   const handleLike = async () => {
     if (!currentProfile) return
@@ -100,7 +100,7 @@ export default function SwipePage() {
       {/* Main Content */}
       <div className="flex-1 container max-w-md py-6 space-y-6">
         <AnimatePresence mode="wait">
-          {isLastProfile || availableProfiles.length === 0 ? (
+          {isLastProfile || (availableProfiles?.length ?? 0) === 0 ? (
             <motion.div
               key="no-more-profiles"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -140,7 +140,7 @@ export default function SwipePage() {
               className="swipe-card-container"
             >
               <AnimatePresence>
-                {availableProfiles.slice(currentProfileIndex, currentProfileIndex + 3).map((profile, index) => (
+                {(availableProfiles || []).slice(currentProfileIndex, currentProfileIndex + 3).map((profile, index) => (
                   <SwipeCard
                     key={profile.id}
                     profile={profile}

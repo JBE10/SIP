@@ -18,12 +18,12 @@ export default function ChatsPage() {
 
   // Filtrar matches cuando cambia el término de búsqueda
   useEffect(() => {
-    const filtered = matches.filter((match) => match.profile.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = (matches || []).filter((match) => match.profile.name.toLowerCase().includes(searchTerm.toLowerCase()))
     setFilteredMatches(filtered)
   }, [searchTerm, matches])
 
   // Convertir matches a formato de chat
-  const chats = filteredMatches.map((match) => ({
+  const chats = (filteredMatches || []).map((match) => ({
     id: match.id,
     name: match.profile.name,
     lastMessage: "Hola! ¿Te gustaría practicar deportes juntos?",
@@ -63,7 +63,7 @@ export default function ChatsPage() {
         </motion.div>
 
         <div className="space-y-2">
-          {chats.length > 0 ? (
+          {(chats?.length ?? 0) > 0 ? (
             chats.map((chat, index) => <ChatPreview key={chat.id} chat={chat} index={index} />)
           ) : (
             <motion.div
