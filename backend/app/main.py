@@ -16,7 +16,7 @@ app = FastAPI()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,6 +68,40 @@ def get_matches(
     # Aquí iría la lógica para obtener los matches
     # Por ahora, devolvemos una lista vacía
     return []
+
+# Rutas de archivos
+@app.post("/users/upload-photo")
+async def upload_photo(
+    file: UploadFile = File(...),
+    current_user: schemas.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    # Verificar que sea una imagen
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Solo se permiten archivos de imagen")
+    
+    # Verificar tamaño (5MB máximo)
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="El archivo es demasiado grande. Máximo 5MB")
+    
+    # Generar nombre único para el archivo
+    file_extension = file.filename.split(".")[-1]
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = f"app/static/uploads/{unique_filename}"
+    
+    # Guardar el archivo
+    with open(file_path, "wb") as buffer:
+        buffer.write(content)
+    
+    # Actualizar la URL de la foto en la base de datos
+    photo_url = f"http://localhost:8000/static/uploads/{unique_filename}"
+    db_user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    db_user.profilePicture = photo_url
+    db.commit()
+    db.refresh(db_user)
+    
+    return {"message": "Foto subida exitosamente", "profilePicture": photo_url}
 
 # Asegúrate de que la carpeta exista
 os.makedirs("app/static/uploads", exist_ok=True)

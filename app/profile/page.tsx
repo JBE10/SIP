@@ -16,7 +16,7 @@ import { useAuth } from "@/context/auth-context"
 
 export default function ProfilePage() {
     const router = useRouter()
-    const { user, logout } = useAuth()
+    const { user, logout, handleAuthError } = useAuth()
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [userData, setUserData] = useState<any>(null)
 
@@ -78,6 +78,7 @@ export default function ProfilePage() {
         }
 
         try {
+            console.log("Enviando foto al servidor...")
             const res = await fetch("http://localhost:8000/users/upload-photo", {
                 method: "POST",
                 headers: {
@@ -86,14 +87,28 @@ export default function ProfilePage() {
                 body: formData,
             })
 
+            console.log("Respuesta del servidor:", res.status, res.statusText)
+
             if (!res.ok) {
-                const errorData = await res.text()
+                if (res.status === 401) {
+                    handleAuthError()
+                    return
+                }
+                
+                let errorData;
+                try {
+                    errorData = await res.json()
+                } catch {
+                    errorData = await res.text()
+                }
                 console.error("Error al subir imagen:", res.status, errorData)
+                alert("Error al subir imagen: " + JSON.stringify(errorData))
                 return
             }
 
             const data = await res.json()
             console.log("Imagen subida exitosamente:", data)
+            alert("Imagen subida exitosamente!")
             
             // Actualizar el estado local y el localStorage
             const updatedUser = { ...userData, profilePicture: data.profilePicture }
@@ -103,7 +118,8 @@ export default function ProfilePage() {
             // Recargar la página para mostrar la nueva imagen
             window.location.reload()
         } catch (error) {
-            console.error("Error al subir imagen:", error)
+            console.error("Error de red al subir imagen:", error)
+            alert("Error de conexión: " + (error instanceof Error ? error.message : String(error)))
         }
     }
 

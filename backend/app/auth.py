@@ -88,7 +88,10 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
         deportes_preferidos=user.deportes_preferidos,
         descripcion=user.descripcion,
         foto_url=user.foto_url,
-        video_url=user.video_url
+        video_url=user.video_url,
+        age=user.age,
+        location=user.location,
+        profilePicture=user.profilePicture
     )
     db.add(db_user)
     db.commit()

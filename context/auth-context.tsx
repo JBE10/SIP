@@ -19,6 +19,8 @@ export type User = {
   bio: string
   sports: string[]
   profilePicture?: string
+  deportes_preferidos?: string
+  descripcion?: string
 }
 
 interface AuthContextType {
@@ -56,7 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isLoggedIn && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
+        // Asegurar que el usuario tiene el formato correcto
+        const user = {
+          ...parsedUser,
+          name: parsedUser.name || parsedUser.username, // Mapear username a name si es necesario
+          bio: parsedUser.bio || parsedUser.descripcion || "",
+          sports: parsedUser.sports || (parsedUser.deportes_preferidos ? parsedUser.deportes_preferidos.split(", ") : [])
+        }
+        setUser(user)
       } catch (err) {
         localStorage.clear()
         setUser(null)
@@ -109,7 +118,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!userResponse.ok) return false
 
-      const user = await userResponse.json()
+      const backendUser = await userResponse.json()
+      
+      // Mapear campos del backend al frontend
+      const user = {
+        ...backendUser,
+        name: backendUser.username, // Mapear username a name
+        bio: backendUser.descripcion || "",
+        sports: backendUser.deportes_preferidos ? backendUser.deportes_preferidos.split(", ") : []
+      }
+      
       setUser(user)
       localStorage.setItem("user", JSON.stringify(user))
       localStorage.setItem("isLoggedIn", "true")
@@ -125,17 +143,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register: AuthContextType["register"] = async (userData) => {
     try {
       const payload = {
-        username: userData.email,
-        name: userData.name,
+        username: userData.name, // Usar name del usuario como username
         email: userData.email,
+        password: userData.password,
+        deportes_preferidos: userData.sports.join(", "), // Convertir array a string
+        descripcion: userData.bio,
+        foto_url: "https://randomuser.me/api/portraits/lego/1.jpg",
         age: userData.age,
         location: userData.location,
-        bio: userData.bio,
-        sports: userData.sports,
-        password: userData.password,
-        confirm_password: userData.confirm_password,
         profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
       }
+
+      console.log("Enviando datos de registro:", payload)
 
       const res = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
@@ -143,7 +162,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(payload)
       })
 
-      return res.ok
+      console.log("Status de respuesta:", res.status)
+      console.log("Headers de respuesta:", res.headers)
+
+      let data;
+      try {
+        data = await res.json()
+        console.log("Datos parseados:", data)
+      } catch (parseError) {
+        console.error("Error parseando JSON:", parseError)
+        const text = await res.text()
+        console.log("Respuesta como texto:", text)
+        return false
+      }
+
+      if (res.ok) {
+        console.log("Registro exitoso!")
+        return true
+      } else {
+        console.error("Error en registro. Status:", res.status)
+        console.error("Detalles del error:", data)
+        return false
+      }
     } catch (err) {
       console.error("Error durante registro:", err)
       return false
