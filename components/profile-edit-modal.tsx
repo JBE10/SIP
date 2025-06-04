@@ -1,85 +1,188 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState, useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SportSelector } from "@/components/sport-selector"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import type { User } from "@/context/auth-context"
 
 interface ProfileEditModalProps {
   isOpen: boolean
   onClose: () => void
-  profile: any
+  profile: User
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalProps) {
-  const [username, setUsername] = useState(profile.username || "")
-  const [description, setDescription] = useState(profile.description || "")
-  const [ubicacion, setUbicacion] = useState(profile.ubicacion || "")
-  const [deportes_preferidos, setDeportesPreferidos] = useState<string[]>(
-    profile.deportes_preferidos ? profile.deportes_preferidos.split(",") : []
-  )
+  const [form, setForm] = useState({
+    name: "",
+    age: 0,
+    location: "",
+    bio: "",
+    email: "",
+    sports: [] as string[],
+    newSport: ""
+  })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleSportToggle = (sport: string) => {
-    if (deportes_preferidos.includes(sport)) {
-      setDeportesPreferidos(deportes_preferidos.filter((s) => s !== sport))
-    } else {
-      setDeportesPreferidos([...deportes_preferidos, sport])
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || "",
+        age: profile.age || 0,
+        location: profile.location || "",
+        bio: profile.bio || "",
+        email: profile.email || "",
+        sports: profile.sports || [],
+        newSport: ""
+      })
+    }
+  }, [profile])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: name === "age" ? parseInt(value) : value }))
+  }
+
+  const handleAddSport = () => {
+    const sport = form.newSport.trim()
+    if (sport && !form.sports.includes(sport)) {
+      setForm(prev => ({ ...prev, sports: [...prev.sports, sport], newSport: "" }))
     }
   }
 
-  const handleSave = () => {
-    // En una aplicación real, aquí guardaríamos los cambios en el perfil
-    // Por ahora, simplemente cerramos el modal
-    onClose()
+  const handleRemoveSport = (sport: string) => {
+    setForm(prev => ({ ...prev, sports: prev.sports.filter(s => s !== sport) }))
   }
 
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("token")
+
+    const res = await fetch("http://localhost:8000/users/me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        bio: form.bio,
+        sports: form.sports,
+        age: form.age,
+        location: form.location,
+        profilePicture: profile.profilePicture
+      })
+    })
+
+    if (res.ok) {
+      const updated = await res.json()
+      localStorage.setItem("user", JSON.stringify(updated))
+      window.location.reload()
+    } else {
+      const error = await res.text()
+      console.error("Error al actualizar perfil:", res.status, error)
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const uploadPhoto = async () => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const token = localStorage.getItem("token");
+    const res = await fetch("http://localhost:8000/users/upload-photo", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log("Foto subida:", data.profilePicture);
+      // Aquí puedes actualizar el estado o recargar la página
+    } else {
+      console.error("Error al subir la foto:", await res.text());
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Editar perfil</DialogTitle>
-        </DialogHeader>
-        <div className="flex justify-center mb-4">
-          <Avatar className="h-20 w-20 border-2 border-primary">
-            <AvatarImage src={profile.foto_url || "/placeholder-avatar.jpg"} alt={profile.username} />
-            <AvatarFallback>{profile.username?.substring(0, 2) || "U"}</AvatarFallback>
-          </Avatar>
-        </div>
-        <Tabs defaultValue="info">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="info">Información</TabsTrigger>
-            <TabsTrigger value="sports">Deportes</TabsTrigger>
-          </TabsList>
-          <TabsContent value="info" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Nombre</Label>
-              <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Perfil</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label>Nombre completo</Label>
+              <Input name="name" value={form.name} onChange={handleChange} />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="ubicacion">Ubicación</Label>
-              <Input id="ubicacion" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} />
+
+            <div className="space-y-1">
+              <Label>Edad</Label>
+              <Input name="age" value={form.age} onChange={handleChange} type="number" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Sobre mí</Label>
-              <Textarea id="description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+
+            <div className="space-y-1">
+              <Label>Ubicación</Label>
+              <Input name="location" value={form.location} onChange={handleChange} />
             </div>
-          </TabsContent>
-          <TabsContent value="sports" className="pt-4">
-            <SportSelector selectedSports={deportes_preferidos} onToggleSport={handleSportToggle} />
-          </TabsContent>
-        </Tabs>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave}>Guardar cambios</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+
+            <div className="space-y-1">
+              <Label>Email</Label>
+              <Input name="email" value={form.email} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-1">
+              <Label>Sobre mí</Label>
+              <Textarea name="bio" value={form.bio} onChange={handleChange} />
+            </div>
+
+            <div className="space-y-1">
+              <Label>Deportes</Label>
+              <div className="flex gap-2">
+                <Input
+                    name="newSport"
+                    value={form.newSport}
+                    onChange={handleChange}
+                    placeholder="Agregar deporte"
+                />
+                <Button onClick={handleAddSport}>Agregar</Button>
+              </div>
+              <div className="flex gap-2 flex-wrap mt-2">
+                {form.sports.map((sport) => (
+                    <div key={sport} className="bg-secondary px-2 py-1 rounded-full text-sm flex items-center gap-1">
+                      {sport}
+                      <button onClick={() => handleRemoveSport(sport)} className="text-red-500">
+                        &times;
+                      </button>
+                    </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Foto de perfil</Label>
+              <Input type="file" accept="image/*" onChange={handleFileChange} />
+              <Button onClick={uploadPhoto}>Subir foto</Button>
+            </div>
+
+            <Button className="w-full mt-4" onClick={handleSubmit}>
+              Guardar cambios
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
   )
 }

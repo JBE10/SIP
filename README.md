@@ -25,6 +25,12 @@ SportMatch es una plataforma que conecta a personas con intereses deportivos sim
 - **Animaciones**: Framer Motion
 - **Estado**: React Context
 
+### Backend
+- **Framework**: FastAPI
+- **Lenguaje**: Python
+- **Base de Datos**: SQLite
+- **Autenticación**: JWT
+
 ## Estructura del Proyecto
 
 ```
@@ -34,13 +40,15 @@ sports-match/
 ├── context/              # Contextos de React
 ├── data/                 # Datos mock
 ├── public/              # Archivos estáticos
-└── styles/              # Estilos globales
+├── styles/              # Estilos globales
+└── untitled/            # Backend FastAPI
 ```
 
 ## Requisitos Previos
 
 - Node.js v20.19.2 o superior
 - npm v11.4.1 o superior
+- Python 3.9+ (para el backend)
 
 ## Instalación
 
@@ -50,51 +58,55 @@ git clone https://github.com/tu-usuario/sports-match.git
 cd sports-match
 ```
 
-2. Instalar dependencias:
+2. Instalar dependencias del frontend:
 ```bash
 npm install
 ```
 
-3. Iniciar el servidor de desarrollo:
+3. Instalar dependencias del backend:
+```bash
+cd untitled
+python -m venv venv
+source venv/bin/activate  # En Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+4. Iniciar el backend:
+```bash
+cd untitled
+uvicorn app.main:app --reload
+```
+
+5. Iniciar el frontend (en otra terminal):
 ```bash
 npm run dev
 ```
 
-4. Abrir el navegador en `http://localhost:3000`
+6. Abrir el navegador en `http://localhost:3000`
 
-## Credenciales de Prueba
-
-Para probar la aplicación, puedes usar las siguientes credenciales:
-- Email: test@example.com
-- Contraseña: cualquier contraseña funcionará
-
-## Características Implementadas
+## API Endpoints
 
 ### Autenticación
-- Registro de usuarios
-- Inicio de sesión
-- Recuperación de contraseña
-- Perfiles personalizables
+- `POST /auth/register`: Registro de usuarios
+- `POST /auth/login`: Inicio de sesión
+- `GET /users/me`: Obtener información del usuario actual
 
-### Interfaz de Usuario
-- Sistema de swipe estilo Tinder
-- Perfiles detallados
-- Chat simulado
-- Navegación intuitiva
+### Perfiles
+- `GET /profiles`: Obtener todos los perfiles
+- `GET /profiles/{id}`: Obtener un perfil por ID
+- `POST /profiles`: Crear un nuevo perfil
+- `PUT /profiles/{id}`: Actualizar un perfil
+- `DELETE /profiles/{id}`: Eliminar un perfil
 
-### Personalización
-- Modo oscuro/claro
-- Perfiles personalizables
-- Preferencias deportivas
-- Ubicación
+### Matches
+- `GET /matches?user_id={user_id}`: Obtener matches de un usuario
+- `GET /matches/{id}`: Obtener un match por ID
+- `POST /matches`: Crear un nuevo match
 
-## Próximos Pasos
-
-1. Implementación del backend
-2. Integración con base de datos
-3. Sistema de chat en tiempo real
-4. Geolocalización
-5. Notificaciones push
+### Mensajes
+- `GET /messages?match_id={match_id}`: Obtener mensajes de un match
+- `POST /messages`: Crear un nuevo mensaje
+- `PATCH /messages/read?match_id={match_id}&user_id={user_id}`: Marcar mensajes como leídos
 
 ## Contribución
 

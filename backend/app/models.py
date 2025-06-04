@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text
-from .database import Base
+from database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -13,3 +13,6 @@ class User(Base):
     descripcion = Column(Text)
     foto_url = Column(String(255))
     video_url = Column(String(255))
+    age = Column(Integer)
+    location = Column(String(100))
+    profilePicture = Column(String(255))

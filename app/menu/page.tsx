@@ -1,53 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion } from "framer-motion"
 import { User, Search, MessageCircle, Settings, LogOut } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
 
 export default function MenuPage() {
-  const router = useRouter()
-
-  const [username, setUsername] = useState("Usuario")
-  const [deportes, setDeportes] = useState("No cargado")
-  const [fotoUrl, setFotoUrl] = useState("")
-
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      router.push("/login")
-      return
-    }
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        if (!res.ok) throw new Error("Token inválido")
-
-        const data = await res.json()
-        setUsername(data.username)
-        setDeportes(data.deportes_preferidos || "No especificado")
-        setFotoUrl(data.foto_url)
-      } catch (err) {
-        console.error(err)
-        router.push("/login")
-      }
-    }
-
-    fetchUser()
-  }, [router])
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    router.push("/login")
-  }
+  const { logout, user } = useAuth()
 
   const container = {
     hidden: { opacity: 0 },
@@ -64,6 +25,10 @@ export default function MenuPage() {
     show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   }
 
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
@@ -73,18 +38,9 @@ export default function MenuPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-center gap-4">
-          {fotoUrl && (
-            <img
-              src={fotoUrl}
-              alt="Foto de perfil"
-              className="w-12 h-12 rounded-full border shadow-sm object-cover"
-            />
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-primary">SportMatch</h1>
-            <p className="text-sm text-muted-foreground">Hola, {username}</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-primary">SportMatch</h1>
+          <p className="text-sm text-muted-foreground">Hola, {user?.name || "Usuario"}</p>
         </div>
         <div className="flex gap-2">
           <ThemeToggle />

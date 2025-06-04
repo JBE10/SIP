@@ -1,10 +1,12 @@
 export interface User {
-  id: number;
-  name: string;
-  email: string;
-  description: string;
-  sport: string;
-  image?: string;
+  id: number
+  name: string
+  email: string
+  age: number
+  location: string
+  bio: string            // antes: description
+  sports: string[]
+  profile_picture?: string  // antes: profilePicture
 }
 
 export interface Match {
@@ -19,27 +21,33 @@ export const mockUsers: User[] = [
     id: 1,
     name: 'Juan Pérez',
     email: 'juan@example.com',
-    description: 'Amante del fútbol y buscando partidos casuales',
-    sport: 'Fútbol',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg'
+    age: 28,
+    location: 'Buenos Aires',
+    bio: 'Amante del fútbol y buscando partidos casuales',
+    sports: ['Fútbol'],
+    profile_picture: 'https://randomuser.me/api/portraits/men/1.jpg'
   },
   {
     id: 2,
     name: 'María García',
     email: 'maria@example.com',
-    description: 'Jugadora de tenis nivel intermedio',
-    sport: 'Tenis',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg'
+    age: 32,
+    location: 'Córdoba',
+    bio: 'Jugadora de tenis nivel intermedio',
+    sports: ['Tenis'],
+    profile_picture: 'https://randomuser.me/api/portraits/women/1.jpg'
   },
   {
     id: 3,
     name: 'Carlos López',
     email: 'carlos@example.com',
-    description: 'Basketball player looking for pickup games',
-    sport: 'Basketball',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg'
+    age: 30,
+    location: 'Rosario',
+    bio: 'Basketball player looking for pickup games',
+    sports: ['Basketball'],
+    profile_picture: 'https://randomuser.me/api/portraits/men/2.jpg'
   }
-];
+]
 
 export const mockMatches: Match[] = [
   {
@@ -59,7 +67,7 @@ export const mockMatches: Match[] = [
 // Función mock para simular login
 export const mockLogin = (email: string, password: string): User | null => {
   const user = mockUsers.find(u => u.email === email);
-  if (user && password === 'password') {
+  if (user && password === password) {
     return user;
   }
   return null;
@@ -67,10 +75,10 @@ export const mockLogin = (email: string, password: string): User | null => {
 
 // Función mock para simular registro
 export const mockRegister = (userData: Omit<User, 'id'>): User => {
-  const newUser = {
+  const newUser: User = {
     ...userData,
     id: mockUsers.length + 1
-  };
-  mockUsers.push(newUser);
-  return newUser;
-}; 
+  }
+  mockUsers.push(newUser)
+  return newUser
+}

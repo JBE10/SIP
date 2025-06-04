@@ -1,106 +1,169 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode
+} from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { mockAuth, mockUser } from "@/src/data/mockUser"
+
+export type User = {
+  id: number
+  username: string
+  name: string
+  email: string
+  age: number
+  location: string
+  bio: string
+  sports: string[]
+  profilePicture?: string
+}
 
 interface AuthContextType {
-  user: any
-  token: string | null
-  login: (email: string, password: string) => Promise<void>
-  register: (userData: any) => Promise<boolean>
-  logout: () => void
+  user: User | null
   isAuthenticated: boolean
+  isLoading: boolean
+  login: (email: string, password: string) => Promise<boolean>
+  logout: () => void
+  register: (userData: {
+    name: string
+    email: string
+    age: number
+    location: string
+    bio: string
+    sports: string[]
+    password: string
+    confirm_password: string
+  }) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any>(null)
-  const [token, setToken] = useState<string | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
 
+  // ✅ Cargar usuario del localStorage
   useEffect(() => {
-    // Simular verificación de token al cargar
-    const storedToken = localStorage.getItem("token")
-    if (storedToken) {
-      setToken(storedToken)
-      setUser(mockUser)
-      setIsAuthenticated(true)
+    const storedUser = localStorage.getItem("user")
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
+
+    if (isLoggedIn && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        setUser(parsedUser)
+      } catch (err) {
+        localStorage.clear()
+        setUser(null)
+      }
     }
+
+    setIsLoading(false)
   }, [])
 
-  // Redirigir según el estado de autenticación
+  // ✅ Redirección automática segura
   useEffect(() => {
-    if (!isAuthenticated && typeof window !== "undefined") {
-      const isAuthRoute = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password"
-      const isPublicRoute = pathname === "/"
+    if (isLoading) return
 
-      if (!user && !isAuthRoute && !isPublicRoute) {
-        router.push("/login")
-      } else if (user && isAuthRoute) {
-        router.push("/swipe")
-      }
+    const isAuthRoute = ["/login", "/register", "/forgot-password"].includes(pathname)
+    const isPublicRoute = pathname === "/"
+
+    if (!user && !isAuthRoute && !isPublicRoute) {
+      router.push("/login")
     }
-  }, [user, isAuthenticated, pathname, router])
 
-  const login = async (email: string, password: string) => {
+    if (user && (isAuthRoute || isPublicRoute)) {
+      router.push("/swipe")
+    }
+  }, [user, isLoading, pathname])
+
+  // ✅ Login
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      if (email === "test@example.com") {
-        // Simular login exitoso
-        setToken(mockAuth.token)
-        setUser(mockUser)
-        setIsAuthenticated(true)
-        localStorage.setItem("token", mockAuth.token)
-        router.push("/swipe")
-      } else {
-        throw new Error("Credenciales inválidas")
-      }
-    } catch (error) {
-      console.error("Error en login:", error)
-      throw error
+      const formData = new URLSearchParams()
+      formData.append("username", email)
+      formData.append("password", password)
+
+      const response = await fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData
+      })
+
+      if (!response.ok) return false
+
+      const { access_token } = await response.json()
+      localStorage.setItem("token", access_token)
+
+      const userResponse = await fetch("http://localhost:8000/users/me", {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          Accept: "application/json"
+        }
+      })
+
+      if (!userResponse.ok) return false
+
+      const user = await userResponse.json()
+      setUser(user)
+      localStorage.setItem("user", JSON.stringify(user))
+      localStorage.setItem("isLoggedIn", "true")
+
+      return true
+    } catch (err) {
+      console.error("Error durante login:", err)
+      return false
     }
   }
 
-  const register = async (userData: any) => {
+  // ✅ Register
+  const register: AuthContextType["register"] = async (userData) => {
     try {
-      // Simular registro exitoso
-      setToken(mockAuth.token)
-      setUser(mockUser)
-      setIsAuthenticated(true)
-      localStorage.setItem("token", mockAuth.token)
-      router.push("/swipe")
-      return true
-    } catch (error) {
-      console.error("Error en registro:", error)
+      const payload = {
+        username: userData.email,
+        name: userData.name,
+        email: userData.email,
+        age: userData.age,
+        location: userData.location,
+        bio: userData.bio,
+        sports: userData.sports,
+        password: userData.password,
+        confirm_password: userData.confirm_password,
+        profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
+      }
+
+      const res = await fetch("http://localhost:8000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+
+      return res.ok
+    } catch (err) {
+      console.error("Error durante registro:", err)
       return false
     }
   }
 
   const logout = () => {
-    setToken(null)
     setUser(null)
-    setIsAuthenticated(false)
-    localStorage.removeItem("token")
-    localStorage.removeItem("likedProfiles")
-    localStorage.removeItem("dislikedProfiles")
-    localStorage.removeItem("matches")
+    localStorage.clear()
     router.push("/login")
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated }}>
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
+        {children}
+      </AuthContext.Provider>
   )
 }
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
+  if (!context) throw new Error("useAuth debe usarse dentro de <AuthProvider>")
   return context
 }
