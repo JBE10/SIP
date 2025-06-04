@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion } from "framer-motion"
 import { User, Search, MessageCircle, Settings, LogOut } from "lucide-react"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/src/context/auth-context"
 
 export default function MenuPage() {
   const { logout, user } = useAuth()

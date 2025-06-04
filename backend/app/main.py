@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -6,6 +6,10 @@ from . import models
 from . import schemas
 from . import auth
 from . import database
+from fastapi.staticfiles import StaticFiles
+import os
+import uuid
+import shutil
 
 app = FastAPI()
 
@@ -55,16 +59,6 @@ def update_user(
     db.refresh(db_user)
     return db_user
 
-@app.post("/users/upload-photo")
-def upload_photo(
-    file: bytes,
-    current_user: schemas.User = Depends(auth.get_current_user),
-    db: Session = Depends(get_db)
-):
-    # Aquí iría la lógica para guardar la foto
-    # Por ahora, simplemente devolvemos una URL de ejemplo
-    return {"profilePicture": "https://randomuser.me/api/portraits/lego/1.jpg"}
-
 # Rutas de matches
 @app.get("/matches", response_model=List[schemas.User])
 def get_matches(
@@ -74,6 +68,10 @@ def get_matches(
     # Aquí iría la lógica para obtener los matches
     # Por ahora, devolvemos una lista vacía
     return []
+
+# Asegúrate de que la carpeta exista
+os.makedirs("app/static/uploads", exist_ok=True)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 if __name__ == "__main__":
     import uvicorn

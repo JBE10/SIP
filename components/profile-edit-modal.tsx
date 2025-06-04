@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import type { User } from "@/context/auth-context"
+import type { User } from "@/src/context/auth-context"
+import { useAuth } from "@/src/context/auth-context"
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -15,6 +16,7 @@ interface ProfileEditModalProps {
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalProps) {
+  const { handleAuthError } = useAuth()
   const [form, setForm] = useState({
     name: "",
     age: 0,
@@ -22,9 +24,12 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
     bio: "",
     email: "",
     sports: [] as string[],
-    newSport: ""
+    newSport: "",
+    profilePicture: ""
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [uploadError, setUploadError] = useState<string>("");
 
   useEffect(() => {
     if (profile) {
@@ -35,7 +40,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         bio: profile.bio || "",
         email: profile.email || "",
         sports: profile.sports || [],
-        newSport: ""
+        newSport: "",
+        profilePicture: profile.profilePicture || ""
       })
     }
   }, [profile])
@@ -58,61 +64,126 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
   const handleSubmit = async () => {
     const token = localStorage.getItem("token")
+    if (!token) {
+      console.error("No hay token de autenticación")
+      handleAuthError()
+      return
+    }
 
-    const res = await fetch("http://localhost:8000/users/me", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        name: form.name,
-        email: form.email,
-        bio: form.bio,
-        sports: form.sports,
-        age: form.age,
-        location: form.location,
-        profilePicture: profile.profilePicture
-      })
-    })
+    try {
+      const res = await fetch("http://localhost:8000/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          bio: form.bio,
+          deportes: form.sports,
+          age: form.age,
+          location: form.location,
+          profilePicture: form.profilePicture
+        })
+      });
 
-    if (res.ok) {
-      const updated = await res.json()
-      localStorage.setItem("user", JSON.stringify(updated))
-      window.location.reload()
-    } else {
-      const error = await res.text()
-      console.error("Error al actualizar perfil:", res.status, error)
+      const data = await res.json();
+      console.log("Respuesta backend:", data);
+
+      if (res.ok) {
+        localStorage.setItem("user", JSON.stringify(data));
+        window.location.reload();
+      } else {
+        if (res.status === 401) {
+          handleAuthError()
+        } else {
+          console.error("Error al actualizar perfil:", res.status, data);
+        }
+      }
+    } catch (error) {
+      console.error("Error al actualizar perfil:", error);
     }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Verificar tipo de archivo
+      if (!file.type.startsWith("image/")) {
+        setUploadError("Solo se permiten archivos de imagen");
+        return;
+      }
+
+      // Verificar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError("La imagen debe ser menor a 5MB");
+        return;
+      }
+
+      setSelectedFile(file);
+      setUploadError("");
     }
   };
 
   const uploadPhoto = async () => {
-    if (!selectedFile) return;
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+    if (!selectedFile) {
+      setUploadError("Por favor selecciona una imagen");
+      return;
+    }
 
     const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:8000/users/upload-photo", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    if (!token) {
+      console.error("No hay token de autenticación");
+      handleAuthError();
+      return;
+    }
 
-    if (res.ok) {
+    setUploadStatus("uploading");
+    setUploadError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const res = await fetch("http://localhost:8000/users/upload-photo", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
       const data = await res.json();
-      console.log("Foto subida:", data.profilePicture);
-      // Aquí puedes actualizar el estado o recargar la página
-    } else {
-      console.error("Error al subir la foto:", await res.text());
+
+      if (res.ok) {
+        console.log("Foto subida:", data.profilePicture);
+        setForm(prev => ({ ...prev, profilePicture: data.profilePicture }));
+        setUploadStatus("success");
+        
+        // Actualizar el usuario en localStorage
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          user.profilePicture = data.profilePicture;
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+        
+        // Recargar la página para mostrar la nueva imagen
+        window.location.reload();
+      } else {
+        if (res.status === 401) {
+          handleAuthError();
+        } else {
+          setUploadError(data.detail || "Error al subir la foto");
+          setUploadStatus("error");
+        }
+      }
+    } catch (error) {
+      console.error("Error al subir la foto:", error);
+      setUploadError("Error al subir la foto");
+      setUploadStatus("error");
     }
   };
 
@@ -175,7 +246,18 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             <div className="space-y-1">
               <Label>Foto de perfil</Label>
               <Input type="file" accept="image/*" onChange={handleFileChange} />
-              <Button onClick={uploadPhoto}>Subir foto</Button>
+              <Button 
+                onClick={uploadPhoto} 
+                disabled={!selectedFile || uploadStatus === "uploading"}
+              >
+                {uploadStatus === "uploading" ? "Subiendo..." : "Subir foto"}
+              </Button>
+              {uploadError && (
+                <p className="text-red-500 text-sm mt-1">{uploadError}</p>
+              )}
+              {uploadStatus === "success" && (
+                <p className="text-green-500 text-sm mt-1">Foto subida exitosamente</p>
+              )}
             </div>
 
             <Button className="w-full mt-4" onClick={handleSubmit}>

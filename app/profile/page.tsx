@@ -12,7 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/src/context/auth-context"
 
 export default function ProfilePage() {
     const router = useRouter()
@@ -25,7 +25,15 @@ export default function ProfilePage() {
             router.push("/login")
             return
         }
-        setUserData(user)
+        setUserData({
+            ...user,
+            name: user.name || "",
+            email: user.email || "",
+            location: user.location || "",
+            bio: user.bio || "",
+            age: user.age || 0,
+            sports: user.sports || []
+        })
     }, [user, router])
 
     const container = {
@@ -46,27 +54,57 @@ export default function ProfilePage() {
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return
-        const formData = new FormData()
-        formData.append("file", e.target.files[0])
-        const token = localStorage.getItem("token")
-
-        const res = await fetch("http://localhost:8000/users/upload-photo", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-        })
-
-        if (!res.ok) {
-            console.error("Error al subir imagen")
+        
+        const file = e.target.files[0]
+        // Verificar el tamaño del archivo (máximo 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            console.error("El archivo es demasiado grande. Máximo 5MB permitido.")
             return
         }
 
-        const data = await res.json()
-        const updatedUser = { ...userData, profilePicture: data.profilePicture }
-        setUserData(updatedUser)
-        localStorage.setItem("user", JSON.stringify(updatedUser))
+        // Verificar el tipo de archivo
+        if (!file.type.startsWith("image/")) {
+            console.error("Solo se permiten archivos de imagen")
+            return
+        }
+
+        const formData = new FormData()
+        formData.append("file", file)
+        const token = localStorage.getItem("token")
+
+        if (!token) {
+            console.error("No hay token de autenticación")
+            return
+        }
+
+        try {
+            const res = await fetch("http://localhost:8000/users/upload-photo", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
+
+            if (!res.ok) {
+                const errorData = await res.text()
+                console.error("Error al subir imagen:", res.status, errorData)
+                return
+            }
+
+            const data = await res.json()
+            console.log("Imagen subida exitosamente:", data)
+            
+            // Actualizar el estado local y el localStorage
+            const updatedUser = { ...userData, profilePicture: data.profilePicture }
+            setUserData(updatedUser)
+            localStorage.setItem("user", JSON.stringify(updatedUser))
+            
+            // Recargar la página para mostrar la nueva imagen
+            window.location.reload()
+        } catch (error) {
+            console.error("Error al subir imagen:", error)
+        }
     }
 
     if (!userData) return null
@@ -179,15 +217,15 @@ export default function ProfilePage() {
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Nombre</Label>
-                                <Input id="name" value={userData.name} readOnly />
+                                <Input id="name" value={userData.name || ""} readOnly />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Correo electrónico</Label>
-                                <Input id="email" type="email" value={userData.email} readOnly />
+                                <Input id="email" type="email" value={userData.email || ""} readOnly />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="location">Ubicación</Label>
-                                <Input id="location" value={userData.location} readOnly />
+                                <Input id="location" value={userData.location || ""} readOnly />
                             </div>
                         </CardContent>
                         <CardFooter className="flex flex-col gap-2">

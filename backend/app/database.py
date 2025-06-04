@@ -1,11 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# ⚠️ Asegurate de que el puerto 3307 es el que usaste en Docker
-DATABASE_URL = "mysql+pymysql://root:admin123@localhost:3307/sportmatch_db"
+# Usar SQLite en lugar de MySQL
+DATABASE_URL = "sqlite:///./sportmatch.db"
 
 # Crear el motor de conexión
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 # Crear sesión de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

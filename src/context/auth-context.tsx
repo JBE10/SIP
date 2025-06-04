@@ -37,6 +37,7 @@ interface AuthContextType {
     password: string
     confirm_password: string
   }) => Promise<boolean>
+  handleAuthError: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -47,23 +48,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
+  const checkToken = async (token: string): Promise<boolean> => {
+    try {
+      const response = await fetch("http://localhost:8000/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
+        }
+      })
+      return response.ok
+    } catch (error) {
+      console.error("Error al verificar token:", error)
+      return false
+    }
+  }
+
   // ✅ Cargar usuario del localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
+    const token = localStorage.getItem("token")
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
 
-    if (isLoggedIn && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser)
-        setUser(parsedUser)
-      } catch (err) {
-        localStorage.clear()
-        setUser(null)
+    const initializeAuth = async () => {
+      if (isLoggedIn && storedUser && token) {
+        try {
+          const isTokenValid = await checkToken(token)
+          if (isTokenValid) {
+            const parsedUser = JSON.parse(storedUser)
+            setUser(parsedUser)
+          } else {
+            // Token inválido, limpiar datos y redirigir al login
+            localStorage.clear()
+            setUser(null)
+            router.push("/login")
+          }
+        } catch (err) {
+          console.error("Error al inicializar autenticación:", err)
+          localStorage.clear()
+          setUser(null)
+        }
       }
+      setIsLoading(false)
     }
 
-    setIsLoading(false)
-  }, [])
+    initializeAuth()
+  }, [router])
 
   // ✅ Redirección automática segura
   useEffect(() => {
@@ -88,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       formData.append("username", email)
       formData.append("password", password)
 
-      const response = await fetch("http://localhost:8001/auth/login", {
+      const response = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
@@ -99,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { access_token } = await response.json()
       localStorage.setItem("token", access_token)
 
-      const userResponse = await fetch("http://localhost:8001/users/me", {
+      const userResponse = await fetch("http://localhost:8000/users/me", {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: "application/json"
@@ -136,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
       }
 
-      const res = await fetch("http://localhost:8001/auth/register", {
+      const res = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -155,10 +184,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/login")
   }
 
+  // Función para manejar errores de autenticación
+  const handleAuthError = () => {
+    console.log("Token expirado o inválido. Redirigiendo al login...")
+    logout()
+  }
+
   return (
-      <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
-        {children}
-      </AuthContext.Provider>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated: !!user, 
+      isLoading, 
+      login, 
+      logout, 
+      register,
+      handleAuthError 
+    }}>
+      {children}
+    </AuthContext.Provider>
   )
 }
 
