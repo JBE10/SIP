@@ -37,10 +37,11 @@ export default function RegisterPage() {
 
     try {
       const success = await register({
-        name,
+        username: name,
         email,
         description,
-        sport,
+        deportes_preferidos: sport,
+        password
       })
 
       if (success) {

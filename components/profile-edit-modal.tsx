@@ -17,17 +17,18 @@ interface ProfileEditModalProps {
 }
 
 export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalProps) {
-  const [name, setName] = useState(profile.name)
-  const [age, setAge] = useState(profile.age.toString())
-  const [location, setLocation] = useState(profile.location)
-  const [bio, setBio] = useState(profile.bio)
-  const [selectedSports, setSelectedSports] = useState<string[]>(profile.sports)
+  const [username, setUsername] = useState(profile.username || "")
+  const [description, setDescription] = useState(profile.description || "")
+  const [ubicacion, setUbicacion] = useState(profile.ubicacion || "")
+  const [deportes_preferidos, setDeportesPreferidos] = useState<string[]>(
+    profile.deportes_preferidos ? profile.deportes_preferidos.split(",") : []
+  )
 
   const handleSportToggle = (sport: string) => {
-    if (selectedSports.includes(sport)) {
-      setSelectedSports(selectedSports.filter((s) => s !== sport))
+    if (deportes_preferidos.includes(sport)) {
+      setDeportesPreferidos(deportes_preferidos.filter((s) => s !== sport))
     } else {
-      setSelectedSports([...selectedSports, sport])
+      setDeportesPreferidos([...deportes_preferidos, sport])
     }
   }
 
@@ -45,8 +46,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         </DialogHeader>
         <div className="flex justify-center mb-4">
           <Avatar className="h-20 w-20 border-2 border-primary">
-            <AvatarImage src={profile.profilePicture || "/placeholder.svg?height=80&width=80"} alt={profile.name} />
-            <AvatarFallback>{profile.name.substring(0, 2)}</AvatarFallback>
+            <AvatarImage src={profile.foto_url || "/placeholder-avatar.jpg"} alt={profile.username} />
+            <AvatarFallback>{profile.username?.substring(0, 2) || "U"}</AvatarFallback>
           </Avatar>
         </div>
         <Tabs defaultValue="info">
@@ -56,24 +57,20 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
           </TabsList>
           <TabsContent value="info" className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+              <Label htmlFor="username">Nombre</Label>
+              <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="age">Edad</Label>
-              <Input id="age" type="number" value={age} onChange={(e) => setAge(e.target.value)} />
+              <Label htmlFor="ubicacion">Ubicación</Label>
+              <Input id="ubicacion" value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Ubicación</Label>
-              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Sobre mí</Label>
-              <Textarea id="bio" rows={4} value={bio} onChange={(e) => setBio(e.target.value)} />
+              <Label htmlFor="description">Sobre mí</Label>
+              <Textarea id="description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
           </TabsContent>
           <TabsContent value="sports" className="pt-4">
-            <SportSelector selectedSports={selectedSports} onToggleSport={handleSportToggle} />
+            <SportSelector selectedSports={deportes_preferidos} onToggleSport={handleSportToggle} />
           </TabsContent>
         </Tabs>
         <DialogFooter>

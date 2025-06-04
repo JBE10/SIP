@@ -30,7 +30,7 @@ export function BottomNavigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-900 border border-gray-700 rounded-t-3xl shadow-2xl z-50">
+    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-t-3xl shadow-2xl z-50">
       <div className="flex justify-around items-center py-4 px-6">
         {navItems.map((item) => {
           const Icon = item.icon

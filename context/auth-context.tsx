@@ -8,6 +8,7 @@ interface AuthContextType {
   user: any
   token: string | null
   login: (email: string, password: string) => Promise<void>
+  register: (userData: any) => Promise<boolean>
   logout: () => void
   isAuthenticated: boolean
 }
@@ -46,11 +47,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, isAuthenticated, pathname, router])
 
   const login = async (email: string, password: string) => {
-    // Simular login exitoso
-    setToken(mockAuth.token)
-    setUser(mockAuth.user)
-    setIsAuthenticated(true)
-    localStorage.setItem("token", mockAuth.token)
+    try {
+      // Simular login exitoso
+      setToken(mockAuth.token)
+      setUser(mockUser)
+      setIsAuthenticated(true)
+      localStorage.setItem("token", mockAuth.token)
+      router.push("/swipe")
+    } catch (error) {
+      console.error("Error en login:", error)
+      throw error
+    }
+  }
+
+  const register = async (userData: any) => {
+    try {
+      // Simular registro exitoso
+      setToken(mockAuth.token)
+      setUser(mockUser)
+      setIsAuthenticated(true)
+      localStorage.setItem("token", mockAuth.token)
+      router.push("/swipe")
+      return true
+    } catch (error) {
+      console.error("Error en registro:", error)
+      return false
+    }
   }
 
   const logout = () => {
@@ -65,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   )

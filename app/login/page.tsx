@@ -16,9 +16,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useAuth } from "@/context/auth-context"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -31,23 +33,9 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        const errData = await response.json()
-        throw new Error(errData.detail || "Error de login")
-      }
-
-      const data = await response.json()
-      localStorage.setItem("token", data.access_token)
-
-      router.push("/menu")
+      await login(email, password)
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || "Error al iniciar sesión")
     } finally {
       setIsLoading(false)
     }

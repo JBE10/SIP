@@ -12,38 +12,21 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { BottomNavigation } from "@/components/bottom-navigation"
+import { useAuth } from "@/context/auth-context"
 
 export default function ProfilePage() {
   const router = useRouter()
+  const { user, logout } = useAuth()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [userData, setUserData] = useState<any>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
+    if (!user) {
       router.push("/login")
       return
     }
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        if (!res.ok) throw new Error("Token inválido")
-
-        const data = await res.json()
-        setUserData(data)
-      } catch (err) {
-        console.error(err)
-        router.push("/login")
-      }
-    }
-
-    fetchUser()
-  }, [router])
+    setUserData(user)
+  }, [user, router])
 
   const container = {
     hidden: { opacity: 0 },
@@ -65,84 +48,53 @@ export default function ProfilePage() {
 
   return (
     <>
-      <motion.div className="container max-w-md py-6 space-y-6 pb-32" variants={container} initial="hidden" animate="show">
-        <motion.div className="flex items-center justify-between" variants={item}>
-          <h1 className="text-2xl font-bold">Mi Perfil</h1>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
-              <Edit className="h-5 w-5" />
-              <span className="sr-only">Editar perfil</span>
-            </Button>
-          </div>
-        </motion.div>
-
-        <motion.div className="flex flex-col items-center gap-4" variants={item}>
-          <motion.div
-            className="relative"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          >
-            <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary relative">
-              <Image
-                src={userData?.foto_url || "/placeholder.svg?height=96&width=96"}
-                alt="Foto de perfil"
-                fill
-                className="object-cover"
-                unoptimized
-              />
-            </div>
-          </motion.div>
-          <div className="text-center">
-            <h2 className="text-xl font-bold">{userData.username}</h2>
-            <p className="text-muted-foreground flex items-center justify-center gap-1">
-              <MapPin className="h-4 w-4" />
-              {userData.ubicacion || "Ubicación no especificada"}
-            </p>
-          </div>
-        </motion.div>
-
+      <motion.div
+        className="container max-w-2xl mx-auto p-4 space-y-6"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
         <motion.div variants={item}>
           <Card>
             <CardHeader>
-              <CardTitle>Sobre mí</CardTitle>
+              <CardTitle>Perfil</CardTitle>
+              <CardDescription>Tu información personal</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p>{userData.descripcion || "Sin descripción"}</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div variants={item}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Mis deportes</CardTitle>
-              <CardDescription>Deportes que practico o me interesan</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {(userData.deportes_preferidos || "").split(",").map((sport: string, index: number) => (
-                  <motion.div
-                    key={sport}
-                    className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    whileHover={{ scale: 1.1 }}
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="relative w-24 h-24">
+                  <Image
+                    src={userData.foto_url || "/placeholder-avatar.jpg"}
+                    alt="Foto de perfil"
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    className="absolute bottom-0 right-0 rounded-full"
+                    onClick={() => setIsEditModalOpen(true)}
                   >
-                    {sport.trim()}
-                  </motion.div>
-                ))}
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">{userData.username}</h3>
+                  <div className="flex items-center text-muted-foreground">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span>{userData.ubicacion || "No especificada"}</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Deportes preferidos</h4>
+                <p className="text-muted-foreground">{userData.deportes_preferidos || "No especificados"}</p>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Descripción</h4>
+                <p className="text-muted-foreground">{userData.description || "No especificada"}</p>
               </div>
             </CardContent>
-            <CardFooter>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
-                <Button variant="outline" className="w-full" onClick={() => setIsEditModalOpen(true)}>
-                  Editar deportes
-                </Button>
-              </motion.div>
-            </CardFooter>
           </Card>
         </motion.div>
 
@@ -172,10 +124,7 @@ export default function ProfilePage() {
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
-                <Button variant="destructive" className="w-full" onClick={() => {
-                  localStorage.removeItem("token")
-                  router.push("/login")
-                }}>
+                <Button variant="destructive" className="w-full" onClick={logout}>
                   Cerrar sesión
                 </Button>
               </motion.div>

@@ -108,7 +108,7 @@ export default function Home() {
             </motion.div>
           </motion.main>
           <motion.footer
-            className="fixed bottom-0 left-0 w-full border-t py-4 text-center text-sm text-muted-foreground bg-background z-50"
+            className="fixed bottom-0 left-0 w-full border-t py-4 text-center text-sm text-muted-foreground bg-background/80 backdrop-blur-sm z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
