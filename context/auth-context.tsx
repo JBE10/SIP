@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { mockAuth, mockUser } from "../src/data/mockUser"
+import { mockAuth, mockUser } from "../data/mockUser"
 
 interface AuthContextType {
   user: any
@@ -48,12 +48,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      // Simular login exitoso
-      setToken(mockAuth.token)
-      setUser(mockUser)
-      setIsAuthenticated(true)
-      localStorage.setItem("token", mockAuth.token)
-      router.push("/swipe")
+      if (email === "test@example.com") {
+        // Simular login exitoso
+        setToken(mockAuth.token)
+        setUser(mockUser)
+        setIsAuthenticated(true)
+        localStorage.setItem("token", mockAuth.token)
+        router.push("/swipe")
+      } else {
+        throw new Error("Credenciales inválidas")
+      }
     } catch (error) {
       console.error("Error en login:", error)
       throw error
