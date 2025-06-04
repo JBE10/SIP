@@ -11,14 +11,23 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Logging para verificar conexión
 print(f"🔗 DATABASE_URL cargada: {DATABASE_URL[:30]}..." if DATABASE_URL else "❌ DATABASE_URL no encontrada")
 
-# Si no hay DATABASE_URL o falla PostgreSQL, usar SQLite local para testing
-if not DATABASE_URL or DATABASE_URL.startswith("postgresql"):
-    # Para testing local, usar SQLite
+# Control de entorno - usar variable USE_LOCAL_DB para forzar SQLite
+USE_LOCAL_DB = os.getenv("USE_LOCAL_DB", "false").lower() == "true"
+
+if USE_LOCAL_DB or not DATABASE_URL:
+    # Usar SQLite local
     LOCAL_DATABASE_URL = "sqlite:///./sportmatch.db"
-    print(f"🔄 Usando SQLite local para testing: {LOCAL_DATABASE_URL}")
+    print(f"🔄 Usando SQLite local: {LOCAL_DATABASE_URL}")
     engine = create_engine(LOCAL_DATABASE_URL, connect_args={"check_same_thread": False})
-else:
+elif DATABASE_URL.startswith("postgresql"):
+    # Conectar a Railway PostgreSQL
+    print(f"🚀 Conectando a Railway PostgreSQL: {DATABASE_URL[:50]}...")
     engine = create_engine(DATABASE_URL)
+else:
+    # Fallback a SQLite si DATABASE_URL no es reconocida
+    LOCAL_DATABASE_URL = "sqlite:///./sportmatch.db"
+    print(f"⚠️ DATABASE_URL no reconocida, usando SQLite: {LOCAL_DATABASE_URL}")
+    engine = create_engine(LOCAL_DATABASE_URL, connect_args={"check_same_thread": False})
 
 # Crear sesión de base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
