@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { mockAuth, mockUser } from "../data/mockUser"
+import { mockAuth, mockUser } from "@/src/data/mockUser"
 
 interface AuthContextType {
   user: any

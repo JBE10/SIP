@@ -16,7 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "../../context/auth-context"
 
 export default function LoginPage() {
   const router = useRouter()
