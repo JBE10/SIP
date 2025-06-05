@@ -28,10 +28,49 @@ const options = {
   }
 };
 
-console.log('🚂 Probando registro en Railway...');
-console.log('📡 Endpoint:', `https://${options.hostname}${options.path}`);
-console.log('📊 Datos a enviar:', userData);
-console.log('⏳ Enviando request...\n');
+// Primero probemos el endpoint raíz para ver si el backend funciona
+console.log('🚂 Probando Railway Backend...');
+console.log('📡 Verificando si el backend está funcionando...\n');
+
+// Probar endpoint raíz primero
+const testRoot = https.request({
+  hostname: 'sip-production.up.railway.app',
+  port: 443,
+  path: '/',
+  method: 'GET'
+}, (res) => {
+  let data = '';
+  res.on('data', chunk => data += chunk);
+  res.on('end', () => {
+    console.log(`🏠 Root endpoint (/) - Status: ${res.statusCode}`);
+    if (res.statusCode === 200) {
+      try {
+        const json = JSON.parse(data);
+        console.log('✅ Backend FastAPI detectado:', json.message);
+        console.log('📋 Endpoints disponibles:', json.endpoints);
+        
+        // Si el backend funciona, probar registro
+        console.log('\n📝 Ahora probando registro...');
+        testRegister();
+      } catch (e) {
+        console.log('❌ No es una API de FastAPI');
+        console.log('📄 Respuesta:', data.substring(0, 200) + '...');
+      }
+    } else {
+      console.log('❌ Backend no accesible');
+    }
+  });
+});
+
+testRoot.on('error', (err) => {
+  console.error('💥 Error conectando al backend:', err.message);
+});
+
+testRoot.end();
+
+function testRegister() {
+  console.log('📊 Datos a enviar:', userData);
+  console.log('⏳ Enviando request de registro...\n');
 
 const req = https.request(options, (res) => {
   console.log(`📈 Status Code: ${res.statusCode}`);
@@ -64,6 +103,7 @@ req.on('error', (err) => {
   console.error('💥 Error en la request:', err);
 });
 
-// Enviar los datos
-req.write(postData);
-req.end(); 
+  // Enviar los datos
+  req.write(postData);
+  req.end();
+} 

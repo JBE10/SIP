@@ -6,13 +6,19 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Carga variables desde .env
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# URL de PostgreSQL de Railway
+DATABASE_URL = "postgresql://postgres:SjPLUpHFZzydYEYfqCPKWbWIrPuJkOyi@shuttle.proxy.rlwy.net:17388/railway"
+
+# También cargar desde .env si existe (para sobrescribir)
+env_database_url = os.getenv("DATABASE_URL")
+if env_database_url:
+    DATABASE_URL = env_database_url
 
 # Logging para verificar conexión
 print(f"🔗 DATABASE_URL cargada: {DATABASE_URL[:30]}..." if DATABASE_URL else "❌ DATABASE_URL no encontrada")
 
-# Control de entorno - usar variable USE_LOCAL_DB para forzar SQLite
-USE_LOCAL_DB = os.getenv("USE_LOCAL_DB", "false").lower() == "true"
+# Control de entorno - forzar PostgreSQL de Railway
+USE_LOCAL_DB = False  # Forzar uso de PostgreSQL
 
 if USE_LOCAL_DB or not DATABASE_URL:
     # Usar SQLite local

@@ -72,33 +72,33 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
     try {
       const res = await fetch("http://localhost:8000/users/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
           name: form.name,
-          email: form.email,
+        email: form.email,
           bio: form.bio,
           deportes: form.sports,
-          age: form.age,
-          location: form.location,
+        age: form.age,
+        location: form.location,
           profilePicture: form.profilePicture
-        })
-      });
+      })
+    });
 
-      const data = await res.json();
-      console.log("Respuesta backend:", data);
+    const data = await res.json();
+    console.log("Respuesta backend:", data);
 
-      if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data));
-        window.location.reload();
+    if (res.ok) {
+      localStorage.setItem("user", JSON.stringify(data));
+      window.location.reload();
       } else {
         if (res.status === 401) {
           handleAuthError()
-        } else {
-          console.error("Error al actualizar perfil:", res.status, data);
+    } else {
+      console.error("Error al actualizar perfil:", res.status, data);
         }
       }
     } catch (error) {
@@ -147,18 +147,18 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       const formData = new FormData();
       formData.append("file", selectedFile);
 
-      const res = await fetch("http://localhost:8000/users/upload-photo", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+    const res = await fetch("http://localhost:8000/users/upload-photo", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
       const data = await res.json();
 
       if (res.ok) {
-        console.log("Foto subida:", data.profilePicture);
+      console.log("Foto subida:", data.profilePicture);
         setForm(prev => ({ ...prev, profilePicture: data.profilePicture }));
         setUploadStatus("success");
         
@@ -175,7 +175,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       } else {
         if (res.status === 401) {
           handleAuthError();
-        } else {
+    } else {
           setUploadError(data.detail || "Error al subir la foto");
           setUploadStatus("error");
         }

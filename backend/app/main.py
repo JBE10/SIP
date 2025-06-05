@@ -51,6 +51,25 @@ def get_db():
 # Rutas de autenticación
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
+# Endpoint raíz para verificar que la API funciona
+@app.get("/")
+def root():
+    return {
+        "message": "🏆 SportMatch API funcionando correctamente", 
+        "version": "1.0.0",
+        "endpoints": {
+            "docs": "/docs",
+            "register": "/auth/register", 
+            "login": "/auth/login",
+            "me": "/users/me"
+        }
+    }
+
+# Endpoint de health check
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "database": "connected"}
+
 # Rutas de usuarios
 @app.get("/users/me", response_model=schemas.User)
 def read_users_me(current_user: schemas.User = Depends(auth.get_current_user)):

@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Enviando datos de registro:", payload)
 
-      const res = await fetch("https://sip-production.up.railway.app/auth/register", {
+      const res = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

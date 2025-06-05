@@ -4,9 +4,13 @@
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
 
-export const API_BASE_URL = isDevelopment || isLocalhost 
-  ? 'http://localhost:8000'  // Desarrollo local
-  : 'https://sip-production.up.railway.app'  // Producción en Railway
+// Por ahora usar localhost hasta que Railway esté configurado
+export const API_BASE_URL = 'http://localhost:8000'  // Backend local
+
+// Una vez que Railway esté funcionando, cambiar a:
+// export const API_BASE_URL = isDevelopment || isLocalhost 
+//   ? 'http://localhost:8000'  // Desarrollo local
+//   : 'https://TU_URL_RAILWAY_CORRECTA'  // Railway backend
 
 export const API_ENDPOINTS = {
   register: `${API_BASE_URL}/auth/register`,
