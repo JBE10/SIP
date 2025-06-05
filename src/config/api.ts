@@ -9,4 +9,10 @@ export const API_ENDPOINTS = {
     ME: `${API_URL}/users/me`,
     UPLOAD_PHOTO: `${API_URL}/users/upload-photo`,
   },
+};
+
+export const API_HEADERS = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'Origin': 'https://sip-gray.vercel.app'
 }; 

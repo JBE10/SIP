@@ -8,7 +8,7 @@ import {
   type ReactNode
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { API_ENDPOINTS } from "@/src/config/api"
+import { API_ENDPOINTS, API_HEADERS } from "@/src/config/api"
 
 export type User = {
   id: number
@@ -101,7 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+          ...API_HEADERS,
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
         body: formData
       })
 
@@ -160,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const res = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: API_HEADERS,
         body: JSON.stringify(payload)
       })
 
