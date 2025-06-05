@@ -9,7 +9,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://sip-backend-production.up.railway.app/:path*"
+      "destination": "https://web-production-07ed64.up.railway.app/:path*"
     }
   ],
   "headers": [

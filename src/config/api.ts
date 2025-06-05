@@ -1,4 +1,4 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://sip-backend-production.up.railway.app';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://web-production-07ed64.up.railway.app';
 
 export const API_ENDPOINTS = {
   AUTH: {

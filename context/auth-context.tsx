@@ -147,11 +147,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: userData.name,
         email: userData.email,
         password: userData.password,
-        deportes_preferidos: userData.sports.join(", "),
+        deportes_preferidos: userData.sports.join(","),
         descripcion: userData.bio,
         foto_url: "https://randomuser.me/api/portraits/lego/1.jpg",
+        video_url: "",
         age: userData.age,
-        location: userData.location
+        location: userData.location,
+        profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
       }
 
       console.log("Enviando datos de registro:", payload)
