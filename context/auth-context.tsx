@@ -18,7 +18,7 @@ export type User = {
   location: string
   bio: string
   sports: string[]
-  profilePicture?: string
+  foto_url?: string
   deportes_preferidos?: string
   descripcion?: string
 }
@@ -150,8 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         descripcion: userData.bio,
         foto_url: "https://randomuser.me/api/portraits/lego/1.jpg",
         age: userData.age,
-        location: userData.location,
-        profilePicture: "https://randomuser.me/api/portraits/lego/1.jpg"
+        location: userData.location
       }
 
       console.log("Enviando datos de registro:", payload)

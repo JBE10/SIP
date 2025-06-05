@@ -24,9 +24,10 @@ try:
 except Exception as e:
     print(f"❌ Error creando tablas: {e}")
 
-# CORS para permitir conexión desde Vercel
+# CORS para permitir conexión desde Vercel y Railway
 origins = [
     "https://sportsmatch.vercel.app",
+    "https://sip-production.up.railway.app",
     "http://localhost:3000",
     "http://localhost:3001"
 ]
@@ -111,11 +112,11 @@ async def upload_photo(
     # Actualizar la URL de la foto en la base de datos
     photo_url = f"http://localhost:8000/static/uploads/{unique_filename}"
     db_user = db.query(models.User).filter(models.User.id == current_user.id).first()
-    db_user.profilePicture = photo_url
+    db_user.foto_url = photo_url
     db.commit()
     db.refresh(db_user)
     
-    return {"message": "Foto subida exitosamente", "profilePicture": photo_url}
+    return {"message": "Foto subida exitosamente", "foto_url": photo_url}
 
 # Asegúrate de que la carpeta exista
 os.makedirs("app/static/uploads", exist_ok=True)

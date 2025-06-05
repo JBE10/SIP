@@ -71,29 +71,25 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/register", response_model=schemas.User)
+@router.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El email ya está registrado"
-        )
-    
-    hashed_password = get_password_hash(user.password)
-    db_user = models.User(
+    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email ya registrado")
+
+    hashed_pw = pwd_context.hash(user.password)
+    new_user = models.User(
         username=user.username,
         email=user.email,
-        password=hashed_password,
+        password=hashed_pw,
         deportes_preferidos=user.deportes_preferidos,
         descripcion=user.descripcion,
         foto_url=user.foto_url,
         video_url=user.video_url,
         age=user.age,
-        location=user.location,
-        profilePicture=user.profilePicture
+        location=user.location
     )
-    db.add(db_user)
+    db.add(new_user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(new_user)
+    return {"message": "Usuario registrado correctamente"}

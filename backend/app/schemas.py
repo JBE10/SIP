@@ -10,10 +10,17 @@ class UserBase(BaseModel):
     video_url: Optional[str] = None
     age: Optional[int] = None
     location: Optional[str] = None
-    profilePicture: Optional[str] = None
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
     password: str
+    deportes_preferidos: Optional[str] = None
+    descripcion: Optional[str] = None
+    foto_url: Optional[str] = None
+    video_url: Optional[str] = None
+    age: Optional[int] = None
+    location: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -27,7 +34,6 @@ class UserUpdate(BaseModel):
     video_url: Optional[str] = None
     age: Optional[int] = None
     location: Optional[str] = None
-    profilePicture: Optional[str] = None
 
 class User(UserBase):
     id: int
