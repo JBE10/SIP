@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       formData.append("username", email)
       formData.append("password", password)
 
-      const response = await fetch("http://localhost:8000/auth/login", {
+      const response = await fetch("https://sip-production.up.railway.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { access_token } = await response.json()
       localStorage.setItem("token", access_token)
 
-      const userResponse = await fetch("http://localhost:8000/users/me", {
+      const userResponse = await fetch("https://sip-production.up.railway.app/users/me", {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: "application/json"
@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Enviando datos de registro:", payload)
 
-      const res = await fetch("http://localhost:8000/auth/register", {
+      const res = await fetch("https://sip-production.up.railway.app/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
