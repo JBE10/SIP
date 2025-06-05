@@ -5,5 +5,22 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://sip-production.up.railway.app/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    }
   ]
 }

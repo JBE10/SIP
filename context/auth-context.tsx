@@ -8,6 +8,7 @@ import {
   type ReactNode
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { API_ENDPOINTS } from "@/src/config/api"
 
 export type User = {
   id: number
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       formData.append("username", email)
       formData.append("password", password)
 
-      const response = await fetch("https://sip-production.up.railway.app/auth/login", {
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
@@ -109,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { access_token } = await response.json()
       localStorage.setItem("token", access_token)
 
-      const userResponse = await fetch("https://sip-production.up.railway.app/users/me", {
+      const userResponse = await fetch(API_ENDPOINTS.USER.ME, {
         headers: {
           Authorization: `Bearer ${access_token}`,
           Accept: "application/json"
@@ -143,10 +144,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register: AuthContextType["register"] = async (userData) => {
     try {
       const payload = {
-        username: userData.name, // Usar name del usuario como username
+        username: userData.name,
         email: userData.email,
         password: userData.password,
-        deportes_preferidos: userData.sports.join(", "), // Convertir array a string
+        deportes_preferidos: userData.sports.join(", "),
         descripcion: userData.bio,
         foto_url: "https://randomuser.me/api/portraits/lego/1.jpg",
         age: userData.age,
@@ -155,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Enviando datos de registro:", payload)
 
-      const res = await fetch("http://localhost:8000/auth/register", {
+      const res = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
