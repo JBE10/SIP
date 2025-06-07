@@ -44,7 +44,6 @@ export function ProfileEditModal({ isOpenAction, onCloseAction, profile }: Profi
   }
 
   const handleSave = () => {
-    // TODO: implementar lógica para guardar los cambios
     onCloseAction()
   }
 
