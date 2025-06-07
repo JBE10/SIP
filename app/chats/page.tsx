@@ -29,7 +29,7 @@ export default function ChatsPage() {
     lastMessage: "Hola! ¿Te gustaría practicar deportes juntos?",
     timestamp: new Date(match.timestamp).toLocaleDateString(),
     unread: Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 1 : 0, // Simular mensajes no leídos
-    avatar: match.profile.profilePicture,
+    avatar: match.profile.profile_picture,
   }))
 
   return (

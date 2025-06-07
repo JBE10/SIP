@@ -1,3 +1,5 @@
+// ✅ Opción 1: Fondo translúcido + blur (estilo iOS modernizado)
+
 "use client"
 
 import Link from "next/link"
@@ -9,54 +11,34 @@ export function BottomNavigation() {
   const pathname = usePathname()
 
   const navItems = [
-    {
-      href: "/profile",
-      icon: User,
-      label: "Mi Perfil",
-      active: pathname === "/profile",
-    },
-    {
-      href: "/swipe",
-      icon: Search,
-      label: "Descubrir",
-      active: pathname === "/swipe",
-    },
-    {
-      href: "/chats",
-      icon: MessageCircle,
-      label: "Mensajes",
-      active: pathname === "/chats" || pathname.startsWith("/chats/"),
-    },
+    { href: "/profile", icon: User, label: "Mi Perfil", active: pathname === "/profile" },
+    { href: "/swipe", icon: Search, label: "Descubrir", active: pathname === "/swipe" },
+    { href: "/chats", icon: MessageCircle, label: "Mensajes", active: pathname === "/chats" || pathname.startsWith("/chats/") },
   ]
 
   return (
-    <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-sm bg-gray-900 border border-gray-700 rounded-t-3xl shadow-2xl z-50">
-      <div className="flex justify-around items-center py-4 px-6">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 min-w-[70px]",
-                item.active
-                  ? "text-white bg-white/20 scale-105"
-                  : "text-gray-400 hover:text-white hover:bg-white/10 hover:scale-105",
-              )}
-            >
-              <Icon className={cn("h-6 w-6", item.active && "scale-110")} />
-              <span className={cn("text-xs font-medium", item.active && "font-semibold")}>{item.label}</span>
-            </Link>
-          )
-        })}
+      <div className="fixed bottom-0 left-0 w-full z-50 py-4 bg-black/70 backdrop-blur-lg border-t border-white/10">
+          <nav className="flex justify-around items-end">
+              {navItems.map((item) => {
+                  const Icon = item.icon
+                  return (
+                      <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                              "flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-2xl transition-all",
+                              item.active
+                                  ? "bg-green-600 text-white scale-105"
+                                  : "text-white/50 hover:text-white hover:bg-white/10"
+                          )}
+                      >
+                          <Icon className="h-6 w-6" />
+                          <span className="text-[10px]">{item.label}</span>
+                      </Link>
+                  )
+              })}
+          </nav>
       </div>
 
-      {/* Footer text */}
-      <div className="text-center py-2 text-xs text-gray-500 border-t border-gray-700 bg-gray-800/50 rounded-b-3xl">
-        © 2025 SportMatch
-      </div>
-    </nav>
   )
 }
-  

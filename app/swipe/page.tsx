@@ -145,8 +145,8 @@ export default function SwipePage() {
                     key={profile.id}
                     profile={profile}
                     isTop={index === 0}
-                    onSwipeLeft={handleDislike}
-                    onSwipeRight={handleLike}
+                    onSwipeLeftAction={handleDislike}
+                    onSwipeRightAction={handleLike}
                   />
                 ))}
               </AnimatePresence>
@@ -168,7 +168,7 @@ export default function SwipePage() {
 
         {/* Modal de match - Aseguramos que solo se renderice cuando matchedProfile existe */}
         {matchedProfile && (
-          <MatchModal isOpen={showMatchModal} onClose={handleMatchModalClose} matchedProfile={matchedProfile} />
+          <MatchModal isOpenAction={showMatchModal} onCloseAction={handleMatchModalClose} matchedProfile={matchedProfile} />
         )}
       </div>
 

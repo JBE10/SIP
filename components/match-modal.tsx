@@ -10,12 +10,12 @@ import { MessageSquare, Handshake } from "lucide-react"
 import type { Profile } from "@/context/app-context"
 
 interface MatchModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpenAction: boolean
+  onCloseAction: () => void
   matchedProfile: Profile
 }
 
-export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps) {
+export function MatchModal({ isOpenAction, onCloseAction, matchedProfile }: MatchModalProps) {
   useEffect(() => {
     return () => {
       // Solo limpieza, no cerramos el modal automáticamente
@@ -25,7 +25,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
   if (!matchedProfile) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpenAction} onOpenChange={onCloseAction}>
       <DialogContent className="sm:max-w-md bg-gradient-to-b from-pink-500 to-purple-600 border-0 text-white">
         <DialogTitle className="sr-only">Match encontrado</DialogTitle>
         <DialogDescription className="sr-only">Has hecho match con {matchedProfile.name}</DialogDescription>
@@ -79,7 +79,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               transition={{ duration: 0.5 }}
             >
               <Image
-                src={matchedProfile.profilePicture || `/placeholder.svg?height=96&width=96`}
+                src={matchedProfile.profile_picture || `/placeholder.svg?height=96&width=96`}
                 alt={matchedProfile.name}
                 width={96}
                 height={96}
@@ -104,7 +104,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               <Button
                 variant="ghost"
                 className="w-full border border-white/30 text-white hover:bg-white/10"
-                onClick={onClose}
+                onClick={onCloseAction}
               >
                 Seguir descubriendo
               </Button>

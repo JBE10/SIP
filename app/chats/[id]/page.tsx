@@ -26,7 +26,7 @@ export default function ChatPage({ params }: { params: { id: string } }) {
     ? {
         id: match.id,
         name: match.profile.name,
-        avatar: match.profile.profilePicture,
+        avatar: match.profile.profile_picture,
         status: "En línea",
       }
     : {

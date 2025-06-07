@@ -1,10 +1,12 @@
 export interface User {
-  id: number;
-  name: string;
-  email: string;
-  description: string;
-  sport: string;
-  image?: string;
+  id: number
+  name: string
+  email: string
+  description: string
+  sports: string
+  profile_picture?: string
+  age?: number
+  location?: string
 }
 
 export interface Match {
@@ -20,24 +22,24 @@ export const mockUsers: User[] = [
     name: 'Juan Pérez',
     email: 'juan@example.com',
     description: 'Amante del fútbol y buscando partidos casuales',
-    sport: 'Fútbol',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg'
+    sports: 'Fútbol',
+    profile_picture: 'https://randomuser.me/api/portraits/men/1.jpg'
   },
   {
     id: 2,
     name: 'María García',
     email: 'maria@example.com',
     description: 'Jugadora de tenis nivel intermedio',
-    sport: 'Tenis',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg'
+    sports: 'Tenis',
+    profile_picture: 'https://randomuser.me/api/portraits/women/1.jpg'
   },
   {
     id: 3,
     name: 'Carlos López',
     email: 'carlos@example.com',
     description: 'Basketball player looking for pickup games',
-    sport: 'Basketball',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg'
+    sports: 'Basketball',
+    profile_picture: 'https://randomuser.me/api/portraits/men/2.jpg'
   }
 ];
 

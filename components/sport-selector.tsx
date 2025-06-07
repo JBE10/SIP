@@ -4,10 +4,10 @@ import { Check } from "lucide-react"
 
 interface SportSelectorProps {
   selectedSports: string[]
-  onToggleSport: (sport: string) => void
+  onToggleSportAction: (sports: string) => void
 }
 
-export function SportSelector({ selectedSports, onToggleSport }: SportSelectorProps) {
+export function SportSelector({ selectedSports, onToggleSportAction }: SportSelectorProps) {
   // Lista de deportes disponibles
   const availableSports = [
     "Fútbol",
@@ -30,18 +30,18 @@ export function SportSelector({ selectedSports, onToggleSport }: SportSelectorPr
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      {availableSports.map((sport) => {
-        const isSelected = selectedSports.includes(sport)
+      {availableSports.map((sports) => {
+        const isSelected = selectedSports.includes(sports)
         return (
           <button
-            key={sport}
+            key={sports}
             type="button"
             className={`flex items-center justify-between px-4 py-2 rounded-md border transition-colors ${
               isSelected ? "border-primary bg-primary/10 text-primary" : "border-input hover:bg-muted"
             }`}
-            onClick={() => onToggleSport(sport)}
+            onClick={() => onToggleSportAction(sports)}
           >
-            <span>{sport}</span>
+            <span>{sports}</span>
             {isSelected && <Check className="h-4 w-4" />}
           </button>
         )
