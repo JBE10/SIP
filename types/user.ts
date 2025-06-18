@@ -1,11 +1,11 @@
-export type User = {
+export interface User {
     id: number
-    name: string
     email: string
-    description: string
-    sports: string
-    profile_picture: string
+    username: string           // ← nuevo
+    full_name: string          // ← nuevo
     age: number
     location: string
-    distance?: number // 👈 añadí esto
+    description: string
+    sports: string             // Ej: "fútbol,tenis"
+    profile_picture?: string
 }

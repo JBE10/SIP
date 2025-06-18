@@ -29,7 +29,8 @@ interface ProfileEditModalProps {
 }
 
 export function ProfileEditModal({ isOpenAction, onCloseAction, profile }: ProfileEditModalProps) {
-  const [name, setName] = useState(profile.name)
+  const [fullName, setFullName] = useState(profile.full_name)
+  const [username, setUsername] = useState(profile.username)
   const [age, setAge] = useState(profile.age?.toString() || "")
   const [location, setLocation] = useState(profile.location)
   const [description, setDescription] = useState(profile.description)
@@ -44,6 +45,7 @@ export function ProfileEditModal({ isOpenAction, onCloseAction, profile }: Profi
   }
 
   const handleSave = () => {
+    // Acá iría la lógica de actualización real al backend
     onCloseAction()
   }
 
@@ -57,9 +59,9 @@ export function ProfileEditModal({ isOpenAction, onCloseAction, profile }: Profi
             <Avatar className="h-20 w-20 border-2 border-primary">
               <AvatarImage
                   src={profile.profile_picture || "/placeholder.svg?height=80&width=80"}
-                  alt={profile.name}
+                  alt={fullName}
               />
-              <AvatarFallback>{profile.name.substring(0, 2)}</AvatarFallback>
+              <AvatarFallback>{fullName?.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
           </div>
           <Tabs defaultValue="info">
@@ -69,11 +71,19 @@ export function ProfileEditModal({ isOpenAction, onCloseAction, profile }: Profi
             </TabsList>
             <TabsContent value="info" className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre</Label>
+                <Label htmlFor="full_name">Nombre completo</Label>
                 <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="full_name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username">Nombre de usuario</Label>
+                <Input
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               <div className="space-y-2">

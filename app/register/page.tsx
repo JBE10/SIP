@@ -22,7 +22,9 @@ import { ALL_SPORTS } from "@/lib/constants/sports"
 export default function RegisterPage() {
   const router = useRouter()
   const { register } = useAuth()
+
   const [name, setName] = useState("")
+  const [username, setUsername] = useState("") // ✅ nuevo
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -55,6 +57,7 @@ export default function RegisterPage() {
     try {
       const success = await register({
         name,
+        username, // ✅
         email,
         password,
         description,
@@ -98,9 +101,19 @@ export default function RegisterPage() {
                 <Label htmlFor="name">Nombre completo</Label>
                 <Input
                     id="name"
-                    placeholder="Tu nombre"
+                    placeholder="Tu nombre real"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username">Nombre de usuario</Label>
+                <Input
+                    id="username"
+                    placeholder="Ej: juanp12"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                 />
               </div>

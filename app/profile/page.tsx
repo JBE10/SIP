@@ -73,8 +73,9 @@ export default function ProfilePage() {
             </motion.div>
             <div className="text-center">
               <h2 className="text-xl font-bold">
-                {user.name}, {user.age}
+                {user.full_name}, {user.age}
               </h2>
+              <p className="text-muted-foreground text-sm">@{user.username}</p>
               <p className="text-muted-foreground flex items-center justify-center gap-1">
                 <MapPin className="h-4 w-4" />
                 {user.location}
@@ -101,8 +102,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {user.sports
-                      .split(",")
+                  {(Array.isArray(user.sports) ? user.sports : user.sports?.split(",") || [])
                       .map((sport, index) => (
                           <motion.div
                               key={sport.trim()}
@@ -134,8 +134,12 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" value={user.name} readOnly />
+                  <Label htmlFor="full_name">Nombre completo</Label>
+                  <Input id="full_name" value={user.full_name} readOnly />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Nombre de usuario</Label>
+                  <Input id="username" value={user.username} readOnly />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo electrónico</Label>

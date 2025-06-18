@@ -5,7 +5,8 @@ import { useRouter, usePathname } from "next/navigation"
 import type { User } from "@/types/user"
 
 type RegisterPayload = {
-  name: string
+  username: string       // ✅ nuevo
+  name: string           // full name
   email: string
   password: string
   description: string
@@ -57,16 +58,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, isLoading, pathname, router])
 
   const fetchUserProfile = async (token: string) => {
-    const res = await fetch("http://localhost:8000/users/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    if (!res.ok) throw new Error("No se pudo obtener el perfil del usuario")
-    const userData = await res.json()
-    setUser(userData)
-    localStorage.setItem("user", JSON.stringify(userData))
-    localStorage.setItem("isLoggedIn", "true")
+    try {
+      const res = await fetch("http://localhost:8000/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!res.ok) throw new Error("Token inválido o expirado")
+      const userData = await res.json()
+      setUser(userData)
+      localStorage.setItem("user", JSON.stringify(userData))
+      localStorage.setItem("isLoggedIn", "true")
+    } catch (err) {
+      console.error("Error al obtener el perfil del usuario:", err)
+      logout()
+    }
   }
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -80,17 +86,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (!res.ok) {
-        console.error("Login fallido:", await res.text())
+        const errorText = await res.text()
+        console.error("Login fallido:", errorText)
+        alert("Login fallido: " + errorText)
         return false
       }
 
       const data = await res.json()
       localStorage.setItem("token", data.access_token)
-
       await fetchUserProfile(data.access_token)
       return true
     } catch (error) {
       console.error("Error al loguear:", error)
+      alert("Error al conectar con el servidor")
       return false
     }
   }
@@ -103,7 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: userData.name,
+          username: userData.username,         // ✅ username único
+          full_name: userData.name,            // ✅ nombre real
           email: userData.email,
           password: userData.password,
           description: userData.description,
@@ -115,29 +124,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (!res.ok) {
-        console.error("Error en el registro:", await res.text())
+        const errorText = await res.text()
+        console.error("Error en el registro:", errorText)
+        alert("Error al registrarse: " + errorText)
         return false
       }
 
       const data = await res.json()
       localStorage.setItem("token", data.access_token)
-
       await fetchUserProfile(data.access_token)
       return true
     } catch (error) {
       console.error("Error al registrar:", error)
+      alert("Error al conectar con el servidor")
       return false
     }
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-    localStorage.removeItem("isLoggedIn")
-    localStorage.removeItem("likedProfiles")
-    localStorage.removeItem("dislikedProfiles")
-    localStorage.removeItem("matches")
+    localStorage.clear()
     router.push("/login")
   }
 
