@@ -168,6 +168,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       const formData = new FormData();
       formData.append("file", selectedFile);
 
+      console.log("Subiendo foto al servidor...");
       const res = await fetch(API_ENDPOINTS.USER.UPLOAD_PHOTO, {
         method: "POST",
         headers: {
@@ -176,18 +177,23 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         body: formData,
       });
 
-      const data = await res.json();
+      console.log("Respuesta del servidor:", res.status, res.statusText);
 
       if (res.ok) {
-        console.log("Foto subida:", data.profilePicture);
-        setForm(prev => ({ ...prev, profilePicture: data.profilePicture }));
+        const data = await res.json();
+        console.log("Foto subida exitosamente:", data);
+        
+        // El backend devuelve foto_url, no profilePicture
+        const fotoUrl = data.foto_url;
+        setForm(prev => ({ ...prev, profilePicture: fotoUrl }));
         setUploadStatus("success");
         
         // Actualizar el usuario en localStorage
         const userStr = localStorage.getItem("user");
         if (userStr) {
           const user = JSON.parse(userStr);
-          user.profilePicture = data.profilePicture;
+          user.profilePicture = fotoUrl;
+          user.foto_url = fotoUrl;
           localStorage.setItem("user", JSON.stringify(user));
         }
         
@@ -197,13 +203,20 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         if (res.status === 401) {
           handleAuthError();
         } else {
-          setUploadError(data.detail || "Error al subir la foto");
+          let errorData;
+          try {
+            errorData = await res.json();
+          } catch {
+            errorData = await res.text();
+          }
+          console.error("Error al subir foto:", res.status, errorData);
+          setUploadError(errorData.detail || "Error al subir la foto");
           setUploadStatus("error");
         }
       }
     } catch (error) {
       console.error("Error al subir la foto:", error);
-      setUploadError("Error al subir la foto");
+      setUploadError("Error de conexión al subir la foto");
       setUploadStatus("error");
     }
   };
