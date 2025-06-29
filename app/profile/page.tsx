@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
         try {
             console.log("Enviando foto al servidor...")
-            const res = await fetch("http://localhost:8000/users/upload-photo", {
+            const res = await fetch("https://web-production-07ed64.up.railway.app/upload-profile-picture", {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

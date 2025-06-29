@@ -4,10 +4,11 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${API_URL}/auth/login`,
     REGISTER: `${API_URL}/auth/register`,
+    PROFILE_UPDATE: `${API_URL}/auth/profile/update`,
   },
   USER: {
     ME: `${API_URL}/users/me`,
-    UPLOAD_PHOTO: `${API_URL}/users/upload-photo`,
+    UPLOAD_PHOTO: `${API_URL}/upload-profile-picture`,
   },
 };
 

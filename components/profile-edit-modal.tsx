@@ -72,20 +72,19 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
     }
 
     try {
-      const res = await fetch(API_ENDPOINTS.USER.ME, {
+      const res = await fetch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          bio: form.bio,
-          deportes: form.sports,
+          username: form.name,
+          descripcion: form.bio,
+          deportes_preferidos: form.sports.join(", "),
           age: form.age,
           location: form.location,
-          profilePicture: form.profilePicture
+          foto_url: form.profilePicture
         })
       });
 
@@ -93,17 +92,38 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       console.log("Respuesta backend:", data);
 
       if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data));
+        // Actualizar el usuario en localStorage con los datos del backend
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          const updatedUser = {
+            ...user,
+            name: data.user.username,
+            username: data.user.username,
+            bio: data.user.descripcion,
+            descripcion: data.user.descripcion,
+            age: data.user.edad,
+            location: data.user.location,
+            foto_url: data.user.foto_url,
+            profilePicture: data.user.foto_url,
+            sports: data.user.deportes_preferidos ? data.user.deportes_preferidos.split(", ") : []
+          };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+        
+        // Recargar la página para mostrar los cambios
         window.location.reload();
       } else {
         if (res.status === 401) {
           handleAuthError()
         } else {
           console.error("Error al actualizar perfil:", res.status, data);
+          alert("Error al actualizar perfil: " + (data.detail || "Error desconocido"));
         }
       }
     } catch (error) {
       console.error("Error al actualizar perfil:", error);
+      alert("Error de conexión al actualizar perfil");
     }
   }
 
