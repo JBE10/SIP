@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
   register: `${API_BASE_URL}/auth/register`,
   login: `${API_BASE_URL}/auth/login`,
   me: `${API_BASE_URL}/users/me`,
-  uploadPhoto: `${API_BASE_URL}/users/upload-photo`,
+  uploadPhoto: `${API_BASE_URL}/upload-profile-picture`,
   matches: `${API_BASE_URL}/matches`,
 } as const
 

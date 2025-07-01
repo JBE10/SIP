@@ -81,6 +81,7 @@ export default function ProfilePage() {
 
         try {
             console.log("Enviando foto al servidor...")
+            console.log("URL del endpoint:", API_ENDPOINTS.USER.UPLOAD_PHOTO)
             const res = await fetch(API_ENDPOINTS.USER.UPLOAD_PHOTO, {
                 method: "POST",
                 headers: {

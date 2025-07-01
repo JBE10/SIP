@@ -94,6 +94,7 @@ export function VideoGallery() {
 
     try {
       console.log("Enviando petición a:", API_ENDPOINTS.USER.UPLOAD_VIDEO)
+      console.log("URL del endpoint:", API_ENDPOINTS.USER.UPLOAD_VIDEO)
       console.log("Token:", token ? `${token.substring(0, 20)}...` : "No hay token")
       console.log("FormData:", formData)
       
