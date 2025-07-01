@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ProfileEditModal } from "@/components/profile-edit-modal"
 import { VideoGallery } from "@/components/video-gallery"
+import { ProfilePictureUpload } from "@/components/profile-picture-upload"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
@@ -54,89 +55,11 @@ export default function ProfilePage() {
         show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
     }
 
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || e.target.files.length === 0) return
-        
-        const file = e.target.files[0]
-        // Verificar el tamaño del archivo (máximo 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            console.error("El archivo es demasiado grande. Máximo 5MB permitido.")
-            return
-        }
 
-        // Verificar el tipo de archivo
-        if (!file.type.startsWith("image/")) {
-            console.error("Solo se permiten archivos de imagen")
-            return
-        }
-
-        const formData = new FormData()
-        formData.append("file", file)
-        const token = localStorage.getItem("token")
-
-        if (!token) {
-            console.error("No hay token de autenticación")
-            return
-        }
-
-        try {
-            console.log("Enviando foto al servidor...")
-            console.log("URL del endpoint:", API_ENDPOINTS.USER.UPLOAD_PHOTO)
-            const res = await fetch(API_ENDPOINTS.USER.UPLOAD_PHOTO, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            })
-
-            console.log("Respuesta del servidor:", res.status, res.statusText)
-
-            if (!res.ok) {
-                if (res.status === 401) {
-                    handleAuthError()
-                    return
-                }
-                
-                let errorData;
-                try {
-                    errorData = await res.json()
-                } catch {
-                    errorData = await res.text()
-                }
-                console.error("Error al subir imagen:", res.status, errorData)
-                alert("Error al subir imagen: " + JSON.stringify(errorData))
-                return
-            }
-
-            const data = await res.json()
-            console.log("Imagen subida exitosamente:", data)
-            console.log("foto_url recibida:", data.foto_url)
-            alert("Imagen subida exitosamente!")
-            
-            // Actualizar el estado local y el localStorage
-            const updatedUser = { 
-                ...userData, 
-                profilePicture: data.foto_url,
-                foto_url: data.foto_url 
-            }
-            console.log("Usuario actualizado:", updatedUser)
-            setUserData(updatedUser)
-            localStorage.setItem("user", JSON.stringify(updatedUser))
-            
-            // Recargar la página para mostrar la nueva imagen
-            window.location.reload()
-        } catch (error) {
-            console.error("Error de red al subir imagen:", error)
-            alert("Error de conexión: " + (error instanceof Error ? error.message : String(error)))
-        }
-    }
 
     if (!userData) return null
 
-    // Log para debug
-    console.log("userData en render:", userData)
-    console.log("URL de la imagen:", userData.profilePicture || userData.foto_url || "/placeholder.svg?height=96&width=96")
+
 
     return (
         <>
@@ -158,32 +81,6 @@ export default function ProfilePage() {
                 </motion.div>
 
                 <motion.div className="flex flex-col items-center gap-4" variants={item}>
-                    <motion.div
-                        className="relative"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    >
-                        <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary relative">
-                            <Image
-                                src={userData.profilePicture || userData.foto_url || "/placeholder.svg?height=96&width=96"}
-                                alt="Foto de perfil"
-                                fill
-                                className="object-cover"
-                                unoptimized
-                            />
-                        </div>
-                        <label className="mt-2 block text-sm font-medium text-center text-primary cursor-pointer">
-                            Cambiar foto de perfil
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleUpload}
-                                className="hidden"
-                            />
-                        </label>
-                    </motion.div>
-
                     <div className="text-center">
                         <h2 className="text-xl font-bold">
                             {userData.name}, {userData.age}
@@ -193,6 +90,10 @@ export default function ProfilePage() {
                             {userData.location}
                         </p>
                     </div>
+                </motion.div>
+
+                <motion.div variants={item}>
+                    <ProfilePictureUpload />
                 </motion.div>
 
                 <motion.div variants={item}>
