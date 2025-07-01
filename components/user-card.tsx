@@ -78,9 +78,9 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
     >
       <Card className="overflow-hidden shadow-lg">
         <div className="relative">
-          {/* Video de fondo */}
-          {user.video_url && (
-            <div className="relative w-full h-96 bg-black">
+          {/* Video de fondo o imagen por defecto */}
+          <div className="relative w-full h-96 bg-black">
+            {user.video_url ? (
               <video
                 ref={videoRef}
                 src={user.video_url}
@@ -89,9 +89,38 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                 loop
                 onPlay={() => setIsVideoPlaying(true)}
                 onPause={() => setIsVideoPlaying(false)}
+                onError={(e) => {
+                  console.log("❌ Error cargando video:", e)
+                  console.log("🔗 URL del video:", user.video_url)
+                  // Ocultar el video si falla y mostrar fondo por defecto
+                  e.currentTarget.style.display = 'none'
+                  const container = e.currentTarget.parentElement
+                  if (container) {
+                    container.style.backgroundImage = 'url(/placeholder-video.jpg)'
+                    container.style.backgroundSize = 'cover'
+                    container.style.backgroundPosition = 'center'
+                  }
+                }}
               />
-              
-              {/* Controles de video */}
+            ) : (
+              // Imagen de fondo por defecto cuando no hay video
+              <div 
+                className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                style={{
+                  backgroundImage: 'url(/placeholder-video.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                <div className="text-white text-center">
+                  <div className="text-4xl mb-2">🏃‍♂️</div>
+                  <div className="text-sm opacity-80">Sin video</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Controles de video (solo si hay video) */}
+            {user.video_url && (
               <div className="absolute top-4 right-4 flex gap-2">
                 <Button
                   size="sm"
@@ -110,9 +139,9 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                   {isVideoPlaying ? <Pause size={16} /> : <Play size={16} />}
                 </Button>
               </div>
-            </div>
-          )}
-          
+            )}
+          </div>
+
           {/* Foto de perfil superpuesta */}
           <div className="absolute top-4 left-4">
             <img
