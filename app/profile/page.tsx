@@ -113,7 +113,11 @@ export default function ProfilePage() {
             alert("Imagen subida exitosamente!")
             
             // Actualizar el estado local y el localStorage
-            const updatedUser = { ...userData, profilePicture: data.foto_url }
+            const updatedUser = { 
+                ...userData, 
+                profilePicture: data.foto_url,
+                foto_url: data.foto_url 
+            }
             setUserData(updatedUser)
             localStorage.setItem("user", JSON.stringify(updatedUser))
             
@@ -155,7 +159,7 @@ export default function ProfilePage() {
                     >
                         <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-primary relative">
                             <Image
-                                src={userData.profilePicture || "/placeholder.svg?height=96&width=96"}
+                                src={userData.profilePicture || userData.foto_url || "/placeholder.svg?height=96&width=96"}
                                 alt="Foto de perfil"
                                 fill
                                 className="object-cover"

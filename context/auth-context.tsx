@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: parsedUser.name || parsedUser.username, // Mapear username a name si es necesario
           bio: parsedUser.bio || parsedUser.descripcion || "",
           sports: parseSports(parsedUser.deportes_preferidos || parsedUser.sports || ""),
-          profilePicture: parsedUser.profilePicture || parsedUser.foto_url || "",
+          profilePicture: parsedUser.foto_url || parsedUser.profilePicture || "",
           video_url: parsedUser.video_url || ""
         }
         setUser(user)
