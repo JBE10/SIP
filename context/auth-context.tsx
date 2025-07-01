@@ -90,6 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ✅ Cargar usuario del localStorage
   useEffect(() => {
+    // Verificar que estamos en el cliente
+    if (typeof window === 'undefined') return
+    
     const storedUser = localStorage.getItem("user")
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
 
@@ -107,7 +110,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         setUser(user)
       } catch (err) {
-        localStorage.clear()
+        if (typeof window !== 'undefined') {
+          localStorage.clear()
+        }
         setUser(null)
       }
     }
@@ -150,7 +155,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!response.ok) return false
 
       const { access_token } = await response.json()
-      localStorage.setItem("token", access_token)
+      // Verificar que estamos en el cliente antes de usar localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("token", access_token)
+      }
 
       const userResponse = await fetch(API_ENDPOINTS.USER.ME, {
         headers: {
@@ -174,8 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       setUser(user)
-      localStorage.setItem("user", JSON.stringify(user))
-      localStorage.setItem("isLoggedIn", "true")
+      // Verificar que estamos en el cliente antes de usar localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("user", JSON.stringify(user))
+        localStorage.setItem("isLoggedIn", "true")
+      }
 
       return true
     } catch (err) {
@@ -247,7 +258,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null)
-    localStorage.clear()
+    // Verificar que estamos en el cliente
+    if (typeof window !== 'undefined') {
+      localStorage.clear()
+    }
     router.push("/login")
   }
 

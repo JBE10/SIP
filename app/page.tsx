@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { motion } from "framer-motion"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
 import { LoadingSpinner } from "@/components/loading-spinner"
@@ -12,6 +12,12 @@ import { LoadingSpinner } from "@/components/loading-spinner"
 export default function Home() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  
+  // Evitar errores de hidratación
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -35,6 +41,15 @@ export default function Home() {
       router.push("/login")
     }
   }, [isAuthenticated, router])
+
+  // No renderizar hasta que esté montado
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-500 to-indigo-700">
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

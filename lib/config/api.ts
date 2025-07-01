@@ -2,12 +2,17 @@
 
 // Configuración de API que detecta automáticamente el entorno
 const isDevelopment = process.env.NODE_ENV === 'development'
-const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
+)
 
 // URL dinámica basada en el entorno
 export const API_BASE_URL = isDevelopment || isLocalhost 
   ? 'http://localhost:8000'  // Desarrollo local
   : 'https://web-production-07ed64.up.railway.app'  // Railway backend
+
+console.log('API_BASE_URL:', API_BASE_URL, 'NODE_ENV:', process.env.NODE_ENV, 'isLocalhost:', isLocalhost)
 
 export const API_ENDPOINTS = {
   register: `${API_BASE_URL}/auth/register`,
