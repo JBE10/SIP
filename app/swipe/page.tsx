@@ -228,10 +228,20 @@ export default function SwipePage() {
         <p className="text-muted-foreground text-center max-w-sm">
           Intenta ajustar tus filtros o espera a que más personas se unan a SportMatch.
         </p>
-        <Button onClick={handleRefresh}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Buscar de nuevo
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/filters">
+              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Modificar filtros
+            </Link>
+          </Button>
+          <Button onClick={handleRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Buscar de nuevo
+          </Button>
+        </div>
       </div>
     )
   }
@@ -244,10 +254,20 @@ export default function SwipePage() {
         <p className="text-muted-foreground text-center max-w-sm">
           Vuelve más tarde para ver nuevos deportistas o ajusta tus filtros.
         </p>
-        <Button onClick={handleRefresh}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Buscar de nuevo
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/filters">
+              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Modificar filtros
+            </Link>
+          </Button>
+          <Button onClick={handleRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Buscar de nuevo
+          </Button>
+        </div>
       </div>
     )
   }
