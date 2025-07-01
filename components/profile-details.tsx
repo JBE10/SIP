@@ -12,7 +12,7 @@ interface ProfileDetailsProps {
     age: number
     location: string
     bio: string
-    sports: string[]
+    sports: { sport: string; level: string }[]
     distance: number
     profilePicture: string
   }
@@ -49,11 +49,21 @@ export function ProfileDetails({ profile }: ProfileDetailsProps) {
               <span className="text-sm font-medium">Deportes favoritos</span>
             </div>
             <div className="flex flex-wrap gap-1 mt-1">
-              {profile.sports.map((sport) => (
-                <Badge key={sport} variant="secondary" className="text-xs">
-                  {sport}
-                </Badge>
-              ))}
+              {profile.sports.map((sport, idx) => {
+                if (typeof sport === "string") {
+                  return (
+                    <Badge key={sport} variant="secondary" className="text-xs">
+                      {sport}
+                    </Badge>
+                  )
+                }
+                // Si es objeto
+                return (
+                  <Badge key={(sport as any).sport || idx} variant="secondary" className="text-xs">
+                    {(sport as any).sport} ({(sport as any).level})
+                  </Badge>
+                )
+              })}
             </div>
           </div>
         </CardContent>

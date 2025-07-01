@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -16,7 +16,7 @@ import { useAuth } from "@/context/auth-context"
 import type { Profile } from "@/context/app-context"
 
 export default function SwipePage() {
-  const { availableProfiles, addLikedProfile, addDislikedProfile, resetProfiles } = useApp()
+  const { availableProfiles, addLikedProfile, addDislikedProfile, resetProfiles, filters } = useApp()
   const { logout, user } = useAuth()
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
   const [showMatchModal, setShowMatchModal] = useState(false)
@@ -24,6 +24,15 @@ export default function SwipePage() {
 
   const currentProfile = availableProfiles?.[currentProfileIndex]
   const isLastProfile = !currentProfile || currentProfileIndex === (availableProfiles?.length ?? 0) - 1
+
+  // Debug: mostrar información de filtros
+  useEffect(() => {
+    console.log("=== FILTROS APLICADOS ===")
+    console.log("Filtros actuales:", filters)
+    console.log("Perfiles disponibles después de filtros:", availableProfiles?.length)
+    console.log("Perfiles:", availableProfiles)
+    console.log("=== FIN FILTROS ===")
+  }, [filters, availableProfiles])
 
   const handleLike = async () => {
     if (!currentProfile) return
@@ -82,6 +91,11 @@ export default function SwipePage() {
         <div>
           <h1 className="text-xl font-bold">Descubrir</h1>
           <p className="text-sm text-muted-foreground">Hola, {user?.name || "Usuario"}</p>
+          <p className="text-xs text-muted-foreground">
+            {availableProfiles?.length || 0} perfiles disponibles
+            {filters.selectedSports.length > 0 && ` • ${filters.selectedSports.length} deporte(s) filtrado(s)`}
+            {filters.selectedBarrio !== "Palermo" && ` • ${filters.selectedBarrio}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -100,7 +114,7 @@ export default function SwipePage() {
       {/* Main Content */}
       <div className="flex-1 container max-w-md py-6 space-y-6">
         <AnimatePresence mode="wait">
-          {isLastProfile || (availableProfiles?.length ?? 0) === 0 ? (
+          {(availableProfiles?.length ?? 0) === 0 ? (
             <motion.div
               key="no-more-profiles"
               initial={{ opacity: 0, scale: 0.9 }}

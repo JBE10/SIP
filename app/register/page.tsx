@@ -10,6 +10,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth-context"
+import { SportSelector } from "@/components/sport-selector"
+
+const barrios = [
+  "Palermo",
+  "Belgrano",
+  "Recoleta",
+  "Villa Crespo",
+  "Caballito",
+  "San Telmo",
+  "Almagro",
+  "Núñez",
+  "Colegiales",
+  "Retiro",
+  "Puerto Madero",
+  "Villa Urquiza",
+  "Saavedra",
+  "Boedo",
+  "Flores",
+]
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -17,24 +36,25 @@ export default function RegisterPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [age, setAge] = useState("")
-  const [location, setLocation] = useState("")
+  const [selectedBarrio, setSelectedBarrio] = useState(barrios[0])
   const [bio, setBio] = useState("")
-  const [sports, setSports] = useState<string[]>([])
-  const [sportInput, setSportInput] = useState("")
+  const [selectedSports, setSelectedSports] = useState<{ sport: string; level: string }[]>([])
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const handleAddSport = () => {
-    if (sportInput.trim() && !sports.includes(sportInput.trim())) {
-      setSports([...sports, sportInput.trim()])
-      setSportInput("")
+  const handleSportToggle = (sport: string) => {
+    const exists = selectedSports.find((s) => s.sport === sport)
+    if (exists) {
+      setSelectedSports(selectedSports.filter((s) => s.sport !== sport))
+    } else {
+      setSelectedSports([...selectedSports, { sport, level: "Principiante" }])
     }
   }
 
-  const handleRemoveSport = (sportToRemove: string) => {
-    setSports(sports.filter((s) => s !== sportToRemove))
+  const handleChangeLevel = (sport: string, level: string) => {
+    setSelectedSports((prev) => prev.map((s) => (s.sport === sport ? { ...s, level } : s)))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,9 +73,9 @@ export default function RegisterPage() {
         name,
         email,
         age: parseInt(age),
-        location,
+        location: selectedBarrio,
         bio,
-        sports,
+        sports: selectedSports,
         password,
         confirm_password: confirmPassword
       })
@@ -120,14 +140,18 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Ubicación</Label>
-              <Input
+              <Label htmlFor="location">Barrio/Zona</Label>
+              <select
                 id="location"
-                placeholder="Tu ubicación"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                className="w-full rounded-md border px-2 py-2 text-base"
+                value={selectedBarrio}
+                onChange={(e) => setSelectedBarrio(e.target.value)}
                 required
-              />
+              >
+                {barrios.map((barrio) => (
+                  <option key={barrio} value={barrio}>{barrio}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="bio">Biografía</Label>
@@ -141,27 +165,11 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <Label>Deportes preferidos</Label>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Ej: Fútbol"
-                  value={sportInput}
-                  onChange={(e) => setSportInput(e.target.value)}
-                />
-                <Button type="button" onClick={handleAddSport}>
-                  Agregar
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {sports.map((sport, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-primary text-white rounded-full px-3 py-1 text-sm cursor-pointer"
-                    onClick={() => handleRemoveSport(sport)}
-                  >
-                    {sport} ✕
-                  </div>
-                ))}
-              </div>
+              <SportSelector
+                selectedSports={selectedSports}
+                onToggleSport={handleSportToggle}
+                onChangeLevel={handleChangeLevel}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>

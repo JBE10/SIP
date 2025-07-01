@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,6 +9,60 @@ import { Textarea } from "@/components/ui/textarea"
 import type { User } from "@/context/auth-context"
 import { useAuth } from "@/context/auth-context"
 import { API_ENDPOINTS } from "@/src/config/api"
+import { SportSelector } from "@/components/sport-selector"
+
+// Función para parsear deportes (igual que en auth-context)
+const parseSports = (deportesString: string): { sport: string; level: string }[] => {
+  if (!deportesString) return []
+  
+  try {
+    // Si ya es un array, devolverlo tal cual
+    if (Array.isArray(deportesString)) {
+      return deportesString.map(sport => {
+        if (typeof sport === "string") {
+          // Intentar parsear "Deporte (Nivel)"
+          const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
+          if (match) {
+            return { sport: match[1].trim(), level: match[2].trim() }
+          }
+          return { sport: sport.trim(), level: "Principiante" }
+        }
+        return sport
+      })
+    }
+    
+    // Si es string, dividir por comas y parsear cada uno
+    const sportsArray = deportesString.split(",").map(s => s.trim()).filter(s => s)
+    return sportsArray.map(sport => {
+      const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
+      if (match) {
+        return { sport: match[1].trim(), level: match[2].trim() }
+      }
+      return { sport: sport.trim(), level: "Principiante" }
+    })
+  } catch (error) {
+    console.error("Error parseando deportes:", error)
+    return []
+  }
+}
+
+const barrios = [
+  "Palermo",
+  "Belgrano",
+  "Recoleta",
+  "Villa Crespo",
+  "Caballito",
+  "San Telmo",
+  "Almagro",
+  "Núñez",
+  "Colegiales",
+  "Retiro",
+  "Puerto Madero",
+  "Villa Urquiza",
+  "Saavedra",
+  "Boedo",
+  "Flores",
+]
 
 interface ProfileEditModalProps {
   isOpen: boolean
@@ -18,52 +72,105 @@ interface ProfileEditModalProps {
 
 export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalProps) {
   const { handleAuthError } = useAuth()
+  const [localSports, setLocalSports] = useState<{ sport: string; level: string }[]>([])
+  
   const [form, setForm] = useState({
     name: "",
     age: 0,
-    location: "",
+    location: barrios[0],
     bio: "",
     email: "",
-    sports: [] as string[],
-    newSport: "",
-    profilePicture: ""
+    profilePicture: "",
+    deportes_preferidos: ""
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [uploadError, setUploadError] = useState<string>("");
 
   useEffect(() => {
-    if (profile) {
+    if (profile && isOpen) {
+      console.log("=== DEBUGGING PERFIL ===")
+      console.log("Perfil completo:", profile)
+      console.log("profile.sports (tipo):", typeof profile.sports, profile.sports)
+      console.log("profile.deportes_preferidos (tipo):", typeof profile.deportes_preferidos, profile.deportes_preferidos)
+      
+      // Verificar si los deportes ya están en formato objeto
+      if (Array.isArray(profile.sports) && profile.sports.length > 0) {
+        console.log("Primer deporte:", profile.sports[0])
+        console.log("¿Es objeto?:", typeof profile.sports[0] === 'object')
+      }
+      
+      // Debuggear parseSports paso a paso
+      const deportesString = profile.deportes_preferidos || (Array.isArray(profile.sports) ? profile.sports.join(", ") : "")
+      console.log("String a parsear:", deportesString)
+      console.log("¿Es string vacío?:", deportesString === "")
+      console.log("¿Es null/undefined?:", deportesString == null)
+      
+      const parsedSports = parseSports(deportesString)
+      console.log("Deportes parseados:", parsedSports)
+      console.log("=== FIN DEBUGGING ===")
+      
       setForm({
-        name: profile.name || "",
+        name: profile.name || profile.username || "",
         age: profile.age || 0,
-        location: profile.location || "",
-        bio: profile.bio || "",
+        location: profile.location || barrios[0],
+        bio: profile.bio || profile.descripcion || "",
         email: profile.email || "",
-        sports: profile.sports || [],
-        newSport: "",
-        profilePicture: profile.profilePicture || ""
+        profilePicture: profile.profilePicture || profile.foto_url || "",
+        deportes_preferidos: deportesString
       })
+      
+      setLocalSports(parsedSports)
     }
-  }, [profile])
+  }, [profile, isOpen])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Función simple para actualizar deportes
+  const updateSportsInForm = (newSports: { sport: string; level: string }[]) => {
+    console.log("updateSportsInForm llamado con:", newSports)
+    setLocalSports(newSports)
+    const deportesString = newSports.map(s => `${s.sport} (${s.level})`).join(", ")
+    console.log("String de deportes generado:", deportesString)
+    setForm(prev => {
+      const newForm = { ...prev, deportes_preferidos: deportesString }
+      console.log("Nuevo formulario:", newForm)
+      return newForm
+    })
+  }
+
+  const handleSportToggle = (sport: string) => {
+    console.log("handleSportToggle ejecutado con deporte:", sport)
+    console.log("Deportes actuales:", localSports)
+    
+    const exists = localSports.find((s: any) => s.sport === sport)
+    if (exists) {
+      console.log("Eliminando deporte:", sport)
+      const newSports = localSports.filter((s: any) => s.sport !== sport)
+      updateSportsInForm(newSports)
+    } else {
+      console.log("Agregando deporte:", sport)
+      const newSports = [...localSports, { sport, level: "Principiante" }]
+      updateSportsInForm(newSports)
+    }
+  }
+
+  const handleChangeLevel = (sport: string, level: string) => {
+    console.log("handleChangeLevel ejecutado - deporte:", sport, "nivel:", level)
+    const updated = localSports.map((s: any) => (s.sport === sport ? { ...s, level } : s))
+    console.log("Deportes actualizados:", updated)
+    updateSportsInForm(updated)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: name === "age" ? parseInt(value) : value }))
   }
 
-  const handleAddSport = () => {
-    const sport = form.newSport.trim()
-    if (sport && !form.sports.includes(sport)) {
-      setForm(prev => ({ ...prev, sports: [...prev.sports, sport], newSport: "" }))
-    }
-  }
-
-  const handleRemoveSport = (sport: string) => {
-    setForm(prev => ({ ...prev, sports: prev.sports.filter(s => s !== sport) }))
-  }
-
   const handleSubmit = async () => {
+    console.log("=== GUARDANDO PERFIL ===")
+    console.log("handleSubmit ejecutándose...")
+    console.log("Datos del formulario:", form)
+    console.log("Deportes del formulario:", form.deportes_preferidos)
+    
     const token = localStorage.getItem("token")
     if (!token) {
       console.error("No hay token de autenticación")
@@ -72,26 +179,33 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
     }
 
     try {
+      const payload = {
+        username: form.name,
+        descripcion: form.bio,
+        deportes_preferidos: form.deportes_preferidos,
+        age: form.age,
+        location: form.location,
+        foto_url: form.profilePicture
+      }
+      
+      console.log("Enviando payload al backend:", payload)
+      console.log("URL del endpoint:", API_ENDPOINTS.AUTH.PROFILE_UPDATE)
+
       const res = await fetch(API_ENDPOINTS.AUTH.PROFILE_UPDATE, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          username: form.name,
-          descripcion: form.bio,
-          deportes_preferidos: form.sports.join(", "),
-          age: form.age,
-          location: form.location,
-          foto_url: form.profilePicture
-        })
+        body: JSON.stringify(payload)
       });
 
+      console.log("Respuesta del servidor:", res.status, res.statusText)
       const data = await res.json();
-      console.log("Respuesta backend:", data);
+      console.log("Datos de respuesta:", data);
 
       if (res.ok) {
+        console.log("Perfil actualizado exitosamente")
         // Actualizar el usuario en localStorage con los datos del backend
         const userStr = localStorage.getItem("user");
         if (userStr) {
@@ -106,13 +220,18 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             location: data.user.location,
             foto_url: data.user.foto_url,
             profilePicture: data.user.foto_url,
-            sports: data.user.deportes_preferidos ? data.user.deportes_preferidos.split(", ") : []
+            sports: parseSports(data.user.deportes_preferidos || data.user.sports || ""),
+            deportes_preferidos: data.user.deportes_preferidos
           };
+          console.log("Usuario actualizado en localStorage:", updatedUser)
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
         
-        // Recargar la página para mostrar los cambios
-        window.location.reload();
+        // Cerrar el modal en lugar de recargar la página
+        onClose();
+        
+        // Mostrar mensaje de éxito
+        alert("Perfil actualizado exitosamente");
       } else {
         if (res.status === 401) {
           handleAuthError()
@@ -125,6 +244,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
       console.error("Error al actualizar perfil:", error);
       alert("Error de conexión al actualizar perfil");
     }
+    console.log("=== FIN GUARDANDO PERFIL ===")
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,8 +317,12 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
           localStorage.setItem("user", JSON.stringify(user));
         }
         
-        // Recargar la página para mostrar la nueva imagen
-        window.location.reload();
+        // No recargar la página, solo mostrar mensaje de éxito
+        setUploadStatus("success");
+        setTimeout(() => {
+          setUploadStatus("idle");
+          setSelectedFile(null);
+        }, 2000);
       } else {
         if (res.status === 401) {
           handleAuthError();
@@ -223,10 +347,14 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
   return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby="profile-edit-description">
           <DialogHeader>
             <DialogTitle>Editar Perfil</DialogTitle>
           </DialogHeader>
+          
+          <div id="profile-edit-description" className="sr-only">
+            Formulario para editar información del perfil de usuario
+          </div>
 
           <div className="space-y-3">
             <div className="space-y-1">
@@ -240,8 +368,19 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             </div>
 
             <div className="space-y-1">
-              <Label>Ubicación</Label>
-              <Input name="location" value={form.location} onChange={handleChange} />
+              <Label htmlFor="location">Barrio/Zona</Label>
+              <select
+                id="location"
+                name="location"
+                className="w-full rounded-md border px-2 py-2 text-base"
+                value={form.location}
+                onChange={handleChange}
+                required
+              >
+                {barrios.map((barrio) => (
+                  <option key={barrio} value={barrio}>{barrio}</option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-1">
@@ -255,25 +394,71 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             </div>
 
             <div className="space-y-1">
-              <Label>Deportes</Label>
-              <div className="flex gap-2">
-                <Input
-                    name="newSport"
-                    value={form.newSport}
-                    onChange={handleChange}
-                    placeholder="Agregar deporte"
-                />
-                <Button onClick={handleAddSport}>Agregar</Button>
-              </div>
-              <div className="flex gap-2 flex-wrap mt-2">
-                {form.sports.map((sport) => (
-                    <div key={sport} className="bg-secondary px-2 py-1 rounded-full text-sm flex items-center gap-1">
-                      {sport}
-                      <button onClick={() => handleRemoveSport(sport)} className="text-red-500">
-                        &times;
-                      </button>
-                    </div>
+              <Label>Deportes preferidos</Label>
+              <div className="space-y-2">
+                {/* Lista de deportes seleccionados */}
+                {localSports.map((sport, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                    <span className="flex-1">{sport.sport}</span>
+                    <select
+                      value={sport.level}
+                      onChange={(e) => {
+                        console.log("Cambiando nivel de", sport.sport, "a", e.target.value)
+                        handleChangeLevel(sport.sport, e.target.value)
+                      }}
+                      className="px-2 py-1 border rounded text-sm"
+                    >
+                      <option value="Principiante">Principiante</option>
+                      <option value="Intermedio">Intermedio</option>
+                      <option value="Avanzado">Avanzado</option>
+                    </select>
+                    <button
+                      onClick={() => {
+                        console.log("Eliminando deporte:", sport.sport)
+                        const newSports = localSports.filter((_, i) => i !== index)
+                        updateSportsInForm(newSports)
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 ))}
+                
+                {/* Selector para agregar deporte */}
+                <div className="flex gap-2">
+                  <select
+                    onChange={(e) => {
+                      const newSport = e.target.value
+                      if (newSport && !localSports.find(s => s.sport === newSport)) {
+                        console.log("Agregando deporte:", newSport)
+                        const newSports = [...localSports, { sport: newSport, level: "Principiante" }]
+                        updateSportsInForm(newSports)
+                        e.target.value = ""
+                      }
+                    }}
+                    className="flex-1 px-2 py-1 border rounded text-sm"
+                    defaultValue=""
+                  >
+                    <option value="">Agregar deporte...</option>
+                    <option value="Fútbol">Fútbol</option>
+                    <option value="Tenis">Tenis</option>
+                    <option value="Básquet">Básquet</option>
+                    <option value="Vóley">Vóley</option>
+                    <option value="Running">Running</option>
+                    <option value="Ciclismo">Ciclismo</option>
+                    <option value="Natación">Natación</option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="Pilates">Pilates</option>
+                    <option value="Pádel">Pádel</option>
+                    <option value="Hockey">Hockey</option>
+                    <option value="Rugby">Rugby</option>
+                    <option value="Golf">Golf</option>
+                    <option value="Escalada">Escalada</option>
+                    <option value="Boxeo">Boxeo</option>
+                    <option value="Artes marciales">Artes marciales</option>
+                  </select>
+                </div>
               </div>
             </div>
 

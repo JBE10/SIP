@@ -18,8 +18,9 @@ export type User = {
   age: number
   location: string
   bio: string
-  sports: string[]
+  sports: { sport: string; level: string }[]
   foto_url?: string
+  profilePicture?: string
   deportes_preferidos?: string
   descripcion?: string
 }
@@ -36,7 +37,7 @@ interface AuthContextType {
     age: number
     location: string
     bio: string
-    sports: string[]
+    sports: { sport: string; level: string }[]
     password: string
     confirm_password: string
   }) => Promise<boolean>
@@ -51,6 +52,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
+  // Función para parsear deportes del backend
+  const parseSports = (deportesString: string): { sport: string; level: string }[] => {
+    if (!deportesString) return []
+    
+    try {
+      // Si ya es un array, devolverlo tal cual
+      if (Array.isArray(deportesString)) {
+        return deportesString.map(sport => {
+          if (typeof sport === "string") {
+            // Intentar parsear "Deporte (Nivel)"
+            const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
+            if (match) {
+              return { sport: match[1].trim(), level: match[2].trim() }
+            }
+            return { sport: sport.trim(), level: "Principiante" }
+          }
+          return sport
+        })
+      }
+      
+      // Si es string, dividir por comas y parsear cada uno
+      const sportsArray = deportesString.split(",").map(s => s.trim()).filter(s => s)
+      return sportsArray.map(sport => {
+        const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
+        if (match) {
+          return { sport: match[1].trim(), level: match[2].trim() }
+        }
+        return { sport: sport.trim(), level: "Principiante" }
+      })
+    } catch (error) {
+      console.error("Error parseando deportes:", error)
+      return []
+    }
+  }
+
   // ✅ Cargar usuario del localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -64,7 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ...parsedUser,
           name: parsedUser.name || parsedUser.username, // Mapear username a name si es necesario
           bio: parsedUser.bio || parsedUser.descripcion || "",
-          sports: parsedUser.sports || (parsedUser.deportes_preferidos ? parsedUser.deportes_preferidos.split(", ") : [])
+          sports: parseSports(parsedUser.deportes_preferidos || parsedUser.sports || ""),
+          profilePicture: parsedUser.profilePicture || parsedUser.foto_url || ""
         }
         setUser(user)
       } catch (err) {
@@ -129,7 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...backendUser,
         name: backendUser.username, // Mapear username a name
         bio: backendUser.descripcion || "",
-        sports: backendUser.deportes_preferidos ? backendUser.deportes_preferidos.split(", ") : []
+        sports: parseSports(backendUser.deportes_preferidos || []),
+        profilePicture: backendUser.foto_url || ""
       }
       
       setUser(user)
@@ -150,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: userData.name,
         email: userData.email,
         password: userData.password,
-        deportes_preferidos: userData.sports.join(","),
+        deportes_preferidos: userData.sports.map((s: any) => `${s.sport} (${s.level})`).join(", "),
         descripcion: userData.bio,
         foto_url: "https://randomuser.me/api/portraits/lego/1.jpg",
         video_url: "",

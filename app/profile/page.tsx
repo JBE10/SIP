@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
         try {
             console.log("Enviando foto al servidor...")
-            const res = await fetch("https://web-production-07ed64.up.railway.app/upload-profile-picture", {
+            const res = await fetch("http://localhost:8000/users/upload-photo", {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -201,18 +201,35 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
-                                {userData.sports.map((sport: string, index: number) => (
-                                    <motion.div
-                                        key={sport}
-                                        className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 0.3 + index * 0.1 }}
-                                        whileHover={{ scale: 1.1 }}
-                                    >
-                                        {sport}
-                                    </motion.div>
-                                ))}
+                                {userData.sports.map((sport: any, index: number) => {
+                                    if (typeof sport === "string") {
+                                        return (
+                                            <motion.div
+                                                key={sport}
+                                                className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: 0.3 + index * 0.1 }}
+                                                whileHover={{ scale: 1.1 }}
+                                            >
+                                                {sport}
+                                            </motion.div>
+                                        )
+                                    }
+                                    // Si es objeto
+                                    return (
+                                        <motion.div
+                                            key={sport.sport || index}
+                                            className="bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm"
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.3 + index * 0.1 }}
+                                            whileHover={{ scale: 1.1 }}
+                                        >
+                                            {sport.sport} ({sport.level})
+                                        </motion.div>
+                                    )
+                                })}
                             </div>
                         </CardContent>
                         <CardFooter>

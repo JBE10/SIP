@@ -44,11 +44,21 @@ export function ProfileCard({ profile }: ProfileCardProps) {
         </div>
         <p className="mb-4 line-clamp-3 bg-black/30 p-3 rounded-lg backdrop-blur-sm">{profile.bio}</p>
         <div className="flex flex-wrap gap-2">
-          {profile.sports.map((sport) => (
-            <Badge key={sport} variant="secondary" className="profile-badge">
-              {sport}
-            </Badge>
-          ))}
+          {profile.sports.map((sport, idx) => {
+            if (typeof sport === "string") {
+              return (
+                <Badge key={sport} variant="secondary" className="profile-badge">
+                  {sport}
+                </Badge>
+              )
+            }
+            // Si es objeto
+            return (
+              <Badge key={(sport as any).sport || idx} variant="secondary" className="profile-badge">
+                {(sport as any).sport} ({(sport as any).level})
+              </Badge>
+            )
+          })}
         </div>
       </div>
     </Card>
