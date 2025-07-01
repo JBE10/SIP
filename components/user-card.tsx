@@ -148,11 +148,18 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
               src={user.foto_url || "/placeholder-user.jpg"}
               alt={`${user.name}`}
               className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+              onLoad={(e) => {
+                console.log("✅ Imagen cargada exitosamente:", user.foto_url)
+              }}
               onError={(e) => {
                 console.log("❌ Error cargando imagen:", e)
                 console.log("🔗 URL de la imagen:", user.foto_url)
+                console.log("👤 Usuario:", user.name)
                 // Fallback a imagen por defecto
                 e.currentTarget.src = "/placeholder-user.jpg"
+                // También agregar un estilo de fallback visual
+                e.currentTarget.style.backgroundColor = "#f3f4f6"
+                e.currentTarget.style.border = "2px solid #e5e7eb"
               }}
             />
           </div>
