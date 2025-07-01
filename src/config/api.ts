@@ -14,6 +14,12 @@ export const API_ENDPOINTS = {
     ME: `${API_URL}/users/me`,
     UPLOAD_PHOTO: `${API_URL}/upload-profile-picture`,
     UPLOAD_VIDEO: `${API_URL}/upload-sport-video`,
+    COMPATIBLE: `${API_URL}/users/compatible`,
+    LIKE: (userId: number) => `${API_URL}/users/like/${userId}`,
+    DISLIKE: (userId: number) => `${API_URL}/users/dislike/${userId}`,
+  },
+  MATCHES: {
+    LIST: `${API_URL}/matches/list`,
   },
 };
 
