@@ -45,6 +45,7 @@ export default function SwipePage() {
       
       const token = localStorage.getItem("token")
       if (!token) {
+        console.log("❌ No hay token, redirigiendo al login")
         router.push("/login")
         return
       }
@@ -79,6 +80,15 @@ export default function SwipePage() {
         },
       })
 
+      if (response.status === 401) {
+        console.log("❌ Token expirado o inválido, redirigiendo al login")
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        localStorage.removeItem("isLoggedIn")
+        router.push("/login")
+        return
+      }
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)
       }
@@ -106,7 +116,10 @@ export default function SwipePage() {
   const handleLike = async (userId: number) => {
     try {
       const token = localStorage.getItem("token")
-      if (!token) return
+      if (!token) {
+        router.push("/login")
+        return
+      }
 
       console.log("❤️ Dando like a usuario:", userId)
       const response = await fetch(API_ENDPOINTS.USER.LIKE(userId), {
@@ -116,6 +129,15 @@ export default function SwipePage() {
           "Content-Type": "application/json",
         },
       })
+
+      if (response.status === 401) {
+        console.log("❌ Token expirado o inválido, redirigiendo al login")
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        localStorage.removeItem("isLoggedIn")
+        router.push("/login")
+        return
+      }
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}`)
@@ -149,7 +171,10 @@ export default function SwipePage() {
   const handleDislike = async (userId: number) => {
     try {
       const token = localStorage.getItem("token")
-      if (!token) return
+      if (!token) {
+        router.push("/login")
+        return
+      }
 
       console.log("❌ Dando dislike a usuario:", userId)
       const response = await fetch(API_ENDPOINTS.USER.DISLIKE(userId), {
@@ -159,6 +184,15 @@ export default function SwipePage() {
           "Content-Type": "application/json",
         },
       })
+
+      if (response.status === 401) {
+        console.log("❌ Token expirado o inválido, redirigiendo al login")
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        localStorage.removeItem("isLoggedIn")
+        router.push("/login")
+        return
+      }
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}`)
