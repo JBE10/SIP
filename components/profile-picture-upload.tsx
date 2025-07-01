@@ -21,16 +21,23 @@ export function ProfilePictureUpload() {
   }, [user])
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return
+    console.log("🖼️ handlePhotoUpload llamado")
+    if (!e.target.files || e.target.files.length === 0) {
+      console.log("❌ No se seleccionó ningún archivo")
+      return
+    }
     
     const file = e.target.files[0]
+    console.log("📁 Archivo seleccionado:", file.name, file.type, file.size)
     
     if (!file.type.startsWith("image/")) {
+      console.log("❌ Tipo de archivo no válido:", file.type)
       setUploadError("Solo se permiten archivos de imagen")
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
+      console.log("❌ Archivo demasiado grande:", file.size)
       setUploadError("El archivo es demasiado grande. Máximo 5MB")
       return
     }
@@ -39,7 +46,9 @@ export function ProfilePictureUpload() {
     formData.append("file", file)
     const token = localStorage.getItem("token")
 
+    console.log("🔑 Token encontrado:", !!token)
     if (!token) {
+      console.log("❌ No hay token de autenticación")
       setUploadError("No hay token de autenticación")
       return
     }
@@ -48,7 +57,9 @@ export function ProfilePictureUpload() {
     setUploadError("")
 
     try {
-      console.log("Enviando foto a:", API_ENDPOINTS.USER.UPLOAD_PHOTO)
+      console.log("🚀 Enviando foto a:", API_ENDPOINTS.USER.UPLOAD_PHOTO)
+      console.log("🔗 URL completa:", API_ENDPOINTS.USER.UPLOAD_PHOTO)
+      console.log("📊 FormData entries:", Array.from(formData.entries()))
       
       const res = await fetch(API_ENDPOINTS.USER.UPLOAD_PHOTO, {
         method: "POST",
@@ -58,8 +69,14 @@ export function ProfilePictureUpload() {
         body: formData,
       })
 
+      console.log("📡 Respuesta del servidor:", res.status, res.statusText)
+      console.log("📋 Headers de respuesta:", Object.fromEntries(res.headers.entries()))
+
       if (!res.ok) {
+        console.log("❌ Error en respuesta:", res.status, res.statusText)
+        
         if (res.status === 401) {
+          console.log("🔒 Error 401: Token inválido o expirado")
           setUploadError("Token inválido o expirado")
           handleAuthError()
           return
@@ -68,17 +85,27 @@ export function ProfilePictureUpload() {
         let errorMessage = `Error ${res.status}`
         try {
           const errorData = await res.json()
+          console.log("📄 Error data:", errorData)
           errorMessage = errorData.detail || errorData.message || errorMessage
-        } catch {
-          // Usar mensaje por defecto
+        } catch (parseError) {
+          console.log("❌ Error parseando respuesta:", parseError)
+          try {
+            const errorText = await res.text()
+            console.log("📄 Error text:", errorText)
+            errorMessage = errorText || errorMessage
+          } catch {
+            // Usar mensaje por defecto
+          }
         }
         
+        console.log("💬 Error final:", errorMessage)
         setUploadError(`Error al subir foto: ${errorMessage}`)
         return
       }
 
       const data = await res.json()
-      console.log("Foto subida exitosamente:", data)
+      console.log("✅ Foto subida exitosamente:", data)
+      console.log("🖼️ foto_url recibida:", data.foto_url)
       
       // Actualizar localStorage
       const userStr = localStorage.getItem("user")
@@ -87,15 +114,23 @@ export function ProfilePictureUpload() {
         userData.foto_url = data.foto_url
         userData.profilePicture = data.foto_url
         localStorage.setItem("user", JSON.stringify(userData))
+        console.log("💾 Usuario actualizado en localStorage:", userData)
       }
       
       setProfilePicture(data.foto_url)
+      console.log("🎯 Estado local actualizado con:", data.foto_url)
       alert("¡Foto de perfil subida exitosamente!")
     } catch (error) {
-      console.error("Error al subir foto:", error)
+      console.error("🌐 Error de red al subir foto:", error)
+      console.error("📋 Error details:", {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      })
       setUploadError("Error de conexión: " + (error instanceof Error ? error.message : String(error)))
     } finally {
       setIsUploading(false)
+      console.log("🏁 Upload finalizado")
     }
   }
 
