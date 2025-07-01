@@ -111,6 +111,7 @@ export default function ProfilePage() {
 
             const data = await res.json()
             console.log("Imagen subida exitosamente:", data)
+            console.log("foto_url recibida:", data.foto_url)
             alert("Imagen subida exitosamente!")
             
             // Actualizar el estado local y el localStorage
@@ -119,6 +120,7 @@ export default function ProfilePage() {
                 profilePicture: data.foto_url,
                 foto_url: data.foto_url 
             }
+            console.log("Usuario actualizado:", updatedUser)
             setUserData(updatedUser)
             localStorage.setItem("user", JSON.stringify(updatedUser))
             
@@ -131,6 +133,10 @@ export default function ProfilePage() {
     }
 
     if (!userData) return null
+
+    // Log para debug
+    console.log("userData en render:", userData)
+    console.log("URL de la imagen:", userData.profilePicture || userData.foto_url || "/placeholder.svg?height=96&width=96")
 
     return (
         <>
