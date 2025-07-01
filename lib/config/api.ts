@@ -24,6 +24,9 @@ export const API_ENDPOINTS = {
   },
   USER: {
     ME: `${API_BASE_URL}/users/me`,
+    COMPATIBLE: `${API_BASE_URL}/users/compatible`,
+    LIKE: (userId: number) => `${API_BASE_URL}/users/like/${userId}`,
+    DISLIKE: (userId: number) => `${API_BASE_URL}/users/dislike/${userId}`,
   },
 } as const
 

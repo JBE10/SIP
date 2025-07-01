@@ -224,7 +224,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (res.ok) {
         console.log("Registro exitoso!")
-        return true
+        
+        // Después del registro exitoso, hacer login automático
+        const loginSuccess = await login(userData.email, userData.password)
+        if (loginSuccess) {
+          console.log("Login automático después del registro exitoso")
+          return true
+        } else {
+          console.error("Error en login automático después del registro")
+          return false
+        }
       } else {
         console.error("Error en registro. Status:", res.status)
         console.error("Detalles del error:", data)
