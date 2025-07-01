@@ -4,33 +4,99 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ChatPreview } from "@/components/chat-preview"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Search } from "lucide-react"
+import { Search, Heart } from "lucide-react"
 import { motion } from "framer-motion"
-import { useApp } from "@/context/app-context"
 import { useState, useEffect } from "react"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import Link from "next/link"
+import { API_ENDPOINTS } from "@/lib/config/api"
+import { useAuth } from "@/context/auth-context"
+
+interface Match {
+  id: number
+  name: string
+  age: number
+  location: string
+  bio: string
+  foto_url: string
+  video_url: string
+  sports: { sport: string; level: string }[]
+  match_date: string
+}
 
 export default function ChatsPage() {
-  const { matches } = useApp()
+  const { user } = useAuth()
+  const [matches, setMatches] = useState<Match[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredMatches, setFilteredMatches] = useState(matches)
+  const [filteredMatches, setFilteredMatches] = useState<Match[]>([])
+
+  // Cargar matches del backend
+  const fetchMatches = async () => {
+    try {
+      setLoading(true)
+      
+      const token = localStorage.getItem("token")
+      if (!token) {
+        console.log("No hay token, redirigiendo al login")
+        return
+      }
+
+      console.log("🔄 Cargando matches...")
+      const response = await fetch(API_ENDPOINTS.matches, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log("✅ Matches cargados:", data.matches?.length || 0)
+      
+      setMatches(data.matches || [])
+    } catch (err) {
+      console.error("❌ Error cargando matches:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      fetchMatches()
+    }
+  }, [user])
 
   // Filtrar matches cuando cambia el término de búsqueda
   useEffect(() => {
-    const filtered = (matches || []).filter((match) => match.profile.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = matches.filter((match) => 
+      match.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     setFilteredMatches(filtered)
   }, [searchTerm, matches])
 
   // Convertir matches a formato de chat
-  const chats = (filteredMatches || []).map((match) => ({
-    id: match.id,
-    name: match.profile.name,
-    lastMessage: "Hola! ¿Te gustaría practicar deportes juntos?",
-    timestamp: new Date(match.timestamp).toLocaleDateString(),
-    unread: Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 1 : 0, // Simular mensajes no leídos
-    avatar: match.profile.profilePicture,
+  const chats = filteredMatches.map((match) => ({
+    id: match.id.toString(),
+    name: match.name,
+    lastMessage: "¡Es un match! 🎉 ¿Te gustaría practicar deportes juntos?",
+    timestamp: new Date(match.match_date).toLocaleDateString(),
+    unread: 0, // Por ahora sin mensajes no leídos
+    avatar: match.foto_url || "/placeholder-user.jpg",
   }))
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="text-lg">Cargando matches...</p>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -42,7 +108,7 @@ export default function ChatsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            Mensajes
+            Matches
           </motion.h1>
           <ThemeToggle />
         </div>
@@ -55,7 +121,7 @@ export default function ChatsPage() {
         >
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Buscar conversaciones"
+            placeholder="Buscar matches"
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -72,9 +138,10 @@ export default function ChatsPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-lg font-semibold mb-2">No tienes mensajes</h2>
+              <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h2 className="text-lg font-semibold mb-2">No tienes matches aún</h2>
               <p className="text-muted-foreground mb-4">
-                Cuando hagas match con alguien, podrás iniciar una conversación aquí.
+                Cuando hagas match con alguien, aparecerá aquí para que puedas chatear.
               </p>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button asChild>
