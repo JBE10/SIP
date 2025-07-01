@@ -8,7 +8,7 @@ import {
   type ReactNode
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { API_ENDPOINTS, API_HEADERS } from "@/src/config/api"
+import { API_ENDPOINTS, API_HEADERS } from "@/lib/config/api"
 
 export type User = {
   id: number
