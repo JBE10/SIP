@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ProfileEditModal } from "@/components/profile-edit-modal"
+import { VideoGallery } from "@/components/video-gallery"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Edit, MapPin } from "lucide-react"
 import { motion } from "framer-motion"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { useAuth } from "@/context/auth-context"
+import { API_ENDPOINTS } from "@/src/config/api"
 
 export default function ProfilePage() {
     const router = useRouter()
@@ -79,7 +81,7 @@ export default function ProfilePage() {
 
         try {
             console.log("Enviando foto al servidor...")
-            const res = await fetch("http://localhost:8000/users/upload-photo", {
+            const res = await fetch(API_ENDPOINTS.USER.UPLOAD_PHOTO, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -111,7 +113,7 @@ export default function ProfilePage() {
             alert("Imagen subida exitosamente!")
             
             // Actualizar el estado local y el localStorage
-            const updatedUser = { ...userData, profilePicture: data.profilePicture }
+            const updatedUser = { ...userData, profilePicture: data.foto_url }
             setUserData(updatedUser)
             localStorage.setItem("user", JSON.stringify(updatedUser))
             
@@ -240,6 +242,10 @@ export default function ProfilePage() {
                             </motion.div>
                         </CardFooter>
                     </Card>
+                </motion.div>
+
+                <motion.div variants={item}>
+                    <VideoGallery />
                 </motion.div>
 
                 <motion.div variants={item}>

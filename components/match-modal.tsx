@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { MessageSquare, Handshake } from "lucide-react"
 import type { Profile } from "@/context/app-context"
+import { useAuth } from "@/context/auth-context"
 
 interface MatchModalProps {
   isOpen: boolean
@@ -16,6 +17,8 @@ interface MatchModalProps {
 }
 
 export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps) {
+  const { user } = useAuth()
+  
   useEffect(() => {
     return () => {
       // Solo limpieza, no cerramos el modal automáticamente
@@ -63,7 +66,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               transition={{ duration: 0.5 }}
             >
               <Image
-                src="/images/profile1.png"
+                src={user?.profilePicture || "/placeholder.svg?height=96&width=96"}
                 alt="Tu perfil"
                 width={96}
                 height={96}

@@ -90,6 +90,11 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
               {profile.name}, {profile.age}
             </h3>
             <p className="text-sm mb-2">{profile.location} • {profile.distance} km</p>
+            {profile.bio && (
+              <p className="text-sm mb-3 line-clamp-2 text-white/90">
+                {profile.bio}
+              </p>
+            )}
             <div className="flex flex-wrap gap-2 mb-3">
               {profile.sports.map((sport, idx) => (
                 <span key={sport.sport || idx} className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">

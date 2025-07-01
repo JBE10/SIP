@@ -20,6 +20,7 @@ export type User = {
   bio: string
   sports: { sport: string; level: string }[]
   foto_url?: string
+  video_url?: string
   profilePicture?: string
   deportes_preferidos?: string
   descripcion?: string
@@ -101,7 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: parsedUser.name || parsedUser.username, // Mapear username a name si es necesario
           bio: parsedUser.bio || parsedUser.descripcion || "",
           sports: parseSports(parsedUser.deportes_preferidos || parsedUser.sports || ""),
-          profilePicture: parsedUser.profilePicture || parsedUser.foto_url || ""
+          profilePicture: parsedUser.profilePicture || parsedUser.foto_url || "",
+          video_url: parsedUser.video_url || ""
         }
         setUser(user)
       } catch (err) {
@@ -167,7 +169,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: backendUser.username, // Mapear username a name
         bio: backendUser.descripcion || "",
         sports: parseSports(backendUser.deportes_preferidos || []),
-        profilePicture: backendUser.foto_url || ""
+        profilePicture: backendUser.foto_url || "",
+        video_url: backendUser.video_url || ""
       }
       
       setUser(user)
