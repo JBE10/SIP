@@ -114,15 +114,19 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
           )}
           
           {/* Foto de perfil superpuesta */}
-          {user.foto_url && (
-            <div className="absolute top-4 left-4">
-              <img
-                src={user.foto_url}
-                alt={`${user.name}`}
-                className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
-              />
-            </div>
-          )}
+          <div className="absolute top-4 left-4">
+            <img
+              src={user.foto_url || "/placeholder-user.jpg"}
+              alt={`${user.name}`}
+              className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+              onError={(e) => {
+                console.log("❌ Error cargando imagen:", e)
+                console.log("🔗 URL de la imagen:", user.foto_url)
+                // Fallback a imagen por defecto
+                e.currentTarget.src = "/placeholder-user.jpg"
+              }}
+            />
+          </div>
           
           {/* Score de compatibilidad */}
           <div className="absolute top-4 left-24 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-bold">
