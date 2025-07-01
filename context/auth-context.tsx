@@ -54,13 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
   // Función para parsear deportes del backend
-  const parseSports = (deportesString: string): { sport: string; level: string }[] => {
-    if (!deportesString) return []
+  const parseSports = (deportesInput: string | any[]): { sport: string; level: string }[] => {
+    if (!deportesInput) return []
     
     try {
       // Si ya es un array, devolverlo tal cual
-      if (Array.isArray(deportesString)) {
-        return deportesString.map(sport => {
+      if (Array.isArray(deportesInput)) {
+        return deportesInput.map((sport: any) => {
           if (typeof sport === "string") {
             // Intentar parsear "Deporte (Nivel)"
             const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
@@ -74,8 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       // Si es string, dividir por comas y parsear cada uno
-      const sportsArray = deportesString.split(",").map(s => s.trim()).filter(s => s)
-      return sportsArray.map(sport => {
+      const sportsArray = deportesInput.split(",").map((s: string) => s.trim()).filter((s: string) => s)
+      return sportsArray.map((sport: string) => {
         const match = sport.match(/^(.+?)\s*\((.+?)\)$/)
         if (match) {
           return { sport: match[1].trim(), level: match[2].trim() }
@@ -176,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...backendUser,
         name: backendUser.username, // Mapear username a name
         bio: backendUser.descripcion || "",
-        sports: parseSports(backendUser.deportes_preferidos || []),
+        sports: backendUser.sports || parseSports(backendUser.deportes_preferidos || ""),
         profilePicture: backendUser.foto_url || "",
         video_url: backendUser.video_url || ""
       }
