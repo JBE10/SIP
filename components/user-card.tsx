@@ -15,7 +15,7 @@ interface UserCardProps {
     bio: string
     foto_url: string
     video_url: string
-    sports: string
+    sports: string | { sport: string; level: string }[]
     compatibility_score: number
     common_sports: string[]
   }
@@ -66,7 +66,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
     }
   }
 
-  const sports = user.sports ? JSON.parse(user.sports) : []
+  const sports = Array.isArray(user.sports) ? user.sports : (user.sports ? JSON.parse(user.sports) : [])
 
   return (
     <motion.div
