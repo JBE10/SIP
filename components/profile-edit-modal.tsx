@@ -347,7 +347,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
   return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md" aria-describedby="profile-edit-description">
+        <DialogContent className="max-w-md max-h-[90vh] flex flex-col" aria-describedby="profile-edit-description">
           <DialogHeader>
             <DialogTitle>Editar Perfil</DialogTitle>
           </DialogHeader>
@@ -356,7 +356,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             Formulario para editar información del perfil de usuario
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto flex-1 pr-2">
             <div className="space-y-1">
               <Label>Nombre completo</Label>
               <Input name="name" value={form.name} onChange={handleChange} />
@@ -478,8 +478,10 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
                 <p className="text-green-500 text-sm mt-1">Foto subida exitosamente</p>
               )}
             </div>
+          </div>
 
-            <Button className="w-full mt-4" onClick={handleSubmit}>
+          <div className="pt-4 border-t">
+            <Button className="w-full" onClick={handleSubmit}>
               Guardar cambios
             </Button>
           </div>

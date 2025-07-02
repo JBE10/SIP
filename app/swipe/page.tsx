@@ -357,22 +357,77 @@ export default function SwipePage() {
         <AnimatePresence>
           {isMatch && matchUser && (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+              initial={{ opacity: 0, y: 50, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 50, scale: 0.8 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             >
-              <Card className="bg-green-500 text-white border-green-600">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <Heart className="h-6 w-6" />
-                    <div>
-                      <h3 className="font-semibold">¡Es un match! 🎉</h3>
-                      <p className="text-sm">Ahora puedes chatear con {matchUser.name}</p>
-                    </div>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
+                className="bg-white rounded-2xl p-6 max-w-sm mx-4 text-center shadow-2xl"
+              >
+                {/* Fotos de ambos usuarios */}
+                <div className="flex items-center justify-center mb-4">
+                  <div className="relative">
+                    <img
+                      src={user?.foto_url || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
+                      alt="Tu foto"
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/60x60/cccccc/666666?text=?"
+                      }}
+                    />
                   </div>
-                </CardContent>
-              </Card>
+                  
+                  {/* Manos apretándose */}
+                  <div className="mx-4 text-4xl">🤝</div>
+                  
+                  <div className="relative">
+                    <img
+                      src={matchUser.foto_url || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
+                      alt={`Foto de ${matchUser.name}`}
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/60x60/cccccc/666666?text=?"
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Mensaje de match */}
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-green-600 mb-2">¡Es un match! 🎉</h3>
+                  <p className="text-gray-600">
+                    Ahora puedes chatear con <span className="font-semibold">{matchUser.name}</span>
+                  </p>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setIsMatch(false)
+                      setMatchUser(null)
+                    }}
+                  >
+                    Seguir explorando
+                  </Button>
+                  <Button
+                    className="flex-1 bg-green-500 hover:bg-green-600"
+                    onClick={() => {
+                      setIsMatch(false)
+                      setMatchUser(null)
+                      router.push("/chats")
+                    }}
+                  >
+                    Ir al chat
+                  </Button>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
