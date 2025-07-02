@@ -457,6 +457,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
                     <option value="Escalada">Escalada</option>
                     <option value="Boxeo">Boxeo</option>
                     <option value="Artes marciales">Artes marciales</option>
+                    <option value="Gimnasio">Gimnasio</option>
                   </select>
                 </div>
               </div>

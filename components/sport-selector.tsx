@@ -29,6 +29,7 @@ export function SportSelector({ selectedSports, onToggleSport, onChangeLevel }: 
     "Escalada",
     "Boxeo",
     "Artes marciales",
+    "Gimnasio",
   ]
 
   return (
