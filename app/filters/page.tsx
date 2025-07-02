@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { SportSelector } from "@/components/sport-selector"
@@ -33,10 +33,10 @@ export default function FiltersPage() {
   const { filters, updateFilters } = useApp()
   const router = useRouter()
   
-  const [distance, setDistance] = useState([filters.distance])
-  const [ageRange, setAgeRange] = useState<number[]>(filters.ageRange)
-  const [selectedSports, setSelectedSports] = useState(filters.selectedSports)
-  const [selectedBarrio, setSelectedBarrio] = useState(filters.selectedBarrio)
+  const [distance, setDistance] = useState([filters.distance || 25])
+  const [ageRange, setAgeRange] = useState<number[]>(filters.ageRange || [18, 65])
+  const [selectedSports, setSelectedSports] = useState(filters.selectedSports || [])
+  const [selectedBarrio, setSelectedBarrio] = useState(filters.selectedBarrio || "")
 
   // Actualizar estado local cuando cambien los filtros del contexto
   useEffect(() => {
@@ -102,15 +102,21 @@ export default function FiltersPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Distancia</CardTitle>
+          <CardTitle>Distancia máxima</CardTitle>
+          <CardDescription>Distancia máxima para encontrar usuarios (por barrio)</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Slider value={distance} max={50} step={1} onValueChange={setDistance} />
+          <Slider value={distance} max={50} step={5} onValueChange={setDistance} />
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">0 km</span>
             <span className="font-medium">{distance[0]} km</span>
             <span className="text-sm text-muted-foreground">50 km</span>
           </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {distance[0] === 0 ? "Solo tu barrio" : 
+             distance[0] <= 10 ? "Barrios cercanos" :
+             distance[0] <= 25 ? "Zona amplia" : "Toda la ciudad"}
+          </p>
         </CardContent>
       </Card>
 
@@ -142,6 +148,7 @@ export default function FiltersPage() {
               value={selectedBarrio}
               onChange={(e) => setSelectedBarrio(e.target.value)}
             >
+              <option value="">Sin especificar (todos los barrios)</option>
               {barrios.map((barrio) => (
                 <option key={barrio} value={barrio}>{barrio}</option>
               ))}

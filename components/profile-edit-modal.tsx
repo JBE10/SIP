@@ -377,6 +377,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
                 onChange={handleChange}
                 required
               >
+                <option value="">Sin especificar</option>
                 {barrios.map((barrio) => (
                   <option key={barrio} value={barrio}>{barrio}</option>
                 ))}
