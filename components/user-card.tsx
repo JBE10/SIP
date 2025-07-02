@@ -80,7 +80,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
         <div className="relative">
           {/* Video de fondo o imagen por defecto */}
           <div className="relative w-full h-96 bg-black">
-            {user.video_url ? (
+            {user.video_url && user.video_url.includes('http') && !user.video_url.includes('railway') ? (
               <video
                 ref={videoRef}
                 src={user.video_url}
@@ -90,8 +90,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                 onPlay={() => setIsVideoPlaying(true)}
                 onPause={() => setIsVideoPlaying(false)}
                 onError={(e) => {
-                  console.log("❌ Error cargando video:", e)
-                  console.log("🔗 URL del video:", user.video_url)
+                  console.log("❌ Error cargando video, usando fallback")
                   // Ocultar el video si falla y mostrar fondo por defecto
                   e.currentTarget.style.display = 'none'
                   const container = e.currentTarget.parentElement
@@ -120,7 +119,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
             )}
             
             {/* Controles de video (solo si hay video) */}
-            {user.video_url && (
+            {user.video_url && user.video_url.includes('http') && !user.video_url.includes('railway') && (
               <div className="absolute top-4 right-4 flex gap-2">
                 <Button
                   size="sm"
@@ -145,16 +144,16 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
           {/* Foto de perfil superpuesta */}
           <div className="absolute top-4 left-4">
             <img
-              src={user.foto_url || "https://via.placeholder.com/64x64/cccccc/666666?text=?"}
+              src={user.foto_url && user.foto_url.includes('http') && !user.foto_url.includes('railway') 
+                ? user.foto_url 
+                : "https://via.placeholder.com/64x64/cccccc/666666?text=?"}
               alt={`${user.name}`}
               className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
               onLoad={(e) => {
-                console.log("✅ Imagen cargada exitosamente:", user.foto_url)
+                console.log("✅ Imagen cargada exitosamente")
               }}
               onError={(e) => {
-                console.log("❌ Error cargando imagen:", e)
-                console.log("🔗 URL de la imagen:", user.foto_url)
-                console.log("👤 Usuario:", user.name)
+                console.log("❌ Error cargando imagen, usando fallback")
                 // Fallback a imagen por defecto
                 e.currentTarget.src = "https://via.placeholder.com/64x64/cccccc/666666?text=?"
                 // También agregar un estilo de fallback visual
