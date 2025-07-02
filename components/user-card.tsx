@@ -96,7 +96,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                   e.currentTarget.style.display = 'none'
                   const container = e.currentTarget.parentElement
                   if (container) {
-                    container.style.backgroundImage = 'url(/placeholder-video.jpg)'
+                    container.style.backgroundImage = 'url(https://via.placeholder.com/400x600/3b82f6/ffffff?text=Sin+Video)'
                     container.style.backgroundSize = 'cover'
                     container.style.backgroundPosition = 'center'
                   }
@@ -107,7 +107,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
               <div 
                 className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
                 style={{
-                  backgroundImage: 'url(/placeholder-video.jpg)',
+                  backgroundImage: 'url(https://via.placeholder.com/400x600/3b82f6/ffffff?text=Sin+Video)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
@@ -145,7 +145,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
           {/* Foto de perfil superpuesta */}
           <div className="absolute top-4 left-4">
             <img
-              src={user.foto_url || "/placeholder-user.jpg"}
+              src={user.foto_url || "https://via.placeholder.com/64x64/cccccc/666666?text=?"}
               alt={`${user.name}`}
               className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
               onLoad={(e) => {
@@ -156,7 +156,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                 console.log("🔗 URL de la imagen:", user.foto_url)
                 console.log("👤 Usuario:", user.name)
                 // Fallback a imagen por defecto
-                e.currentTarget.src = "/placeholder-user.jpg"
+                e.currentTarget.src = "https://via.placeholder.com/64x64/cccccc/666666?text=?"
                 // También agregar un estilo de fallback visual
                 e.currentTarget.style.backgroundColor = "#f3f4f6"
                 e.currentTarget.style.border = "2px solid #e5e7eb"
