@@ -11,9 +11,11 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowLeft, MoreVertical, Send } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useApp } from "@/context/app-context"
+import { useAuth } from "@/context/auth-context"
 
 export default function ChatPage({ params }: { params: { id: string } }) {
   const { matches } = useApp()
+  const { user: currentAuthUser } = useAuth()
   const [messages, setMessages] = useState<any[]>([])
   const [newMessage, setNewMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)

@@ -28,7 +28,7 @@ interface CompatibleUser {
 
 export default function SwipePage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user: currentAuthUser } = useAuth()
   const { filters } = useApp()
   const [users, setUsers] = useState<CompatibleUser[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -107,10 +107,10 @@ export default function SwipePage() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (currentAuthUser) {
       fetchUsers()
     }
-  }, [user])
+  }, [currentAuthUser])
 
   // Manejar like
   const handleLike = async (userId: number) => {
@@ -222,7 +222,7 @@ export default function SwipePage() {
     fetchUsers()
   }
 
-  if (!user) {
+  if (!currentAuthUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p>Redirigiendo al login...</p>
@@ -372,7 +372,7 @@ export default function SwipePage() {
                 <div className="flex items-center justify-center mb-4">
                   <div className="relative">
                     <img
-                      src={user?.foto_url || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
+                      src={currentAuthUser?.foto_url || currentAuthUser?.profilePicture || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
                       alt="Tu foto"
                       className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
                       onError={(e) => {
