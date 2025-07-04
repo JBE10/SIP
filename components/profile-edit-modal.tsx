@@ -81,7 +81,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
     bio: "",
     email: "",
     profilePicture: "",
-    deportes_preferidos: ""
+    deportes_preferidos: "",
+    instagram: ""
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
@@ -117,7 +118,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         bio: profile.bio || profile.descripcion || "",
         email: profile.email || "",
         profilePicture: profile.profilePicture || profile.foto_url || "",
-        deportes_preferidos: deportesString
+        deportes_preferidos: deportesString,
+        instagram: profile.instagram || ""
       })
       
       setLocalSports(parsedSports)
@@ -185,7 +187,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         deportes_preferidos: form.deportes_preferidos,
         age: form.age,
         location: form.location,
-        foto_url: form.profilePicture
+        foto_url: form.profilePicture,
+        instagram: form.instagram
       }
       
       console.log("Enviando payload al backend:", payload)
@@ -221,7 +224,8 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             foto_url: data.user.foto_url,
             profilePicture: data.user.foto_url,
             sports: parseSports(data.user.deportes_preferidos || data.user.sports || ""),
-            deportes_preferidos: data.user.deportes_preferidos
+            deportes_preferidos: data.user.deportes_preferidos,
+            instagram: data.user.instagram || ""
           };
           console.log("Usuario actualizado en localStorage:", updatedUser)
           localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -462,6 +466,17 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
                   </select>
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Instagram (link completo)</Label>
+              <Input
+                name="instagram"
+                value={form.instagram}
+                onChange={handleChange}
+                placeholder="https://instagram.com/tuusuario"
+                type="url"
+              />
             </div>
 
             <div className="space-y-1">

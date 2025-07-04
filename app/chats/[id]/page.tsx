@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import React from "react"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,8 +11,11 @@ import { ArrowLeft, MoreVertical, Send } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useApp } from "@/context/app-context"
 import { useAuth } from "@/context/auth-context"
+import { useParams } from "next/navigation"
 
-export default function ChatPage({ params }: { params: { id: string } }) {
+export default function ChatPage() {
+  const params = useParams();
+  const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
   const { matches } = useApp()
   const { user: currentAuthUser } = useAuth()
   const [messages, setMessages] = useState<any[]>([])
@@ -21,18 +23,18 @@ export default function ChatPage({ params }: { params: { id: string } }) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Encontrar el match correspondiente
-  const match = matches.find((m) => m.id === params.id)
+  const match = matches.find((m) => m.id === id)
 
   // Si no hay match, usar datos simulados
   const chat = match
     ? {
         id: match.id,
         name: match.profile.name,
-        avatar: match.profile.profilePicture,
+        avatar: match.profile.foto_url,
         status: "En línea",
       }
     : {
-        id: params.id,
+        id: id,
         name: "Usuario",
         avatar: "/placeholder.svg",
         status: "En línea",

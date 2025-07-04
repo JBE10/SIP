@@ -17,7 +17,8 @@ const mockProfiles = [
       { sport: "Tenis", level: "Principiante" }
     ],
     distance: 2.5,
-    profilePicture: "/images/profile2.png",
+    foto_url: "/images/profile2.png",
+    video_url: "",
   },
   {
     id: "2",
@@ -31,7 +32,8 @@ const mockProfiles = [
       { sport: "Natación", level: "Principiante" }
     ],
     distance: 3.8,
-    profilePicture: "/images/profile3.png",
+    foto_url: "/images/profile3.png",
+    video_url: "",
   },
   {
     id: "3",
@@ -45,7 +47,8 @@ const mockProfiles = [
       { sport: "Ciclismo", level: "Principiante" }
     ],
     distance: 1.7,
-    profilePicture: "/images/profile4.png",
+    foto_url: "/images/profile4.png",
+    video_url: "",
   },
   {
     id: "4",
@@ -59,7 +62,8 @@ const mockProfiles = [
       { sport: "Pilates", level: "Avanzado" }
     ],
     distance: 4.2,
-    profilePicture: "/images/profile5.jpeg",
+    foto_url: "/images/profile5.jpeg",
+    video_url: "",
   },
   {
     id: "5",
@@ -73,7 +77,8 @@ const mockProfiles = [
       { sport: "Natación", level: "Intermedio" }
     ],
     distance: 6.1,
-    profilePicture: "/images/profile1.png",
+    foto_url: "/images/profile1.png",
+    video_url: "",
   },
   {
     id: "6",
@@ -87,7 +92,8 @@ const mockProfiles = [
       { sport: "Running", level: "Principiante" }
     ],
     distance: 8.3,
-    profilePicture: "/images/profile2.png",
+    foto_url: "/images/profile2.png",
+    video_url: "",
   },
   {
     id: "7",
@@ -101,7 +107,8 @@ const mockProfiles = [
       { sport: "Gimnasio", level: "Avanzado" }
     ],
     distance: 5.7,
-    profilePicture: "/images/profile3.png",
+    foto_url: "/images/profile3.png",
+    video_url: "",
   },
   {
     id: "8",
@@ -115,7 +122,8 @@ const mockProfiles = [
       { sport: "Running", level: "Intermedio" }
     ],
     distance: 7.2,
-    profilePicture: "/images/profile4.png",
+    foto_url: "/images/profile4.png",
+    video_url: "",
   },
   {
     id: "9",
@@ -129,7 +137,8 @@ const mockProfiles = [
       { sport: "Natación", level: "Avanzado" }
     ],
     distance: 9.5,
-    profilePicture: "/images/profile5.jpeg",
+    foto_url: "/images/profile5.jpeg",
+    video_url: "",
   },
   {
     id: "10",
@@ -143,7 +152,8 @@ const mockProfiles = [
       { sport: "Yoga", level: "Intermedio" }
     ],
     distance: 3.9,
-    profilePicture: "/images/profile1.png",
+    foto_url: "/images/profile1.png",
+    video_url: "",
   },
 ]
 
@@ -156,7 +166,9 @@ export interface Profile {
   bio: string
   sports: { sport: string; level: string }[]
   distance: number
-  profilePicture: string
+  foto_url: string
+  video_url: string
+  instagram?: string
 }
 
 export interface Filters {
@@ -215,7 +227,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       { sport: "Yoga", level: "Intermedio" }
     ],
     distance: 0,
-    profilePicture: "/images/profile1.png",
+    foto_url: "/images/profile1.png",
+    video_url: "",
   }
 
   // Función para aplicar filtros
@@ -300,7 +313,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       if (profile) {
         const newMatch: Match = {
           id: `match-${Date.now()}`,
-          profile,
+          profile: {
+            ...profile,
+            foto_url: profile.foto_url,
+            video_url: profile.video_url,
+          },
           timestamp: new Date().toISOString(),
         }
         setMatches((prev) => [...prev, newMatch])

@@ -309,7 +309,7 @@ export default function SwipePage() {
   const currentUser = users[currentIndex]
 
   return (
-    <>
+    <div className="relative min-h-screen bg-background pb-32">
       <div className="container max-w-md py-6 space-y-6 pb-32">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -348,7 +348,10 @@ export default function SwipePage() {
               user={currentUser}
               onLike={handleLike}
               onDislike={handleDislike}
-              onSwipe={handleSwipe}
+              onSwipe={(direction) => {
+                if (direction === 'right') setCurrentIndex((prev) => prev + 1)
+                if (direction === 'left') setCurrentIndex((prev) => prev + 1)
+              }}
             />
           </motion.div>
         </AnimatePresence>
@@ -360,47 +363,44 @@ export default function SwipePage() {
               initial={{ opacity: 0, y: 50, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.8 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-500/80 via-purple-500/80 to-blue-500/80"
             >
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.8 }}
-                className="bg-white rounded-2xl p-6 max-w-sm mx-4 text-center shadow-2xl"
+                className="bg-white/90 rounded-2xl p-8 max-w-sm mx-4 text-center shadow-2xl border border-white/40 backdrop-blur-lg"
               >
-                {/* Fotos de ambos usuarios */}
-                <div className="flex items-center justify-center mb-4">
-                  <div className="relative">
-                    <img
-                      src={currentAuthUser?.foto_url || currentAuthUser?.profilePicture || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
-                      alt="Tu foto"
-                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/60x60/cccccc/666666?text=?"
-                      }}
-                    />
+                {/* Fotos de ambos usuarios estilo Tinder */}
+                <div className="flex items-center justify-center mb-6 relative h-32">
+                  <img
+                    src={currentAuthUser?.foto_url || currentAuthUser?.profilePicture || "https://via.placeholder.com/100x100/cccccc/666666?text=?"}
+                    alt="Tu foto"
+                    className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover absolute left-1/2 -translate-x-[70%] z-20 bg-white"
+                    style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
+                    onError={(e) => {
+                      e.currentTarget.src = "https://via.placeholder.com/100x100/cccccc/666666?text=?"
+                    }}
+                  />
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 text-5xl select-none pointer-events-none">
+                    🤝
                   </div>
-                  
-                  {/* Manos apretándose */}
-                  <div className="mx-4 text-4xl">🤝</div>
-                  
-                  <div className="relative">
-                    <img
-                      src={matchUser.foto_url || "https://via.placeholder.com/60x60/cccccc/666666?text=?"}
-                      alt={`Foto de ${matchUser.name}`}
-                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/60x60/cccccc/666666?text=?"
-                      }}
-                    />
-                  </div>
+                  <img
+                    src={matchUser.foto_url || "https://via.placeholder.com/100x100/cccccc/666666?text=?"}
+                    alt={`Foto de ${matchUser.name}`}
+                    className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover absolute left-1/2 translate-x-[70%] z-20 bg-white"
+                    style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
+                    onError={(e) => {
+                      e.currentTarget.src = "https://via.placeholder.com/100x100/cccccc/666666?text=?"
+                    }}
+                  />
                 </div>
 
                 {/* Mensaje de match */}
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-green-600 mb-2">¡Es un match! 🎉</h3>
-                  <p className="text-gray-600">
-                    Ahora puedes chatear con <span className="font-semibold">{matchUser.name}</span>
+                  <h3 className="text-3xl font-extrabold text-pink-600 mb-2 drop-shadow">¡Es un match!</h3>
+                  <p className="text-gray-700 text-lg font-medium">
+                    Ahora puedes chatear con <span className="font-bold text-purple-700">{matchUser.name}</span>
                   </p>
                 </div>
 
@@ -417,7 +417,7 @@ export default function SwipePage() {
                     Seguir explorando
                   </Button>
                   <Button
-                    className="flex-1 bg-green-500 hover:bg-green-600"
+                    className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold shadow"
                     onClick={() => {
                       setIsMatch(false)
                       setMatchUser(null)
@@ -434,6 +434,6 @@ export default function SwipePage() {
       </div>
 
       <BottomNavigation />
-    </>
+    </div>
   )
 }

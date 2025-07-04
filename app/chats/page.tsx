@@ -130,7 +130,7 @@ export default function ChatsPage() {
 
         <div className="space-y-2">
           {(chats?.length ?? 0) > 0 ? (
-            chats.map((chat, index) => <ChatPreview key={chat.id} chat={chat} index={index} />)
+            chats.map((chat, index) => <ChatPreview key={chat.id + '-' + index} chat={chat} index={index} />)
           ) : (
             <motion.div
               className="text-center py-12"

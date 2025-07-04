@@ -24,6 +24,7 @@ export type User = {
   profilePicture?: string
   deportes_preferidos?: string
   descripcion?: string
+  instagram?: string
 }
 
 interface AuthContextType {

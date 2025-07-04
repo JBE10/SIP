@@ -76,11 +76,12 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
       whileHover={{ scale: 1.02 }}
       className="w-full max-w-sm mx-auto"
     >
-      <Card className="overflow-hidden shadow-lg">
-        <div className="relative">
-          {/* Video de fondo o imagen por defecto */}
-          <div className="relative w-full h-96 bg-black">
-            {user.video_url && user.video_url.includes('http') && !user.video_url.includes('railway') ? (
+      <Card className="overflow-hidden shadow-lg p-4 flex flex-col items-center">
+        {/* Video como fondo principal y foto de perfil arriba a la izquierda */}
+        <div className="w-full mb-4">
+          <div className="w-full aspect-[9/16] bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
+            {/* Video */}
+            {user.video_url && user.video_url.includes('http') ? (
               <video
                 ref={videoRef}
                 src={user.video_url}
@@ -90,37 +91,44 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
                 onPlay={() => setIsVideoPlaying(true)}
                 onPause={() => setIsVideoPlaying(false)}
                 onError={(e) => {
-                  console.log("❌ Error cargando video, usando fallback")
-                  // Ocultar el video si falla y mostrar fondo por defecto
                   e.currentTarget.style.display = 'none'
-                  const container = e.currentTarget.parentElement
-                  if (container) {
-                    container.style.backgroundImage = 'url(https://via.placeholder.com/400x600/3b82f6/ffffff?text=Sin+Video)'
-                    container.style.backgroundSize = 'cover'
-                    container.style.backgroundPosition = 'center'
-                  }
                 }}
               />
             ) : (
-              // Imagen de fondo por defecto cuando no hay video
               <div 
-                className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+                className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600"
                 style={{
-                  backgroundImage: 'url(https://via.placeholder.com/400x600/3b82f6/ffffff?text=Sin+Video)',
+                  backgroundImage: 'url(https://via.placeholder.com/400x600/3b82f6/ffffff?text=No+video)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
               >
-                <div className="text-white text-center">
-                  <div className="text-4xl mb-2">🏃‍♂️</div>
-                  <div className="text-sm opacity-80">Sin video</div>
+                <div className="flex flex-col items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-white/80 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 002.828 2.828l6.586-6.586a2 2 0 00-2.828-2.828z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 13V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2v-6" />
+                    <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  <div className="text-lg font-semibold text-white drop-shadow mb-1">No tiene video</div>
                 </div>
               </div>
             )}
-            
-            {/* Controles de video (solo si hay video) */}
-            {user.video_url && user.video_url.includes('http') && !user.video_url.includes('railway') && (
-              <div className="absolute top-4 right-4 flex gap-2">
+            {/* Foto de perfil overlay */}
+            <img
+              src={user.foto_url && user.foto_url.includes('http')
+                ? user.foto_url
+                : "https://via.placeholder.com/64x64/cccccc/666666?text=?"}
+              alt={`${user.name}`}
+              className="absolute top-2 left-2 w-12 h-12 rounded-full border-4 border-white shadow-lg object-cover bg-white z-20"
+              onError={(e) => {
+                e.currentTarget.src = "https://via.placeholder.com/64x64/cccccc/666666?text=?"
+                e.currentTarget.style.backgroundColor = "#f3f4f6"
+                e.currentTarget.style.border = "2px solid #e5e7eb"
+              }}
+            />
+            {/* Controles de video */}
+            {user.video_url && user.video_url.includes('http') && (
+              <div className="absolute top-2 right-2 flex gap-2 z-10">
                 <Button
                   size="sm"
                   variant="secondary"
@@ -140,111 +148,77 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
               </div>
             )}
           </div>
-
-          {/* Foto de perfil superpuesta */}
-          <div className="absolute top-4 left-4">
-            <img
-              src={user.foto_url && user.foto_url.includes('http') && !user.foto_url.includes('railway') 
-                ? user.foto_url 
-                : "https://via.placeholder.com/64x64/cccccc/666666?text=?"}
-              alt={`${user.name}`}
-              className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
-              onLoad={(e) => {
-                console.log("✅ Imagen cargada exitosamente")
-              }}
-              onError={(e) => {
-                console.log("❌ Error cargando imagen, usando fallback")
-                // Fallback a imagen por defecto
-                e.currentTarget.src = "https://via.placeholder.com/64x64/cccccc/666666?text=?"
-                // También agregar un estilo de fallback visual
-                e.currentTarget.style.backgroundColor = "#f3f4f6"
-                e.currentTarget.style.border = "2px solid #e5e7eb"
-              }}
-            />
-          </div>
-          
-          {/* Score de compatibilidad */}
-          <div className="absolute top-4 left-24 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-bold">
-            {user.compatibility_score}% match
-          </div>
         </div>
 
-        <CardContent className="p-6">
-          {/* Información del usuario */}
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold mb-1">
-              {user.name}, {user.age}
-            </h2>
-            <p className="text-muted-foreground mb-2">
-              📍 {user.location}
+        {/* Nombre, edad y ubicación */}
+        <div className="w-full text-center mb-2">
+          <h2 className="text-2xl font-bold mb-1">
+            {user.name}, {user.age}
+          </h2>
+          <p className="text-muted-foreground mb-2">
+            📍 {user.location}
+          </p>
+        </div>
+
+        {/* Deportes y nivel */}
+        <div className="w-full flex flex-wrap justify-center gap-2 mb-2">
+          {sports.map((sport: any, idx: number) => (
+            <span
+              key={sport.sport || idx}
+              className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+            >
+              {sport.sport} ({sport.level})
+            </span>
+          ))}
+        </div>
+
+        {/* Descripción */}
+        {user.bio && (
+          <div className="w-full text-center mt-2">
+            <p className="text-sm text-gray-600 mb-3">
+              {user.bio}
             </p>
-            {user.bio && (
-              <p className="text-sm text-gray-600 mb-3">
-                {user.bio}
-              </p>
-            )}
           </div>
+        )}
 
-          {/* Deportes en común */}
-          {user.common_sports.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold text-green-600 mb-2">
-                🏆 Deportes en común:
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {user.common_sports.map((sport, index) => (
-                  <span
-                    key={index}
-                    className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
-                  >
-                    {sport}
-                  </span>
-                ))}
-              </div>
+        {/* Deportes en común */}
+        {user.common_sports.length > 0 && (
+          <div className="mb-2 w-full text-center">
+            <h3 className="text-xs font-semibold text-green-600 mb-1">
+              🏆 Deportes en común:
+            </h3>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {user.common_sports.map((sport, index) => (
+                <span
+                  key={index}
+                  className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                >
+                  {sport}
+                </span>
+              ))}
             </div>
-          )}
-
-          {/* Deportes del usuario */}
-          {sports.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold mb-2">🏃‍♂️ Deportes:</h3>
-              <div className="flex flex-wrap gap-2">
-                {sports.map((sport: any, index: number) => {
-                  const sportName = typeof sport === 'string' ? sport : sport.sport
-                  const level = typeof sport === 'object' ? sport.level : 'Principiante'
-                  return (
-                    <span
-                      key={index}
-                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-                    >
-                      {sportName} ({level})
-                    </span>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Botones de acción */}
-          <div className="flex justify-center gap-4">
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleDislike}
-              className="w-16 h-16 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
-            >
-              <X size={24} />
-            </Button>
-            
-            <Button
-              size="lg"
-              onClick={handleLike}
-              className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white"
-            >
-              <Heart size={24} />
-            </Button>
           </div>
-        </CardContent>
+        )}
+
+        {/* Botones de acción */}
+        <div className="flex justify-center gap-4 mt-4">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={handleDislike}
+            className="w-16 h-16 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
+          >
+            <X size={24} />
+          </Button>
+          
+          <Button
+            size="lg"
+            onClick={handleLike}
+            className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white"
+          >
+            <Heart size={24} />
+          </Button>
+        </div>
       </Card>
     </motion.div>
   )
