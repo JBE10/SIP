@@ -1,173 +1,256 @@
 "use client"
 
-import React from "react"
-import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { ArrowLeft, MoreVertical, Send } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useApp } from "@/context/app-context"
+import { Card, CardContent } from "@/components/ui/card"
+import { ArrowLeft, Send, MessageSquare, Phone, Instagram } from "lucide-react"
+import { motion } from "framer-motion"
+import { BottomNavigation } from "@/components/bottom-navigation"
 import { useAuth } from "@/context/auth-context"
-import { useParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/config/api"
+
+interface Message {
+  id: number
+  content: string
+  created_at: string
+  is_read: boolean
+  sender: {
+    id: number
+    username: string
+    foto_url: string
+  }
+}
+
+interface MatchUser {
+  id: number
+  username: string
+  age: number
+  location: string
+  descripcion: string
+  foto_url: string
+  video_url: string
+  deportes_preferidos: string
+  instagram?: string
+  whatsapp?: string
+  phone?: string
+}
 
 export default function ChatPage() {
-  const params = useParams();
-  const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
-  const { matches } = useApp()
-  const { user: currentAuthUser } = useAuth()
-  const [messages, setMessages] = useState<any[]>([])
+  const params = useParams()
+  const router = useRouter()
+  const { user } = useAuth()
+  const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [matchUser, setMatchUser] = useState<MatchUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // Encontrar el match correspondiente
-  const match = matches.find((m) => m.id === id)
-
-  // Si no hay match, usar datos simulados
-  const chat = match
-    ? {
-        id: match.id,
-        name: match.profile.name,
-        avatar: match.profile.foto_url,
-        status: "En línea",
-      }
-    : {
-        id: id,
-        name: "Usuario",
-        avatar: "/placeholder.svg",
-        status: "En línea",
-      }
-
-  // Cargar mensajes iniciales
-  useEffect(() => {
-    // Simular mensajes iniciales
-    const initialMessages = [
-      {
-        id: "1",
-        senderId: "other",
-        text: `Hola! Vi que también te gusta ${match?.profile.sports[0] || "el deporte"}`,
-        timestamp: "10:30",
-      },
-      {
-        id: "2",
-        senderId: "me",
-        text: `¡Hola! Sí, practico ${match?.profile.sports[0] || "deportes"} desde hace unos años. ¿Tú también?`,
-        timestamp: "10:32",
-      },
-      {
-        id: "3",
-        senderId: "other",
-        text: `Sí, estoy buscando compañeros para practicar en ${match?.profile.location || "Buenos Aires"}`,
-        timestamp: "10:33",
-      },
-    ]
-
-    setMessages(initialMessages)
-  }, [match])
+  const matchId = params.id as string
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    if (matchId) {
+      loadMatchData()
+      loadMessages()
+    }
+  }, [matchId])
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (newMessage.trim()) {
-      const newMsg = {
-        id: Date.now().toString(),
-        senderId: "me",
-        text: newMessage,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  const loadMatchData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/matches/${user?.id}`)
+      const data = await response.json()
+      
+      const match = data.matches.find((m: any) => m.match_id.toString() === matchId)
+      if (match) {
+        setMatchUser(match.user)
       }
-      setMessages([...messages, newMsg])
-      setNewMessage("")
+    } catch (error) {
+      console.error("Error cargando datos del match:", error)
     }
   }
 
+  const loadMessages = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/messages/${matchId}`)
+      const data = await response.json()
+      setMessages(data.messages || [])
+    } catch (error) {
+      console.error("Error cargando mensajes:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !user) return
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/messages/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          match_id: parseInt(matchId),
+          sender_id: user.id,
+          content: newMessage.trim()
+        })
+      })
+
+      if (response.ok) {
+        setNewMessage("")
+        loadMessages() // Recargar mensajes
+      }
+    } catch (error) {
+      console.error("Error enviando mensaje:", error)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Cargando chat...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-background">
+      {/* Header */}
       <motion.header
-        className="border-b p-4 flex items-center justify-between"
+        className="flex items-center gap-4 p-4 border-b bg-white shadow-sm"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/chats">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Volver</span>
-            </Link>
-          </Button>
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage src={chat.avatar || "/placeholder.svg"} alt={chat.name} />
-              <AvatarFallback>{chat.name.substring(0, 2)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="font-semibold">{chat.name}</h2>
-              <p className="text-xs text-muted-foreground">{chat.status}</p>
-            </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.back()}
+          className="flex-shrink-0"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+            <img
+              src={matchUser?.foto_url || "/placeholder-user.jpg"}
+              alt={matchUser?.username}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-lg truncate">{matchUser?.username}</h2>
+            <p className="text-sm text-muted-foreground truncate">
+              {matchUser?.age} años • {matchUser?.location}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-            <span className="sr-only">Más opciones</span>
-          </Button>
+
+        {/* Botones de contacto rápido */}
+        <div className="flex gap-2">
+          {matchUser?.whatsapp && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(`https://wa.me/${matchUser.whatsapp}`, '_blank')}
+              className="text-green-600 hover:text-green-700"
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Button>
+          )}
+          {matchUser?.phone && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(`tel:${matchUser.phone}`, '_blank')}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              <Phone className="h-4 w-4" />
+            </Button>
+          )}
+          {matchUser?.instagram && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(matchUser.instagram, '_blank')}
+              className="text-pink-600 hover:text-pink-700"
+            >
+              <Instagram className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </motion.header>
 
-      <main className="flex-1 overflow-y-auto p-4 space-y-4">
-        <AnimatePresence>
-          {messages.map((message, index) => (
+      {/* Mensajes */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="text-center text-muted-foreground py-8">
+            <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>No hay mensajes aún</p>
+            <p className="text-sm">¡Envía el primer mensaje para empezar a chatear!</p>
+          </div>
+        ) : (
+          messages.map((message) => (
             <motion.div
               key={message.id}
-              className={`flex ${message.senderId === "me" ? "justify-end" : "justify-start"}`}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className={`flex ${message.sender.id === user?.id ? 'justify-end' : 'justify-start'}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <motion.div
-                className={`message-bubble ${message.senderId === "me" ? "sent" : "received"}`}
-                whileHover={{ scale: 1.02 }}
+              <div
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                  message.sender.id === user?.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
               >
-                <p>{message.text}</p>
-                <span className="message-time">{message.timestamp}</span>
-              </motion.div>
+                <p className="text-sm">{message.content}</p>
+                <p className={`text-xs mt-1 ${
+                  message.sender.id === user?.id ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                }`}>
+                  {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
             </motion.div>
-          ))}
-        </AnimatePresence>
-        <div ref={messagesEndRef} />
-      </main>
+          ))
+        )}
+      </div>
 
-      <motion.footer
-        className="border-t p-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
-        <form onSubmit={handleSendMessage} className="flex gap-2">
+      {/* Input de mensaje */}
+      <div className="p-4 border-t bg-white">
+        <div className="flex gap-2">
           <Input
-            placeholder="Escribe un mensaje..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Escribe un mensaje..."
             className="flex-1"
           />
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Button type="submit" size="icon">
-              <Send className="h-5 w-5" />
-              <span className="sr-only">Enviar</span>
-            </Button>
-          </motion.div>
-        </form>
-      </motion.footer>
+          <Button
+            onClick={sendMessage}
+            disabled={!newMessage.trim()}
+            size="icon"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <BottomNavigation />
     </div>
   )
 }

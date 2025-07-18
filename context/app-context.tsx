@@ -168,7 +168,10 @@ export interface Profile {
   distance: number
   foto_url: string
   video_url: string
+  profilePicture?: string
   instagram?: string
+  whatsapp?: string
+  phone?: string
 }
 
 export interface Filters {

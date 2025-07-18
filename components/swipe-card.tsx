@@ -78,7 +78,7 @@ export function SwipeCard({ profile, isTop, onSwipeLeft, onSwipeRight }: SwipeCa
       <Card className="overflow-hidden h-[70vh] relative">
         <div className="relative w-full h-full">
           <Image
-            src={profile.profilePicture || `/placeholder.svg?height=800&width=600`}
+            src={profile.profilePicture && profile.profilePicture.trim() !== "" ? profile.profilePicture : "/placeholder-user.jpg"}
             alt={profile.name}
             fill
             className="object-cover"

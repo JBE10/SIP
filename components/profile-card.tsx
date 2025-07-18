@@ -22,7 +22,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
       <div className="absolute inset-0 overflow-hidden">
         <div className="relative h-full w-full">
           <Image
-            src={profile.profilePicture || "/placeholder.svg?height=600&width=400"}
+            src={profile.profilePicture && profile.profilePicture.trim() !== "" ? profile.profilePicture : "/placeholder-user.jpg"}
             alt={profile.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"

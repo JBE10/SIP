@@ -82,7 +82,9 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
     email: "",
     profilePicture: "",
     deportes_preferidos: "",
-    instagram: ""
+    instagram: "",
+    whatsapp: "",
+    phone: ""
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
@@ -119,7 +121,9 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         email: profile.email || "",
         profilePicture: profile.profilePicture || profile.foto_url || "",
         deportes_preferidos: deportesString,
-        instagram: profile.instagram || ""
+        instagram: profile.instagram || "",
+        whatsapp: profile.whatsapp || "",
+        phone: profile.phone || ""
       })
       
       setLocalSports(parsedSports)
@@ -188,7 +192,9 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
         age: form.age,
         location: form.location,
         foto_url: form.profilePicture,
-        instagram: form.instagram
+        instagram: form.instagram,
+        whatsapp: form.whatsapp,
+        phone: form.phone
       }
       
       console.log("Enviando payload al backend:", payload)
@@ -225,7 +231,9 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             profilePicture: data.user.foto_url,
             sports: parseSports(data.user.deportes_preferidos || data.user.sports || ""),
             deportes_preferidos: data.user.deportes_preferidos,
-            instagram: data.user.instagram || ""
+            instagram: data.user.instagram || "",
+            whatsapp: data.user.whatsapp || "",
+            phone: data.user.phone || ""
           };
           console.log("Usuario actualizado en localStorage:", updatedUser)
           localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -477,6 +485,29 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
                 placeholder="https://instagram.com/tuusuario"
                 type="url"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Input
+                id="whatsapp"
+                name="whatsapp"
+                placeholder="5491112345678"
+                value={form.whatsapp}
+                onChange={handleChange}
+              />
+              <p className="text-xs text-muted-foreground">Número con código de país (ej: 5491112345678)</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Teléfono</Label>
+              <Input
+                id="phone"
+                name="phone"
+                placeholder="+54 9 11 1234-5678"
+                value={form.phone}
+                onChange={handleChange}
+              />
+              <p className="text-xs text-muted-foreground">Número de teléfono para llamadas</p>
             </div>
 
             <div className="space-y-1">

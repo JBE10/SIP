@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ProfileEditModal } from "@/components/profile-edit-modal"
+import { ContactInfoModal } from "@/components/contact-info-modal"
 import { VideoGallery } from "@/components/video-gallery"
 import { ProfilePictureUpload } from "@/components/profile-picture-upload"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -21,6 +22,7 @@ export default function ProfilePage() {
     const router = useRouter()
     const { user, logout, handleAuthError } = useAuth()
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false)
     const [userData, setUserData] = useState<any>(null)
 
     useEffect(() => {
@@ -89,6 +91,37 @@ export default function ProfilePage() {
                             <MapPin className="h-4 w-4" />
                             {userData.location}
                         </p>
+                        {/* Contacto: Instagram y WhatsApp */}
+                        {(userData.instagram || userData.whatsapp) && (
+                          <div className="flex flex-col items-center gap-1 mt-2">
+                            {userData.instagram && (
+                              <a
+                                href={userData.instagram.startsWith('http') ? userData.instagram : `https://instagram.com/${userData.instagram.replace(/^@/, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-pink-600 hover:underline text-sm"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 3.75A3.75 3.75 0 0 0 3.75 7.5v9A3.75 3.75 0 0 0 7.5 20.25h9a3.75 3.75 0 0 0 3.75-3.75v-9A3.75 3.75 0 0 0 16.5 3.75h-9ZM16.5 3.75v2.25M7.5 3.75v2.25m-3.75 3.75h16.5m-16.5 0v6.75A3.75 3.75 0 0 0 7.5 20.25h9a3.75 3.75 0 0 0 3.75-3.75v-6.75" />
+                                </svg>
+                                {userData.instagram.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '').replace('/', '')}
+                              </a>
+                            )}
+                            {userData.whatsapp && (
+                              <a
+                                href={`https://wa.me/${userData.whatsapp}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-green-600 hover:underline text-sm"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12a9.75 9.75 0 1 1 18.186 5.671l1.41 4.23a.75.75 0 0 1-.95.95l-4.23-1.41A9.75 9.75 0 0 1 2.25 12Z" />
+                                </svg>
+                                WhatsApp
+                              </a>
+                            )}
+                          </div>
+                        )}
                     </div>
                 </motion.div>
 
@@ -186,6 +219,11 @@ export default function ProfilePage() {
                                 </Button>
                             </motion.div>
                             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
+                                <Button variant="outline" className="w-full" onClick={() => setIsContactModalOpen(true)}>
+                                    Información de contacto
+                                </Button>
+                            </motion.div>
+                            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">
                                 <Button variant="destructive" className="w-full" onClick={logout}>
                                     Cerrar sesión
                                 </Button>
@@ -198,6 +236,15 @@ export default function ProfilePage() {
                     isOpen={isEditModalOpen}
                     onClose={() => setIsEditModalOpen(false)}
                     profile={userData}
+                />
+                
+                <ContactInfoModal
+                    isOpen={isContactModalOpen}
+                    onClose={() => setIsContactModalOpen(false)}
+                    onSave={() => {
+                        // Recargar datos del usuario
+                        window.location.reload()
+                    }}
                 />
             </motion.div>
 

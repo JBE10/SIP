@@ -9,7 +9,7 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import Link from "next/link"
-import { API_ENDPOINTS } from "@/lib/config/api"
+import { API_BASE_URL } from "@/lib/config/api"
 import { useAuth } from "@/context/auth-context"
 
 interface Match {
@@ -22,20 +22,25 @@ interface Match {
   video_url: string
   sports: { sport: string; level: string }[]
   match_date: string
+  instagram?: string
+  whatsapp?: string
+  phone?: string
 }
 
-export default function ChatsPage() {
+export default function MatchesPage() {
   const { user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filteredMatches, setFilteredMatches] = useState<Match[]>([])
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   // Cargar matches del backend
   const fetchMatches = async () => {
     try {
       setLoading(true)
-      
+
       const token = localStorage.getItem("token")
       if (!token) {
         console.log("No hay token, redirigiendo al login")
@@ -43,7 +48,7 @@ export default function ChatsPage() {
       }
 
       console.log("🔄 Cargando matches...")
-      const response = await fetch(API_ENDPOINTS.matches, {
+      const response = await fetch(`${API_BASE_URL}/matches/${user?.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -56,8 +61,23 @@ export default function ChatsPage() {
 
       const data = await response.json()
       console.log("✅ Matches cargados:", data.matches?.length || 0)
-      
-      setMatches(data.matches || [])
+
+      setMatches(
+        (data.matches || []).map((m: any) => ({
+          id: m.user.id,
+          name: m.user.username,
+          age: m.user.age,
+          location: m.user.location,
+          bio: m.user.descripcion,
+          foto_url: m.user.foto_url,
+          video_url: m.user.video_url,
+          sports: m.user.deportes_preferidos,
+          match_date: m.created_at,
+          instagram: m.user.instagram,
+          whatsapp: m.user.whatsapp,
+          phone: m.user.phone,
+        })),
+      )
     } catch (err) {
       console.error("❌ Error cargando matches:", err)
     } finally {
@@ -69,25 +89,29 @@ export default function ChatsPage() {
     if (user) {
       fetchMatches()
     }
+    if (sessionStorage.getItem("refreshMatches") === "true") {
+      fetchMatches()
+      sessionStorage.removeItem("refreshMatches")
+    }
   }, [user])
 
   // Filtrar matches cuando cambia el término de búsqueda
   useEffect(() => {
-    const filtered = matches.filter((match) => 
-      match.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = matches.filter(
+      (match) => match && typeof match.name === "string" && match.name.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredMatches(filtered)
   }, [searchTerm, matches])
 
-  // Convertir matches a formato de chat
-  const chats = filteredMatches.map((match) => ({
-    id: match.id.toString(),
-    name: match.name,
-    lastMessage: "¡Es un match! 🎉 ¿Te gustaría practicar deportes juntos?",
-    timestamp: new Date(match.match_date).toLocaleDateString(),
-    unread: 0, // Por ahora sin mensajes no leídos
-    avatar: match.foto_url || "/placeholder-user.jpg",
-  }))
+  const handleMatchClick = (match: Match) => {
+    setSelectedMatch(match)
+    setIsProfileModalOpen(true)
+  }
+
+  const handleCloseProfile = () => {
+    setIsProfileModalOpen(false)
+    setSelectedMatch(null)
+  }
 
   if (loading) {
     return (
@@ -108,7 +132,7 @@ export default function ChatsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            Matches
+            Mis Matches
           </motion.h1>
           <ThemeToggle />
         </div>
@@ -128,9 +152,30 @@ export default function ChatsPage() {
           />
         </motion.div>
 
-        <div className="space-y-2">
-          {(chats?.length ?? 0) > 0 ? (
-            chats.map((chat, index) => <ChatPreview key={chat.id + '-' + index} chat={chat} index={index} />)
+        <div className="space-y-3">
+          {(filteredMatches?.length ?? 0) > 0 ? (
+            filteredMatches.map((match, index) => (
+              <ChatPreview
+                key={match.id}
+                chat={{
+                  ...match,
+                  id: match.id.toString(),
+                  avatar: match.foto_url,
+                  lastMessage: "¡Es un match! 🎉 ¿Te gustaría practicar deportes juntos?",
+                  timestamp: match.match_date ? new Date(match.match_date).toLocaleDateString() : "",
+                  unread: 0,
+                  video_url: match.video_url || "",
+                  age: match.age || null,
+                  location: match.location || "",
+                  sports: match.sports || [],
+                  bio: match.bio || "",
+                  instagram: match.instagram || "",
+                  whatsapp: match.whatsapp || "",
+                  phone: match.phone || "",
+                }}
+                index={index}
+              />
+            ))
           ) : (
             <motion.div
               className="text-center py-12"
@@ -141,7 +186,7 @@ export default function ChatsPage() {
               <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h2 className="text-lg font-semibold mb-2">No tienes matches aún</h2>
               <p className="text-muted-foreground mb-4">
-                Cuando hagas match con alguien, aparecerá aquí para que puedas chatear.
+                Cuando hagas match con alguien, aparecerá aquí para que puedas ver su perfil.
               </p>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button asChild>
@@ -152,6 +197,10 @@ export default function ChatsPage() {
           )}
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {/* The MatchProfileModal component is no longer used here as the profile is now opened via ChatPreview */}
+
       <BottomNavigation />
     </>
   )

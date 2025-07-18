@@ -25,6 +25,8 @@ export type User = {
   deportes_preferidos?: string
   descripcion?: string
   instagram?: string
+  whatsapp?: string
+  phone?: string
 }
 
 interface AuthContextType {
@@ -43,6 +45,7 @@ interface AuthContextType {
     password: string
     confirm_password: string
   }) => Promise<boolean>
+  updateUser: (userData: Partial<User>) => void
   handleAuthError: () => void
 }
 
@@ -266,6 +269,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/login")
   }
 
+  // Función para actualizar datos del usuario
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...userData }
+      setUser(updatedUser)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+      }
+    }
+  }
+
   // Función para manejar errores de autenticación
   const handleAuthError = () => {
     console.log("Token expirado o inválido. Redirigiendo al login...")
@@ -273,7 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-      <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register, handleAuthError }}>
+      <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register, updateUser, handleAuthError }}>
         {children}
       </AuthContext.Provider>
   )

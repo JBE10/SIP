@@ -186,10 +186,11 @@ export function ProfilePictureUpload() {
             <h3 className="text-lg font-semibold">Mi Foto de Perfil</h3>
             <div className="flex items-center gap-4">
               <img
-                src={profilePicture}
+                src={profilePicture || "/placeholder-user.jpg"}
                 alt="Foto de perfil"
                 className="w-24 h-24 rounded-full object-cover border-2 border-primary"
                 onError={(e) => {
+                  e.currentTarget.src = "/placeholder-user.jpg"
                   console.error("❌ Error cargando imagen:", e)
                   console.error("🔗 URL de la imagen:", profilePicture)
                 }}

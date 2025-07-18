@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { motion } from "framer-motion"
+import { useState } from "react"
+import { ProfileDetailModal } from "./profile-detail-modal"
 
 interface ChatPreviewProps {
   chat: {
@@ -12,19 +14,30 @@ interface ChatPreviewProps {
     timestamp: string
     unread: number
     avatar: string
+    video_url?: string
+    age?: number
+    location?: string
+    sports?: { sport: string; level: string }[]
+    bio?: string
+    instagram?: string
+    whatsapp?: string
+    phone?: string
   }
   index: number
 }
 
 export function ChatPreview({ chat, index }: ChatPreviewProps) {
+  const [open, setOpen] = useState(false)
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
-    >
-      <Link href={`/chats/${chat.id}`}>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
+        whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
+        onClick={() => setOpen(true)}
+        className="cursor-pointer"
+      >
         <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
           <Avatar className="border border-primary/20">
             <AvatarImage src={chat.avatar || "/placeholder.svg?height=40&width=40"} alt={chat.name} />
@@ -48,7 +61,8 @@ export function ChatPreview({ chat, index }: ChatPreviewProps) {
             </motion.div>
           )}
         </div>
-      </Link>
-    </motion.div>
+      </motion.div>
+      <ProfileDetailModal open={open} onClose={() => setOpen(false)} chat={chat} />
+    </>
   )
 }

@@ -66,7 +66,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               transition={{ duration: 0.5 }}
             >
               <Image
-                src={user?.profilePicture || "/placeholder.svg?height=128&width=128"}
+                src={user?.profilePicture && user?.profilePicture.trim() !== "" ? user?.profilePicture : "/placeholder-user.jpg"}
                 alt="Tu perfil"
                 width={128}
                 height={128}
@@ -82,7 +82,7 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
               transition={{ duration: 0.5 }}
             >
               <Image
-                src={matchedProfile.profilePicture || `/placeholder.svg?height=128&width=128`}
+                src={matchedProfile.profilePicture && matchedProfile.profilePicture.trim() !== "" ? matchedProfile.profilePicture : "/placeholder-user.jpg"}
                 alt={matchedProfile.name}
                 width={128}
                 height={128}
@@ -92,20 +92,51 @@ export function MatchModal({ isOpen, onClose, matchedProfile }: MatchModalProps)
             </motion.div>
           </div>
 
-          {/* Instagram del match (si existe) */}
-          {matchedProfile.instagram && (
-            <div className="mb-6 flex flex-col items-center">
-              <span className="text-white/90 text-base mb-1">Instagram:</span>
-              <a
-                href={matchedProfile.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-white/90 text-purple-700 font-semibold px-4 py-2 rounded-full shadow hover:bg-white"
-              >
-                {matchedProfile.instagram.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '').replace('/', '')}
-              </a>
-            </div>
-          )}
+          {/* Información de contacto del match */}
+          <div className="mb-6 flex flex-col items-center gap-3">
+            {/* Instagram */}
+            {matchedProfile.instagram && (
+              <div className="flex items-center gap-2">
+                <span className="text-white/90 text-sm">📸</span>
+                <a
+                  href={matchedProfile.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-white/90 text-purple-700 font-semibold px-3 py-1 rounded-full shadow hover:bg-white text-sm"
+                >
+                  {matchedProfile.instagram.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '').replace('/', '')}
+                </a>
+              </div>
+            )}
+            
+            {/* WhatsApp */}
+            {matchedProfile.whatsapp && (
+              <div className="flex items-center gap-2">
+                <span className="text-white/90 text-sm">💬</span>
+                <a
+                  href={`https://wa.me/${matchedProfile.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-green-500 text-white font-semibold px-3 py-1 rounded-full shadow hover:bg-green-600 text-sm"
+                >
+                  WhatsApp
+                </a>
+              </div>
+            )}
+            
+            {/* Teléfono */}
+            {matchedProfile.phone && (
+              <div className="flex items-center gap-2">
+                <span className="text-white/90 text-sm">📞</span>
+                <a
+                  href={`tel:${matchedProfile.phone}`}
+                  className="inline-block bg-blue-500 text-white font-semibold px-3 py-1 rounded-full shadow hover:bg-blue-600 text-sm"
+                >
+                  Llamar
+                </a>
+              </div>
+            )}
+          </div>
 
           {/* Botones */}
           <div className="flex flex-col gap-3 w-full">
