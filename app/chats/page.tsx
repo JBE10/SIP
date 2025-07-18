@@ -156,7 +156,7 @@ export default function MatchesPage() {
           {(filteredMatches?.length ?? 0) > 0 ? (
             filteredMatches.map((match, index) => (
               <ChatPreview
-                key={match.id}
+                key={`${match.id}-${index}`}
                 chat={{
                   ...match,
                   id: match.id.toString(),
@@ -165,7 +165,7 @@ export default function MatchesPage() {
                   timestamp: match.match_date ? new Date(match.match_date).toLocaleDateString() : "",
                   unread: 0,
                   video_url: match.video_url || "",
-                  age: match.age || null,
+                  age: match.age || undefined,
                   location: match.location || "",
                   sports: match.sports || [],
                   bio: match.bio || "",
