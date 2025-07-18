@@ -10,6 +10,7 @@ import type { User } from "@/context/auth-context"
 import { useAuth } from "@/context/auth-context"
 import { API_ENDPOINTS } from "@/src/config/api"
 import { SportSelector } from "@/components/sport-selector"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 
 // Función para parsear deportes (igual que en auth-context)
 const parseSports = (deportesString: string): { sport: string; level: string }[] => {
@@ -363,7 +364,7 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
   return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md max-h-[90vh] flex flex-col" aria-describedby="profile-edit-description">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Perfil</DialogTitle>
           </DialogHeader>
@@ -372,164 +373,102 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
             Formulario para editar información del perfil de usuario
           </div>
 
-          <div className="space-y-3 overflow-y-auto flex-1 pr-2">
-            <div className="space-y-1">
-              <Label>Nombre completo</Label>
-              <Input name="name" value={form.name} onChange={handleChange} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Edad</Label>
-              <Input name="age" value={form.age} onChange={handleChange} type="number" />
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="location">Barrio/Zona</Label>
-              <select
-                id="location"
-                name="location"
-                className="w-full rounded-md border px-2 py-2 text-base"
-                value={form.location}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Sin especificar</option>
-                {barrios.map((barrio) => (
-                  <option key={barrio} value={barrio}>{barrio}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <Label>Email</Label>
-              <Input name="email" value={form.email} onChange={handleChange} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Sobre mí</Label>
-              <Textarea name="bio" value={form.bio} onChange={handleChange} />
-            </div>
-
-            <div className="space-y-1">
-              <Label>Deportes preferidos</Label>
-              <div className="space-y-2">
-                {/* Lista de deportes seleccionados */}
-                {localSports.map((sport, index) => (
-                  <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                    <span className="flex-1">{sport.sport}</span>
+          <div className="overflow-y-auto max-h-[70vh] min-h-[300px] p-2">
+            <Accordion type="multiple" defaultValue={["personal", "contacto"]} className="w-full">
+              <AccordionItem value="personal">
+                <AccordionTrigger>Datos personales</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2">
+                    <Label>Nombre completo</Label>
+                    <Input name="name" value={form.name} onChange={handleChange} />
+                    <Label>Edad</Label>
+                    <Input name="age" value={form.age} onChange={handleChange} type="number" />
+                    <Label htmlFor="location">Barrio/Zona</Label>
                     <select
-                      value={sport.level}
-                      onChange={(e) => {
-                        console.log("Cambiando nivel de", sport.sport, "a", e.target.value)
-                        handleChangeLevel(sport.sport, e.target.value)
-                      }}
-                      className="px-2 py-1 border rounded text-sm"
+                      id="location"
+                      name="location"
+                      className="w-full rounded-md border px-2 py-2 text-base"
+                      value={form.location}
+                      onChange={handleChange}
+                      required
                     >
-                      <option value="Principiante">Principiante</option>
-                      <option value="Intermedio">Intermedio</option>
-                      <option value="Avanzado">Avanzado</option>
+                      <option value="">Sin especificar</option>
+                      {barrios.map((barrio) => (
+                        <option key={barrio} value={barrio}>{barrio}</option>
+                      ))}
                     </select>
-                    <button
-                      onClick={() => {
-                        console.log("Eliminando deporte:", sport.sport)
-                        const newSports = localSports.filter((_, i) => i !== index)
-                        updateSportsInForm(newSports)
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      ✕
-                    </button>
+                    <Label>Email</Label>
+                    <Input name="email" value={form.email} onChange={handleChange} />
+                    <Label>Sobre mí</Label>
+                    <Textarea name="bio" value={form.bio} onChange={handleChange} />
                   </div>
-                ))}
-                
-                {/* Selector para agregar deporte */}
-                <div className="flex gap-2">
-                  <select
-                    onChange={(e) => {
-                      const newSport = e.target.value
-                      if (newSport && !localSports.find(s => s.sport === newSport)) {
-                        console.log("Agregando deporte:", newSport)
-                        const newSports = [...localSports, { sport: newSport, level: "Principiante" }]
-                        updateSportsInForm(newSports)
-                        e.target.value = ""
-                      }
-                    }}
-                    className="flex-1 px-2 py-1 border rounded text-sm"
-                    defaultValue=""
-                  >
-                    <option value="">Agregar deporte...</option>
-                    <option value="Fútbol">Fútbol</option>
-                    <option value="Tenis">Tenis</option>
-                    <option value="Básquet">Básquet</option>
-                    <option value="Vóley">Vóley</option>
-                    <option value="Running">Running</option>
-                    <option value="Ciclismo">Ciclismo</option>
-                    <option value="Natación">Natación</option>
-                    <option value="Yoga">Yoga</option>
-                    <option value="Pilates">Pilates</option>
-                    <option value="Pádel">Pádel</option>
-                    <option value="Hockey">Hockey</option>
-                    <option value="Rugby">Rugby</option>
-                    <option value="Golf">Golf</option>
-                    <option value="Escalada">Escalada</option>
-                    <option value="Boxeo">Boxeo</option>
-                    <option value="Artes marciales">Artes marciales</option>
-                    <option value="Gimnasio">Gimnasio</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label>Instagram (link completo)</Label>
-              <Input
-                name="instagram"
-                value={form.instagram}
-                onChange={handleChange}
-                placeholder="https://instagram.com/tuusuario"
-                type="url"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp</Label>
-              <Input
-                id="whatsapp"
-                name="whatsapp"
-                placeholder="5491112345678"
-                value={form.whatsapp}
-                onChange={handleChange}
-              />
-              <p className="text-xs text-muted-foreground">Número con código de país (ej: 5491112345678)</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input
-                id="phone"
-                name="phone"
-                placeholder="+54 9 11 1234-5678"
-                value={form.phone}
-                onChange={handleChange}
-              />
-              <p className="text-xs text-muted-foreground">Número de teléfono para llamadas</p>
-            </div>
-
-            <div className="space-y-1">
-              <Label>Foto de perfil</Label>
-              <Input type="file" accept="image/*" onChange={handleFileChange} />
-              <Button 
-                onClick={uploadPhoto} 
-                disabled={!selectedFile || uploadStatus === "uploading"}
-              >
-                {uploadStatus === "uploading" ? "Subiendo..." : "Subir foto"}
-              </Button>
-              {uploadError && (
-                <p className="text-red-500 text-sm mt-1">{uploadError}</p>
-              )}
-              {uploadStatus === "success" && (
-                <p className="text-green-500 text-sm mt-1">Foto subida exitosamente</p>
-              )}
-            </div>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="contacto">
+                <AccordionTrigger>Contacto</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2">
+                    <Label>Instagram (link completo)</Label>
+                    <Input
+                      name="instagram"
+                      value={form.instagram}
+                      onChange={handleChange}
+                      placeholder="https://instagram.com/tuusuario"
+                      type="url"
+                    />
+                    <Label htmlFor="whatsapp">WhatsApp</Label>
+                    <Input
+                      id="whatsapp"
+                      name="whatsapp"
+                      placeholder="5491112345678"
+                      value={form.whatsapp}
+                      onChange={handleChange}
+                    />
+                    <p className="text-xs text-muted-foreground">Número con código de país (ej: 5491112345678)</p>
+                    <Label htmlFor="phone">Teléfono</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      placeholder="+54 9 11 1234-5678"
+                      value={form.phone}
+                      onChange={handleChange}
+                    />
+                    <p className="text-xs text-muted-foreground">Número de teléfono para llamadas</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="deportes">
+                <AccordionTrigger>Deportes</AccordionTrigger>
+                <AccordionContent>
+                  <SportSelector
+                    selectedSports={localSports}
+                    onToggleSport={handleSportToggle}
+                    onChangeLevel={handleChangeLevel}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="foto">
+                <AccordionTrigger>Foto de perfil</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2">
+                    <Label>Foto de perfil</Label>
+                    <Input type="file" accept="image/*" onChange={handleFileChange} />
+                    <Button 
+                      onClick={uploadPhoto} 
+                      disabled={!selectedFile || uploadStatus === "uploading"}
+                    >
+                      {uploadStatus === "uploading" ? "Subiendo..." : "Subir foto"}
+                    </Button>
+                    {uploadError && (
+                      <p className="text-red-500 text-sm mt-1">{uploadError}</p>
+                    )}
+                    {uploadStatus === "success" && (
+                      <p className="text-green-500 text-sm mt-1">Foto subida exitosamente</p>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
           <div className="pt-4 border-t">

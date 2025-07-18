@@ -211,6 +211,14 @@ export default function ProfilePage() {
                                 <Label htmlFor="location">Ubicación</Label>
                                 <Input id="location" value={userData.location || ""} readOnly />
                             </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="instagram">Instagram</Label>
+                                <Input id="instagram" value={userData.instagram || ""} readOnly />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="whatsapp">WhatsApp</Label>
+                                <Input id="whatsapp" value={userData.whatsapp || ""} readOnly />
+                            </div>
                         </CardContent>
                         <CardFooter className="flex flex-col gap-2">
                             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full">

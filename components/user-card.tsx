@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, X, Play, Pause, Volume2, VolumeX } from "lucide-react"
+import { Handshake, X, Play, Pause, Volume2, VolumeX } from "lucide-react"
 import { motion, PanInfo } from "framer-motion"
 
 interface UserCardProps {
@@ -206,17 +206,17 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
             size="lg"
             variant="outline"
             onClick={handleDislike}
-            className="w-16 h-16 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
+            className="w-24 h-24 rounded-full border-2 border-red-500 text-red-500 bg-black hover:bg-red-700 hover:text-white transition-colors duration-200"
           >
-            <X size={24} />
+            <X size={36} />
           </Button>
           
           <Button
             size="lg"
             onClick={handleLike}
-            className="w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white"
+            className="w-24 h-24 rounded-full border-2 border-green-500 text-green-500 bg-black hover:bg-green-700 hover:text-white transition-colors duration-200"
           >
-            <Heart size={24} />
+            <Handshake size={36} />
           </Button>
         </div>
       </Card>
