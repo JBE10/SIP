@@ -159,11 +159,14 @@ export default function ChatPage() {
 
         {/* Botones de contacto rápido */}
         <div className="flex gap-2">
-          {matchUser?.whatsapp && (
+          {(matchUser?.whatsapp || matchUser?.phone) && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => window.open(`https://wa.me/${matchUser.whatsapp}`, '_blank')}
+              onClick={() => {
+                const number = (matchUser?.whatsapp || matchUser?.phone || '').replace(/\D/g, '')
+                window.open(`https://wa.me/${number}`, '_blank')
+              }}
               className="text-green-600 hover:text-green-700"
             >
               <MessageSquare className="h-4 w-4" />

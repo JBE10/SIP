@@ -132,16 +132,16 @@ export function ProfileDetailModal({ open, onClose, chat }: ProfileDetailModalPr
             )}
 
             {/* Botones de contacto */}
-            {(!!chat.whatsapp || (typeof chat.instagram === 'string' && chat.instagram)) && (
+            {((!!chat.whatsapp || !!chat.phone) || (typeof chat.instagram === 'string' && chat.instagram)) && (
               <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                {chat.whatsapp && (
+                {(chat.whatsapp || chat.phone) && (
                   <Button
                     asChild
                     size="sm"
                     className="flex-1 bg-green-500/80 backdrop-blur-md hover:bg-green-500/90 text-white border border-white/30 shadow-lg transition-all duration-200"
                   >
                     <a
-                      href={`https://wa.me/${chat.whatsapp}`}
+                      href={`https://wa.me/${(chat.whatsapp || chat.phone || '').replace(/\D/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2"

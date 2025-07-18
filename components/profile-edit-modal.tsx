@@ -168,7 +168,11 @@ export function ProfileEditModal({ isOpen, onClose, profile }: ProfileEditModalP
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: name === "age" ? parseInt(value) : value }))
+    if (name === "whatsapp") {
+      setForm(prev => ({ ...prev, whatsapp: value, phone: value }))
+    } else {
+      setForm(prev => ({ ...prev, [name]: name === "age" ? parseInt(value) : value }))
+    }
   }
 
   const handleSubmit = async () => {
