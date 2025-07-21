@@ -415,10 +415,7 @@ export default function SwipePage() {
               user={currentUser}
               onLike={handleLike}
               onDislike={handleDislike}
-              onSwipe={(direction) => {
-                if (direction === "right") setCurrentIndex((prev) => prev + 1)
-                if (direction === "left") setCurrentIndex((prev) => prev + 1)
-              }}
+              onSwipe={() => {}}
             />
           </motion.div>
         </AnimatePresence>

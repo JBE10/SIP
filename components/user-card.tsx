@@ -49,20 +49,18 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
 
   const handleLike = () => {
     onLike(user.id)
-    onSwipe('right')
   }
 
   const handleDislike = () => {
     onDislike(user.id)
-    onSwipe('left')
   }
 
   const handleDragEnd = (event: any, info: PanInfo) => {
     const threshold = 100
     if (info.offset.x > threshold) {
-      handleLike()
+      onLike(user.id)
     } else if (info.offset.x < -threshold) {
-      handleDislike()
+      onDislike(user.id)
     }
   }
 
