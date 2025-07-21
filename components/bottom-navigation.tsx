@@ -34,7 +34,7 @@ export function BottomNavigation() {
           className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-accent transition-colors"
         >
           <MessageCircle className="h-5 w-5" />
-          <span className="text-xs">Mensajes</span>
+          <span className="text-xs">Matches</span>
         </Link>
       </div>
     </motion.nav>
