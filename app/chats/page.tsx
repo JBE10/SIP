@@ -97,7 +97,15 @@ export default function MatchesPage() {
 
   // Filtrar matches cuando cambia el término de búsqueda
   useEffect(() => {
-    const filtered = matches.filter(
+    // Eliminar duplicados por id
+    const uniqueMatchesMap = new Map<number, Match>()
+    matches.forEach((match) => {
+      if (!uniqueMatchesMap.has(match.id)) {
+        uniqueMatchesMap.set(match.id, match)
+      }
+    })
+    const uniqueMatches = Array.from(uniqueMatchesMap.values())
+    const filtered = uniqueMatches.filter(
       (match) => match && typeof match.name === "string" && match.name.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredMatches(filtered)
