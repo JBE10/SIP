@@ -343,7 +343,7 @@ export default function SwipePage() {
   const currentUser = users[currentIndex]
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-32">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 pb-32">
       <div className="container max-w-md py-6 space-y-6 pb-32">
         {/* Header mejorado */}
         <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
