@@ -37,7 +37,7 @@ export default function MatchesPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
 
   // Cargar matches del backend
-  const fetchMatches = async () => {
+  const fetchMatches = async () => {s
     try {
       setLoading(true)
 

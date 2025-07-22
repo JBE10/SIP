@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/context/auth-context"
 import { SportSelector } from "@/components/sport-selector"
+import { useRef } from "react"
 
 const barrios = [
   "Palermo",
@@ -43,6 +44,12 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [instagram, setInstagram] = useState("")
+  const [whatsapp, setWhatsapp] = useState("")
+  const [foto, setFoto] = useState<File | null>(null)
+  const [video, setVideo] = useState<File | null>(null)
+  const fotoInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
 
   const handleSportToggle = (sport: string) => {
     const exists = selectedSports.find((s) => s.sport === sport)
@@ -69,16 +76,24 @@ export default function RegisterPage() {
     }
 
     try {
-      const success = await register({
-        name,
-        email,
-        age: parseInt(age),
-        location: selectedBarrio,
-        bio,
-        sports: selectedSports,
-        password,
-        confirm_password: confirmPassword
-      })
+      const formData = new FormData()
+      formData.append("name", name)
+      formData.append("email", email)
+      formData.append("age", age)
+      formData.append("location", selectedBarrio)
+      formData.append("bio", bio)
+      formData.append("password", password)
+      formData.append("confirm_password", confirmPassword)
+      formData.append("instagram", instagram)
+      formData.append("whatsapp", whatsapp)
+      if (foto) formData.append("foto", foto)
+      if (video) formData.append("video", video)
+      formData.append(
+        "sports",
+        JSON.stringify(selectedSports)
+      )
+
+      const success = await register(formData)
 
       if (success) {
         router.push("/swipe")
@@ -191,6 +206,44 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="foto">Foto de perfil</Label>
+              <Input
+                id="foto"
+                type="file"
+                accept="image/*"
+                ref={fotoInputRef}
+                onChange={e => setFoto(e.target.files?.[0] || null)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="video">Video de presentación</Label>
+              <Input
+                id="video"
+                type="file"
+                accept="video/*"
+                ref={videoInputRef}
+                onChange={e => setVideo(e.target.files?.[0] || null)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="instagram">Instagram</Label>
+              <Input
+                id="instagram"
+                placeholder="Tu usuario de Instagram"
+                value={instagram}
+                onChange={e => setInstagram(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Input
+                id="whatsapp"
+                placeholder="Tu número de WhatsApp"
+                value={whatsapp}
+                onChange={e => setWhatsapp(e.target.value)}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
