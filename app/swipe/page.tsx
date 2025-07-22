@@ -274,69 +274,75 @@ export default function SwipePage() {
 
   if (users.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 space-y-6 p-6">
-        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-          <Users className="h-10 w-10 text-blue-500" />
+      <>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 space-y-6 p-6">
+          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+            <Users className="h-10 w-10 text-blue-500" />
+          </div>
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-bold text-gray-800">No hay usuarios compatibles</h2>
+            <p className="text-gray-600 max-w-sm">
+              Intenta ajustar tus filtros o espera a que más personas se unan a SportMatch.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm">
+              <Link href="/filters">
+                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+                Modificar filtros
+              </Link>
+            </Button>
+            <Button onClick={handleRefresh} className="bg-blue-500 hover:bg-blue-600">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Buscar de nuevo
+            </Button>
+          </div>
         </div>
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl font-bold text-gray-800">No hay usuarios compatibles</h2>
-          <p className="text-gray-600 max-w-sm">
-            Intenta ajustar tus filtros o espera a que más personas se unan a SportMatch.
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm">
-            <Link href="/filters">
-              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              Modificar filtros
-            </Link>
-          </Button>
-          <Button onClick={handleRefresh} className="bg-blue-500 hover:bg-blue-600">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Buscar de nuevo
-          </Button>
-        </div>
-      </div>
+        <BottomNavigation />
+      </>
     )
   }
 
   if (currentIndex >= users.length) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 space-y-6 p-6">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-          <Heart className="h-10 w-10 text-green-500" />
+      <>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 space-y-6 p-6">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+            <Heart className="h-10 w-10 text-green-500" />
+          </div>
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-bold text-green-800">¡Has visto todos los perfiles!</h2>
+            <p className="text-green-700 max-w-sm">Vuelve más tarde para ver nuevos deportistas o ajusta tus filtros.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm">
+              <Link href="/filters">
+                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+                Modificar filtros
+              </Link>
+            </Button>
+            <Button onClick={handleRefresh} className="bg-green-500 hover:bg-green-600">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Buscar de nuevo
+            </Button>
+          </div>
         </div>
-        <div className="text-center space-y-3">
-          <h2 className="text-2xl font-bold text-green-800">¡Has visto todos los perfiles!</h2>
-          <p className="text-green-700 max-w-sm">Vuelve más tarde para ver nuevos deportistas o ajusta tus filtros.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm">
-            <Link href="/filters">
-              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              Modificar filtros
-            </Link>
-          </Button>
-          <Button onClick={handleRefresh} className="bg-green-500 hover:bg-green-600">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Buscar de nuevo
-          </Button>
-        </div>
-      </div>
+        <BottomNavigation />
+      </>
     )
   }
 
