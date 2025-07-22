@@ -234,20 +234,22 @@ export default function SwipePage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 space-y-6">
-        <div className="relative">
-          <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-            <RefreshCw className="h-10 w-10 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-white/40">
+          <div className="relative">
+            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
+              <RefreshCw className="h-10 w-10 animate-spin text-primary" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
           </div>
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-            <Sparkles className="w-3 h-3 text-white" />
-          </div>
-        </div>
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-gray-800">Buscando deportistas</h2>
-          <p className="text-lg text-gray-600">Encontrando tu match perfecto...</p>
-          <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 text-sm text-gray-500">
-            Filtros: {filters.selectedSports.length} deportes • {filters.distance}km
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-blue-800">Buscando deportistas</h2>
+            <p className="text-lg text-gray-700">Encontrando tu match perfecto...</p>
+            <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 text-sm text-gray-500 border border-blue-100">
+              Filtros: {filters.selectedSports.length} deportes • {filters.distance}km
+            </div>
           </div>
         </div>
       </div>
