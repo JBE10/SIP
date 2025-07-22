@@ -93,7 +93,20 @@ export default function RegisterPage() {
         JSON.stringify(selectedSports)
       )
 
-      const success = await register(formData)
+      const formDataObj = {
+        name: name,
+        email: email,
+        age: Number(age),
+        location: selectedBarrio,
+        bio: bio,
+        sports: selectedSports,
+        password: password,
+        confirm_password: confirmPassword,
+        instagram: instagram,
+        whatsapp: whatsapp
+      }
+
+      const success = await register(formDataObj)
 
       if (success) {
         router.push("/swipe")

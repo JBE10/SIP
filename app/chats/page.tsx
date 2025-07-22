@@ -35,9 +35,8 @@ export default function MatchesPage() {
   const [filteredMatches, setFilteredMatches] = useState<Match[]>([])
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
-
   // Cargar matches del backend
-  const fetchMatches = async () => {s
+  const fetchMatches = async () => {
     try {
       setLoading(true)
 
