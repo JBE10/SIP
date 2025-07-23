@@ -62,20 +62,35 @@ export default function MatchesPage() {
       console.log("✅ Matches cargados:", data.matches?.length || 0)
 
       setMatches(
-        (data.matches || []).map((m: any) => ({
-          id: m.user.id,
-          name: m.user.username,
-          age: m.user.age,
-          location: m.user.location,
-          bio: m.user.descripcion,
-          foto_url: m.user.foto_url,
-          video_url: m.user.video_url,
-          sports: m.user.deportes_preferidos,
-          match_date: m.created_at,
-          instagram: m.user.instagram,
-          whatsapp: m.user.whatsapp,
-          phone: m.user.phone,
-        })),
+        (data.matches || []).map((m: any) => {
+          console.log('DEBUG deportes:', m.user.sports, m.user.deportes_preferidos);
+          return {
+            id: m.user.id,
+            name: m.user.username,
+            age: m.user.age,
+            location: m.user.location,
+            bio: m.user.descripcion,
+            foto_url: m.user.foto_url,
+            video_url: m.user.video_url,
+            sports: Array.isArray(m.user.sports)
+              ? m.user.sports
+              : (typeof m.user.deportes_preferidos === 'string' && m.user.deportes_preferidos.trim())
+                ? m.user.deportes_preferidos.split(',').map((item: string) => {
+                    item = item.trim();
+                    if (!item) return null;
+                    if (item.includes('(') && item.includes(')')) {
+                      const [nombre, nivel] = item.split('(');
+                      return { sport: nombre.trim(), level: nivel.replace(')', '').trim() };
+                    }
+                    return { sport: item, level: 'Principiante' };
+                  }).filter(Boolean)
+                : [],
+            match_date: m.created_at,
+            instagram: m.user.instagram,
+            whatsapp: m.user.whatsapp,
+            phone: m.user.phone,
+          }
+        })
       )
     } catch (err) {
       console.error("❌ Error cargando matches:", err)
