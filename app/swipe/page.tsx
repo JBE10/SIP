@@ -353,24 +353,22 @@ export default function SwipePage() {
   const currentUser = users[currentIndex]
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 pb-32">
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pb-32 flex items-center justify-center">
       <div className="container max-w-md py-6 space-y-6 pb-32">
         {/* Header mejorado con botón de filtros */}
-        <div className="flex items-center justify-between bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20 dark:border-gray-800">
+        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Descubrir
-            </h1>
+            <h1 className="text-2xl font-bold text-blue-800">Descubrir</h1>
           </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               asChild
-              className="bg-white/80 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-white/40 dark:border-gray-700 hover:bg-white hover:dark:bg-gray-700"
+              className="bg-white/80 text-blue-700 border-blue-200 hover:bg-blue-50"
             >
               <Link href="/filters">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,7 +385,7 @@ export default function SwipePage() {
               variant="outline"
               size="sm"
               onClick={handleRefresh}
-              className="bg-white/80 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-white/40 dark:border-gray-700 hover:bg-white hover:dark:bg-gray-700"
+              className="bg-white/80 text-blue-700 border-blue-200 hover:bg-blue-50"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -395,16 +393,16 @@ export default function SwipePage() {
         </div>
 
         {/* Estadísticas mejoradas */}
-        <div className="flex justify-between items-center bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-xl p-3 text-sm border border-white/20 dark:border-gray-800">
+        <div className="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-xl p-3 text-sm border border-white/20">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-800 dark:text-gray-100 font-medium">
+            <span className="text-blue-800 font-medium">
               Perfil {currentIndex + 1} de {users.length}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-green-700 dark:text-green-400 font-semibold">{Math.round(currentUser.compatibility_score)}% match</span>
+            <span className="text-green-700 font-semibold">{Math.round(currentUser.compatibility_score)}% match</span>
           </div>
         </div>
 
