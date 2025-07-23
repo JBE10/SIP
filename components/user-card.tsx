@@ -74,7 +74,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
       whileHover={{ scale: 1.02 }}
       className="w-full max-w-sm mx-auto"
     >
-      <Card className="overflow-hidden shadow-lg p-4 flex flex-col items-center">
+      <Card className="overflow-hidden shadow-lg p-4 flex flex-col items-center bg-gray-800/80 text-white">
         {/* Video como fondo principal y foto de perfil arriba a la izquierda */}
         <div className="w-full mb-4">
           <div className="w-full aspect-[9/16] bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
@@ -163,7 +163,7 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
           {sports.map((sport: any, idx: number) => (
             <span
               key={sport.sport || idx}
-              className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+              className="bg-gray-700 text-blue-300 px-2 py-1 rounded-full text-xs"
             >
               {sport.sport} ({sport.level})
             </span>
@@ -182,14 +182,14 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
         {/* Deportes en común */}
         {user.common_sports.length > 0 && (
           <div className="mb-2 w-full text-center">
-            <h3 className="text-xs font-semibold text-green-600 mb-1">
+            <h3 className="text-xs font-semibold text-green-300 mb-1">
               🏆 Deportes en común:
             </h3>
             <div className="flex flex-wrap gap-2 justify-center">
               {user.common_sports.map((sport, index) => (
                 <span
                   key={index}
-                  className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                  className="bg-gray-700 text-green-300 px-2 py-1 rounded-full text-xs"
                 >
                   {sport}
                 </span>
@@ -200,22 +200,19 @@ export function UserCard({ user, onLike, onDislike, onSwipe }: UserCardProps) {
 
         {/* Botones de acción */}
         <div className="flex justify-center gap-4 mt-4">
-          <Button
-            size="lg"
-            variant="outline"
+          <button
             onClick={handleDislike}
-            className="w-24 h-24 rounded-full border-2 border-red-500 text-red-500 bg-black hover:bg-red-700 hover:text-white transition-colors duration-200"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 px-8 w-24 h-24 rounded-full border-2 border-red-500 text-red-500 bg-black hover:bg-red-700 hover:text-white transition-colors duration-200"
           >
             <X size={36} />
-          </Button>
+          </button>
           
-          <Button
-            size="lg"
+          <button
             onClick={handleLike}
-            className="w-24 h-24 rounded-full border-2 border-green-500 text-green-500 bg-black hover:bg-green-700 hover:text-white transition-colors duration-200"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 px-8 w-24 h-24 rounded-full border-2 border-green-500 text-green-500 bg-black hover:bg-green-700 hover:text-white transition-colors duration-200"
           >
             <Handshake size={36} />
-          </Button>
+          </button>
         </div>
       </Card>
     </motion.div>

@@ -234,20 +234,20 @@ export default function SwipePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-white/40">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+        <div className="w-full max-w-md bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-gray-700">
           <div className="relative">
-            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-              <RefreshCw className="h-10 w-10 animate-spin text-primary" />
+            <div className="w-20 h-20 bg-blue-900/30 rounded-full flex items-center justify-center">
+              <RefreshCw className="h-10 w-10 animate-spin text-blue-400" />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-blue-800">Buscando deportistas</h2>
-            <p className="text-lg text-gray-700">Encontrando tu match perfecto...</p>
-            <div className="bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 text-sm text-gray-500 border border-blue-100">
+            <h2 className="text-2xl font-bold text-white">Buscando deportistas</h2>
+            <p className="text-lg text-gray-400">Encontrando tu match perfecto...</p>
+            <div className="bg-gray-900/80 backdrop-blur-sm rounded-full px-4 py-2 text-sm text-gray-400 border border-gray-700">
               Filtros: {filters.selectedSports.length} deportes • {filters.distance}km
             </div>
           </div>
@@ -277,19 +277,19 @@ export default function SwipePage() {
   if (users.length === 0) {
     return (
       <>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-          <div className="w-full max-w-md bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-white/40">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
-              <Users className="h-10 w-10 text-blue-500" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+          <div className="w-full max-w-md bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-gray-700">
+            <div className="w-20 h-20 bg-blue-900/30 rounded-full flex items-center justify-center">
+              <Users className="h-10 w-10 text-blue-400" />
             </div>
             <div className="text-center space-y-3">
-              <h2 className="text-2xl font-bold text-blue-800">No hay usuarios compatibles</h2>
-              <p className="text-gray-700 max-w-sm">
+              <h2 className="text-2xl font-bold text-white">No hay usuarios compatibles</h2>
+              <p className="text-gray-400 max-w-sm">
                 Intenta ajustar tus filtros o espera a que más personas se unan a SportMatch.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-              <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm border-blue-200 text-blue-700">
+              <Button variant="outline" asChild className="bg-gray-700 border border-gray-600 text-gray-200 hover:bg-gray-600">
                 <Link href="/filters">
                   <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -302,7 +302,7 @@ export default function SwipePage() {
                   Modificar filtros
                 </Link>
               </Button>
-              <Button onClick={handleRefresh} className="bg-blue-500 hover:bg-blue-600 text-white">
+              <Button onClick={handleRefresh} className="bg-blue-600 hover:bg-blue-700 text-white">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Buscar de nuevo
               </Button>
@@ -317,32 +317,34 @@ export default function SwipePage() {
   if (currentIndex >= users.length) {
     return (
       <>
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 space-y-6 p-6">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-            <Heart className="h-10 w-10 text-green-500" />
-          </div>
-          <div className="text-center space-y-3">
-            <h2 className="text-2xl font-bold text-green-800">¡Has visto todos los perfiles!</h2>
-            <p className="text-green-700 max-w-sm">Vuelve más tarde para ver nuevos deportistas o ajusta tus filtros.</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" asChild className="bg-white/80 backdrop-blur-sm">
-              <Link href="/filters">
-                <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                  />
-                </svg>
-                Modificar filtros
-              </Link>
-            </Button>
-            <Button onClick={handleRefresh} className="bg-green-500 hover:bg-green-600">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Buscar de nuevo
-            </Button>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+          <div className="w-full max-w-md bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center space-y-6 border border-gray-700">
+            <div className="w-20 h-20 bg-green-900/30 rounded-full flex items-center justify-center">
+              <Heart className="h-10 w-10 text-green-400" />
+            </div>
+            <div className="text-center space-y-3">
+              <h2 className="text-2xl font-bold text-white">¡Has visto todos los perfiles!</h2>
+              <p className="text-green-300 max-w-sm">Vuelve más tarde para ver nuevos deportistas o ajusta tus filtros.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+              <Button variant="outline" asChild className="bg-gray-700 border border-gray-600 text-gray-200 hover:bg-gray-600">
+                <Link href="/filters">
+                  <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    />
+                  </svg>
+                  Modificar filtros
+                </Link>
+              </Button>
+              <Button onClick={handleRefresh} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Buscar de nuevo
+              </Button>
+            </div>
           </div>
         </div>
         <BottomNavigation />
@@ -353,22 +355,22 @@ export default function SwipePage() {
   const currentUser = users[currentIndex]
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 pb-32 flex items-center justify-center">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 pb-32 flex items-center justify-center">
       <div className="container max-w-md py-6 space-y-6 pb-32">
         {/* Header mejorado con botón de filtros */}
-        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white/20">
+        <div className="flex items-center justify-between bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-blue-800">Descubrir</h1>
+            <h1 className="text-2xl font-bold text-white">Descubrir</h1>
           </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               asChild
-              className="bg-white/80 text-blue-700 border-blue-200 hover:bg-blue-50"
+              className="bg-gray-700 border border-gray-600 text-gray-200 hover:bg-gray-600"
             >
               <Link href="/filters">
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +387,7 @@ export default function SwipePage() {
               variant="outline"
               size="sm"
               onClick={handleRefresh}
-              className="bg-white/80 text-blue-700 border-blue-200 hover:bg-blue-50"
+              className="bg-gray-700 border border-gray-600 text-gray-200 hover:bg-gray-600"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -393,16 +395,16 @@ export default function SwipePage() {
         </div>
 
         {/* Estadísticas mejoradas */}
-        <div className="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-xl p-3 text-sm border border-white/20">
+        <div className="flex justify-between items-center bg-gray-800/80 backdrop-blur-sm rounded-xl p-3 text-sm border border-gray-700">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="text-blue-800 font-medium">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span className="text-white font-medium">
               Perfil {currentIndex + 1} de {users.length}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-green-700 font-semibold">{Math.round(currentUser.compatibility_score)}% match</span>
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span className="text-green-300 font-semibold">{Math.round(currentUser.compatibility_score)}% match</span>
           </div>
         </div>
 

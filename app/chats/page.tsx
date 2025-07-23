@@ -122,19 +122,19 @@ export default function MatchesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-lg">Cargando matches...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p className="text-lg text-white">Cargando matches...</p>
       </div>
     )
   }
 
   return (
     <>
-      <div className="container max-w-md py-6 space-y-6 pb-32">
+      <div className="container max-w-md py-6 space-y-6 pb-32 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white">
         <div className="flex items-center justify-between">
           <motion.h1
-            className="text-2xl font-bold"
+            className="text-2xl font-bold text-white"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -150,10 +150,10 @@ export default function MatchesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Buscar matches"
-            className="pl-10"
+            className="pl-10 bg-gray-900 text-white border-gray-700"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -185,18 +185,18 @@ export default function MatchesPage() {
             ))
           ) : (
             <motion.div
-              className="text-center py-12"
+              className="text-center py-12 text-gray-400"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <Heart className="h-16 w-16 text-gray-600 mx-auto mb-4" />
               <h2 className="text-lg font-semibold mb-2">No tienes matches aún</h2>
-              <p className="text-muted-foreground mb-4">
+              <p className="mb-4">
                 Cuando hagas match con alguien, aparecerá aquí para que puedas ver su perfil.
               </p>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button asChild>
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
                   <Link href="/swipe">Descubrir personas</Link>
                 </Button>
               </motion.div>

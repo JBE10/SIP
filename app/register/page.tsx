@@ -121,32 +121,33 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-500 to-indigo-700 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
+      <Card className="w-full max-w-md bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
-            <div className="bg-primary rounded-full p-2 text-primary-foreground">
+            <div className="bg-blue-600 rounded-full p-2 text-white">
               <Handshake className="h-6 w-6" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Crear cuenta</CardTitle>
-          <CardDescription>Registrate para encontrar compañeros deportivos</CardDescription>
+          <CardTitle className="text-2xl font-bold text-white">Crear cuenta</CardTitle>
+          <CardDescription className="text-gray-400">Registrate para encontrar compañeros deportivos</CardDescription>
         </CardHeader>
         <CardContent>
-          {error && <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4">{error}</div>}
+          {error && <div className="bg-red-900/30 text-red-400 text-sm p-3 rounded-md mb-4">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre completo</Label>
+              <Label htmlFor="name" className="text-gray-200">Nombre completo</Label>
               <Input
                 id="name"
                 placeholder="Tu nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-200">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -154,10 +155,11 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="age">Edad</Label>
+              <Label htmlFor="age" className="text-gray-200">Edad</Label>
               <Input
                 id="age"
                 type="number"
@@ -165,13 +167,14 @@ export default function RegisterPage() {
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Barrio/Zona</Label>
+              <Label htmlFor="location" className="text-gray-200">Barrio/Zona</Label>
               <select
                 id="location"
-                className="w-full rounded-md border px-2 py-2 text-base"
+                className="w-full rounded-md border px-2 py-2 text-base bg-gray-900 text-white border-gray-700"
                 value={selectedBarrio}
                 onChange={(e) => setSelectedBarrio(e.target.value)}
                 required
@@ -182,17 +185,18 @@ export default function RegisterPage() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="bio">Biografía</Label>
+              <Label htmlFor="bio" className="text-gray-200">Biografía</Label>
               <Input
                 id="bio"
                 placeholder="Cuéntanos sobre ti"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label>Deportes preferidos</Label>
+              <Label className="text-gray-200">Deportes preferidos</Label>
               <SportSelector
                 selectedSports={selectedSports}
                 onToggleSport={handleSportToggle}
@@ -200,7 +204,7 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password" className="text-gray-200">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
@@ -208,10 +212,11 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+              <Label htmlFor="confirmPassword" className="text-gray-200">Confirmar contraseña</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -219,55 +224,60 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="foto">Foto de perfil</Label>
+              <Label htmlFor="foto" className="text-gray-200">Foto de perfil</Label>
               <Input
                 id="foto"
                 type="file"
                 accept="image/*"
                 ref={fotoInputRef}
                 onChange={e => setFoto(e.target.files?.[0] || null)}
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="video">Video de presentación</Label>
+              <Label htmlFor="video" className="text-gray-200">Video de presentación</Label>
               <Input
                 id="video"
                 type="file"
                 accept="video/*"
                 ref={videoInputRef}
                 onChange={e => setVideo(e.target.files?.[0] || null)}
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="instagram">Instagram</Label>
+              <Label htmlFor="instagram" className="text-gray-200">Instagram</Label>
               <Input
                 id="instagram"
                 placeholder="Tu usuario de Instagram"
                 value={instagram}
                 onChange={e => setInstagram(e.target.value)}
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Label htmlFor="whatsapp" className="text-gray-200">WhatsApp</Label>
               <Input
                 id="whatsapp"
                 placeholder="Tu número de WhatsApp"
                 value={whatsapp}
                 onChange={e => setWhatsapp(e.target.value)}
+                className="bg-gray-900 text-white border-gray-700"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
               {isLoading ? "Registrando..." : "Crear cuenta"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <span className="text-sm">
+          <span className="text-sm text-gray-400">
             ¿Ya tenés una cuenta?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-blue-400 hover:underline">
               Iniciar sesión
             </Link>
           </span>

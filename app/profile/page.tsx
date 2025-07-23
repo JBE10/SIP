@@ -66,13 +66,13 @@ export default function ProfilePage() {
     return (
         <>
             <motion.div
-                className="container max-w-md py-6 space-y-6 pb-32"
+                className="container max-w-md py-6 space-y-6 pb-32 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white"
                 variants={container}
                 initial="hidden"
                 animate="show"
             >
                 <motion.div className="flex items-center justify-between" variants={item}>
-                    <h1 className="text-2xl font-bold">Mi Perfil</h1>
+                    <h1 className="text-2xl font-bold text-white">Mi Perfil</h1>
                     <div className="flex items-center gap-2">
                         <ThemeToggle />
                         <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
@@ -84,10 +84,10 @@ export default function ProfilePage() {
 
                 <motion.div className="flex flex-col items-center gap-4" variants={item}>
                     <div className="text-center">
-                        <h2 className="text-xl font-bold">
+                        <h2 className="text-xl font-bold text-white">
                             {userData.name}, {userData.age}
                         </h2>
-                        <p className="text-muted-foreground flex items-center justify-center gap-1">
+                        <p className="text-gray-400 flex items-center justify-center gap-1">
                             <MapPin className="h-4 w-4" />
                             {userData.location}
                         </p>
@@ -99,7 +99,7 @@ export default function ProfilePage() {
                                 href={userData.instagram.startsWith('http') ? userData.instagram : `https://instagram.com/${userData.instagram.replace(/^@/, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-pink-600 hover:underline text-sm"
+                                className="inline-flex items-center gap-2 text-pink-400 hover:underline text-sm"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 3.75A3.75 3.75 0 0 0 3.75 7.5v9A3.75 3.75 0 0 0 7.5 20.25h9a3.75 3.75 0 0 0 3.75-3.75v-9A3.75 3.75 0 0 0 16.5 3.75h-9ZM16.5 3.75v2.25M7.5 3.75v2.25m-3.75 3.75h16.5m-16.5 0v6.75A3.75 3.75 0 0 0 7.5 20.25h9a3.75 3.75 0 0 0 3.75-3.75v-6.75" />
@@ -112,7 +112,7 @@ export default function ProfilePage() {
                                 href={`https://wa.me/${userData.whatsapp}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-green-600 hover:underline text-sm"
+                                className="inline-flex items-center gap-2 text-green-400 hover:underline text-sm"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12a9.75 9.75 0 1 1 18.186 5.671l1.41 4.23a.75.75 0 0 1-.95.95l-4.23-1.41A9.75 9.75 0 0 1 2.25 12Z" />
