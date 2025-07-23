@@ -355,6 +355,9 @@ export default function SwipePage() {
 
   const currentUser = users[currentIndex]
 
+  // Debug: log del estado de match antes del render
+  console.log("RENDER MATCH CARD", isMatch, matchUser)
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 pb-32 flex items-center justify-center">
       <div className="container max-w-md py-6 space-y-6 pb-32">
