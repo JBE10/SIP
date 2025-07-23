@@ -131,7 +131,7 @@ export default function MatchesPage() {
 
   return (
     <>
-      <div className="container max-w-md py-6 space-y-6 pb-32 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white">
+      <div className="container max-w-md py-6 space-y-6 pb-32 min-h-screen bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white flex flex-col">
         <div className="flex items-center justify-between">
           <motion.h1
             className="text-2xl font-bold text-white"
