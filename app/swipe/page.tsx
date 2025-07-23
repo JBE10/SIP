@@ -145,9 +145,10 @@ export default function SwipePage() {
 
       // Si hay match, mostrar notificación
       if (data.is_match) {
-        console.log("🎉 ¡ES UN MATCH!")
+        console.log("🎉 ¡ES UN MATCH!", users[currentIndex]);
+        // Guardar una copia del usuario matcheado en el momento
         setIsMatch(true)
-        setMatchUser(users[currentIndex])
+        setMatchUser({ ...users[currentIndex] })
 
         // Ocultar notificación después de 8 segundos
         setTimeout(() => {
